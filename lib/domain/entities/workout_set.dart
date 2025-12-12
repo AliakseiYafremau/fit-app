@@ -1,3 +1,5 @@
+import 'package:fit_app/domain/entities/exercise.dart';
+
 import 'id.dart';
 
 
@@ -6,11 +8,13 @@ import 'id.dart';
 /// Содержит информацию о количестве повторений и весе (если применимо).
 class WorkoutSet {
   final Id id;
+  final Exercise exercise;
   final int repetitions;
   final double? weight;
 
   WorkoutSet({
     required this.id,
+    required this.exercise,
     required this.repetitions,
     this.weight,
   }) {
@@ -29,11 +33,13 @@ class WorkoutSet {
 /// Содержит информацию о целевых повторениях и весе (если применимо).
 class PlannedSet {
   final Id id;
+  final Exercise exercise;
   final int targetRepetitions;
   final double? targetWeight;
 
   PlannedSet({
     required this.id,
+    required this.exercise,
     required this.targetRepetitions,
     this.targetWeight,
   }) {
@@ -42,6 +48,16 @@ class PlannedSet {
     }
     if (targetWeight != null && targetWeight! < 0) {
       throw ArgumentError('Target weight cannot be negative');
+    }
+    if (!exercise.usesWeights && targetWeight != null && targetWeight! > 0) {
+      throw ArgumentError(
+        'Planned set for exercise "${exercise.name}" does not use weights, target weight must be null or zero',
+      );
+    }
+    if (exercise.usesWeights && targetWeight == null) {
+      throw ArgumentError(
+        'Planned set for exercise "${exercise.name}" uses weights, target weight must be provided',
+      );
     }
   }
 }

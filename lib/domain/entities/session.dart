@@ -1,6 +1,7 @@
+import 'package:fit_app/domain/entities/workout_set.dart';
+
 import 'id.dart';
 import 'training.dart';
-import 'exercise.dart';
 
 
 /// Тренировочная сессия.
@@ -9,11 +10,11 @@ import 'exercise.dart';
 class Session {
   final Id id;
   final Training training;
-  final List<WorkoutExercsie> workoutExercsies;
+  final List<WorkoutSet> workoutSets;
 
   Session({
     required this.id,
     required this.training,
-    List<WorkoutExercsie>? workoutExercsies,
-  }) : workoutExercsies = workoutExercsies ?? [];
+    List<WorkoutSet>? workoutSets,
+  }) : workoutSets = workoutSets ?? [];
 }

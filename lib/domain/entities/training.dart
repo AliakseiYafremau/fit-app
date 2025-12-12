@@ -1,4 +1,5 @@
 import 'package:fit_app/domain/entities/exercise.dart';
+import 'package:fit_app/domain/entities/workout_set.dart';
 
 import 'id.dart';
 
@@ -9,13 +10,13 @@ import 'id.dart';
 class Training {
   final Id id;
   final String name;
-  final List<PlannedExercise> exercises;
+  final List<PlannedSet> plannedSets;
 
   Training({
     required this.id,
     required this.name,
-    List<PlannedExercise>? exercises,
-  }) : exercises = exercises ?? [] {
+    List<PlannedSet>? plannedSets,
+  }) : plannedSets = plannedSets ?? [] {
     if (name.trim().isEmpty) {
       throw ArgumentError('Training name cannot be empty');
     }

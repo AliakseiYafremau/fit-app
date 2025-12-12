@@ -1,4 +1,3 @@
-import 'package:fit_app/domain/entities/exercise.dart';
 import 'package:fit_app/domain/entities/workout_set.dart';
 
 import 'id.dart';

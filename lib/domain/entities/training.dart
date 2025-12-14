@@ -1,11 +1,10 @@
+import 'package:fit_app/domain/entities/id.dart';
 import 'package:fit_app/domain/entities/workout_set.dart';
 
-import 'id.dart';
 
-
-/// Тренировка.
-/// 
-/// Состоит из набора предлагаемых упражнений.
+/// Training entity.
+///
+/// Contains the list of suggested exercises.
 class Training {
   final Id id;
   final String name;

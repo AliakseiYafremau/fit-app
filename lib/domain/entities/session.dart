@@ -1,12 +1,11 @@
 import 'package:fit_app/domain/entities/workout_set.dart';
+import 'package:fit_app/domain/entities/id.dart';
+import 'package:fit_app/domain/entities/training.dart';
 
-import 'id.dart';
-import 'training.dart';
 
-
-/// Тренировочная сессия.
-/// 
-/// Состоит из выбранной тренировки (как база/план) и выполненных упражнений.
+/// Training session entity.
+///
+/// Uses a base training plan and stores completed exercises for that session.
 class Session {
   final Id id;
   final Training training;

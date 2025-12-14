@@ -1,9 +1,8 @@
-import 'id.dart';
+import 'package:fit_app/domain/entities/id.dart';
 
-
-/// Упражнение.
-/// 
-/// Содержит информацию о самом упражнении и его характеристиках.
+/// Exercise entity.
+///
+/// Holds all the core information and metadata for an exercise.
 class Exercise {
   final Id id;
   final String name;

@@ -1,11 +1,10 @@
 import 'package:fit_app/domain/entities/exercise.dart';
+import 'package:fit_app/domain/entities/id.dart';
 
-import 'id.dart';
 
-
-/// Выполненный подход упражнения в тренировочной сессии.
-/// 
-/// Содержит информацию о количестве повторений и весе (если применимо).
+/// Completed set of an exercise within a training session.
+///
+/// Includes repetitions and optional weight.
 class WorkoutSet {
   final Id id;
   final Exercise exercise;
@@ -24,13 +23,16 @@ class WorkoutSet {
     if (weight != null && weight! < 0) {
       throw ArgumentError('Weight cannot be negative');
     }
+    if (weight == null && exercise.usesWeights) {
+      throw ArgumentError('Weight is required for exercises that use weights');
+    }
   }
 }
 
 
-/// Запланированный подход упражнения в тренировке.
-/// 
-/// Содержит информацию о целевых повторениях и весе (если применимо).
+/// Planned set that belongs to a training.
+///
+/// Stores target repetitions and optional weight.
 class PlannedSet {
   final Id id;
   final Exercise exercise;

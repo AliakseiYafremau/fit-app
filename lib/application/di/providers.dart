@@ -32,7 +32,7 @@ List<SingleChildWidget> buildAppProviders(Isar isar) => [
         create: (_) => IsarSessionRepository(isar),
       ),
       ProxyProvider2<ExerciseRepository, IdGenerator, CreateExercise>(
-        update: (_, exerciseRepository, idGenerator, __) => CreateExercise(
+        update: (_, exerciseRepository, idGenerator, previous) => CreateExercise(
           exerciseRepository: exerciseRepository,
           idGenerator: idGenerator,
         ),
@@ -40,7 +40,7 @@ List<SingleChildWidget> buildAppProviders(Isar isar) => [
       ProxyProvider4<TrainingRepository, ExerciseRepository,
           PlannedSetRepository, IdGenerator, CreateTraining>(
         update: (_, trainingRepository, exerciseRepository,
-                plannedSetRepository, idGenerator, __) =>
+                plannedSetRepository, idGenerator, previous) =>
             CreateTraining(
           trainingRepository: trainingRepository,
           exerciseRepository: exerciseRepository,

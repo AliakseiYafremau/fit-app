@@ -17,5 +17,6 @@ class InMemoryTrainingRepository implements TrainingRepository {
     logger.i('Training added: ${training.name}');
   }
 
+  @override
   List<Training> getAll() => List.unmodifiable(_trainings);
 }

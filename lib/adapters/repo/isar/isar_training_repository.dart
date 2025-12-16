@@ -1,6 +1,7 @@
 import 'package:fit_app/adapters/models.dart';
 import 'package:fit_app/adapters/repo/isar/mappers.dart';
 import 'package:fit_app/application/interfaces/repo/training.dart';
+import 'package:fit_app/domain/entities/id.dart' as domain_id;
 import 'package:fit_app/domain/entities/training.dart';
 import 'package:fit_app/domain/entities/workout_set.dart';
 import 'package:isar/isar.dart';
@@ -37,6 +38,39 @@ class IsarTrainingRepository implements TrainingRepository {
     return models.map(_mapTrainingFromModel).toList(growable: false);
   }
 
+  @override
+  Training? getById(domain_id.Id trainingId) {
+    final model =
+        _collection.where().entityIdEqualTo(trainingId).findFirstSync();
+    if (model == null) {
+      return null;
+    }
+    return _mapTrainingFromModel(model);
+  }
+
+  @override
+  Training getByPlannedSetId(domain_id.Id plannedSetId) {
+    final model = _collection
+        .filter()
+        .plannedSetIdsElementEqualTo(plannedSetId)
+        .findFirstSync();
+    if (model == null) {
+      throw StateError('Training with planned set $plannedSetId not found');
+    }
+    return _mapTrainingFromModel(model);
+  }
+
+  @override
+  void delete(domain_id.Id trainingId) {
+    _isar.writeTxnSync(() {
+      final model =
+          _collection.where().entityIdEqualTo(trainingId).findFirstSync();
+      if (model?.isarId != null) {
+        _collection.deleteSync(model!.isarId!);
+      }
+    });
+  }
+
   Training _mapTrainingFromModel(TrainingModel model) {
     final plannedSets = <PlannedSet>[];
 
@@ -58,10 +92,9 @@ class IsarTrainingRepository implements TrainingRepository {
       }
 
       plannedSets.add(
-        PlannedSet(
-          id: plannedSetModel.entityId,
-          exercise: mapExerciseFromModel(exerciseModel),
-          targetRepetitions: plannedSetModel.targetRepetitions,
+        mapPlannedSetFromModel(
+          plannedSetModel,
+          mapExerciseFromModel(exerciseModel),
         ),
       );
     }

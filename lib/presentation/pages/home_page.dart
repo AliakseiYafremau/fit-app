@@ -1,3 +1,5 @@
+import 'package:fit_app/application/interactors/delete_exercise.dart';
+import 'package:fit_app/application/interactors/delete_training.dart';
 import 'package:fit_app/application/interfaces/repo/exercise.dart';
 import 'package:fit_app/application/interfaces/repo/training.dart';
 import 'package:fit_app/domain/entities/exercise.dart';
@@ -22,6 +24,8 @@ class _HomePageState extends State<HomePage> {
 
   late final TrainingRepository _trainingRepository;
   late final ExerciseRepository _exerciseRepository;
+  late final DeleteExercise _deleteExercise;
+  late final DeleteTraining _deleteTraining;
 
   List<Training> _trainings = const [];
   List<Exercise> _exercises = const [];
@@ -32,6 +36,8 @@ class _HomePageState extends State<HomePage> {
     if (_dependenciesReady) return;
     _trainingRepository = context.read<TrainingRepository>();
     _exerciseRepository = context.read<ExerciseRepository>();
+    _deleteExercise = context.read<DeleteExercise>();
+    _deleteTraining = context.read<DeleteTraining>();
     _trainings = _trainingRepository.getAll();
     _exercises = _exerciseRepository.getAll();
     _dependenciesReady = true;
@@ -81,6 +87,52 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> _onDeleteExercise(Exercise exercise) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete exercise'),
+        content: Text('Are you sure you want to delete "${exercise.name}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || confirmed != true) return;
+    _deleteExercise.execute(exercise.id);
+    _refreshExercises();
+  }
+
+  Future<void> _onDeleteTraining(Training training) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete workout'),
+        content: Text('Delete workout "${training.name}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || confirmed != true) return;
+    _deleteTraining.execute(training.id);
+    _refreshTrainings();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,8 +149,14 @@ class _HomePageState extends State<HomePage> {
           ),
           Expanded(
             child: _selectedIndex == 0
-                ? _WorkoutsList(trainings: _trainings)
-                : _ExercisesList(exercises: _exercises),
+                ? _WorkoutsList(
+                    trainings: _trainings,
+                    onDelete: _onDeleteTraining,
+                  )
+                : _ExercisesList(
+                    exercises: _exercises,
+                    onDelete: _onDeleteExercise,
+                  ),
           ),
         ],
       ),
@@ -112,9 +170,13 @@ class _HomePageState extends State<HomePage> {
 }
 
 class _WorkoutsList extends StatelessWidget {
-  const _WorkoutsList({required this.trainings});
+  const _WorkoutsList({
+    required this.trainings,
+    required this.onDelete,
+  });
 
   final List<Training> trainings;
+  final ValueChanged<Training> onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -133,6 +195,11 @@ class _WorkoutsList extends StatelessWidget {
           child: ListTile(
             title: Text(training.name),
             subtitle: Text(subtitle),
+            trailing: IconButton(
+              icon: const Icon(Icons.delete_outline),
+              tooltip: 'Delete workout',
+              onPressed: () => onDelete(training),
+            ),
           ),
         );
       },
@@ -143,9 +210,13 @@ class _WorkoutsList extends StatelessWidget {
 }
 
 class _ExercisesList extends StatelessWidget {
-  const _ExercisesList({required this.exercises});
+  const _ExercisesList({
+    required this.exercises,
+    required this.onDelete,
+  });
 
   final List<Exercise> exercises;
+  final ValueChanged<Exercise> onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -166,10 +237,20 @@ class _ExercisesList extends StatelessWidget {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            trailing: Icon(
-              exercise.usesWeights
-                  ? Icons.fitness_center
-                  : Icons.directions_run,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  exercise.usesWeights
+                      ? Icons.fitness_center
+                      : Icons.directions_run,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline),
+                  tooltip: 'Delete exercise',
+                  onPressed: () => onDelete(exercise),
+                ),
+              ],
             ),
           ),
         );

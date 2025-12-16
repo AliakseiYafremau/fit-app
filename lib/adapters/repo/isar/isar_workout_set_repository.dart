@@ -5,23 +5,23 @@ import 'package:fit_app/domain/entities/id.dart' as domain_id;
 import 'package:fit_app/domain/entities/workout_set.dart';
 import 'package:isar/isar.dart';
 
-class IsarPlannedSetRepository implements PlannedSetRepository {
-  IsarPlannedSetRepository(this._isar);
+class IsarWorkoutSetRepository implements WorkoutSetRepository {
+  IsarWorkoutSetRepository(this._isar);
 
   final Isar _isar;
 
-  IsarCollection<PlannedSetModel> get _collection =>
-      _isar.collection<PlannedSetModel>();
+  IsarCollection<WorkoutSetModel> get _collection =>
+      _isar.collection<WorkoutSetModel>();
   IsarCollection<ExerciseModel> get _exerciseCollection =>
       _isar.collection<ExerciseModel>();
 
   @override
-  void add(PlannedSet plannedSet) {
+  void add(WorkoutSet workoutSet) {
     _isar.writeTxnSync(() {
       final existing =
-          _collection.where().entityIdEqualTo(plannedSet.id).findFirstSync();
-      final model = mapPlannedSetToModel(
-        plannedSet,
+          _collection.where().entityIdEqualTo(workoutSet.id).findFirstSync();
+      final model = mapWorkoutSetToModel(
+        workoutSet,
         existing: existing,
       );
       model.isarId = existing?.isarId;
@@ -30,30 +30,29 @@ class IsarPlannedSetRepository implements PlannedSetRepository {
   }
 
   @override
-  List<PlannedSet> getByExerciseId(domain_id.Id exerciseId) {
+  List<WorkoutSet> getByExerciseId(domain_id.Id exerciseId) {
     final exerciseModel = _exerciseCollection
         .where()
         .entityIdEqualTo(exerciseId)
         .findFirstSync();
     if (exerciseModel == null) {
-      return const <PlannedSet>[];
+      return const <WorkoutSet>[];
     }
-
     final exercise = mapExerciseFromModel(exerciseModel);
     final models = _collection
         .filter()
         .exerciseIdEqualTo(exerciseId)
         .findAllSync();
     return models
-        .map((model) => mapPlannedSetFromModel(model, exercise))
+        .map((model) => mapWorkoutSetFromModel(model, exercise))
         .toList(growable: false);
   }
 
   @override
-  void delete(domain_id.Id plannedSetId) {
+  void delete(domain_id.Id workoutSetId) {
     _isar.writeTxnSync(() {
       final model =
-          _collection.where().entityIdEqualTo(plannedSetId).findFirstSync();
+          _collection.where().entityIdEqualTo(workoutSetId).findFirstSync();
       if (model?.isarId != null) {
         _collection.deleteSync(model!.isarId!);
       }

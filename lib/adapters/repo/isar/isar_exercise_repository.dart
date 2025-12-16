@@ -40,4 +40,15 @@ class IsarExerciseRepository implements ExerciseRepository {
       _collection.putSync(model);
     });
   }
+
+  @override
+  void delete(domain_id.Id exerciseId) {
+    _isar.writeTxnSync(() {
+      final model =
+          _collection.where().entityIdEqualTo(exerciseId).findFirstSync();
+      if (model?.isarId != null) {
+        _collection.deleteSync(model!.isarId!);
+      }
+    });
+  }
 }

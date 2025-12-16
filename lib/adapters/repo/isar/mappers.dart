@@ -75,3 +75,26 @@ SessionModel mapSessionToModel(
   model.workoutSetIds = List<String>.from(workoutSetIds);
   return model;
 }
+
+PlannedSet mapPlannedSetFromModel(
+  PlannedSetModel model,
+  Exercise exercise,
+) {
+  return PlannedSet(
+    id: model.entityId,
+    exercise: exercise,
+    targetRepetitions: model.targetRepetitions,
+  );
+}
+
+WorkoutSet mapWorkoutSetFromModel(
+  WorkoutSetModel model,
+  Exercise exercise,
+) {
+  return WorkoutSet(
+    id: model.entityId,
+    exercise: exercise,
+    repetitions: model.repetitions,
+    weight: model.weight,
+  );
+}

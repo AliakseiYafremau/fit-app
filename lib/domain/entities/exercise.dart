@@ -6,16 +6,16 @@ import 'package:fit_app/domain/entities/id.dart';
 class Exercise {
   final Id id;
   final String name;
-  final String technique;
-  final String notes;
+  final String? technique;
+  final String? notes;
   final bool usesWeights;
   final List<String> links;
 
   Exercise({
     required this.id,
     required this.name,
-    this.technique = '',
-    this.notes = '',
+    this.technique,
+    this.notes,
     required this.usesWeights,
     this.links = const [],
   }) {

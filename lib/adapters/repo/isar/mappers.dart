@@ -11,8 +11,8 @@ ExerciseModel mapExerciseToModel(
   final model = existing ?? ExerciseModel();
   model.entityId = exercise.id;
   model.name = exercise.name;
-  model.technique = exercise.technique;
-  model.notes = exercise.notes;
+  model.technique = exercise.technique ?? '';
+  model.notes = exercise.notes ?? '';
   model.usesWeights = exercise.usesWeights;
   model.links = List<String>.from(exercise.links);
   return model;
@@ -22,8 +22,8 @@ Exercise mapExerciseFromModel(ExerciseModel model) {
   return Exercise(
     id: model.entityId,
     name: model.name,
-    technique: model.technique,
-    notes: model.notes,
+    technique: model.technique.isEmpty ? null : model.technique,
+    notes: model.notes.isEmpty ? null : model.notes,
     usesWeights: model.usesWeights,
     links: List<String>.from(model.links),
   );

@@ -294,9 +294,9 @@ class _ExercisesList extends StatelessWidget {
           child: ListTile(
             title: Text(exercise.name),
             subtitle: Text(
-              exercise.technique.isEmpty
+              (exercise.technique ?? '').isEmpty
                   ? 'No technique description'
-                  : exercise.technique,
+                  : exercise.technique!,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -440,9 +440,9 @@ class _ExerciseDetailsSheet extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                exercise.technique.isEmpty
+                (exercise.technique ?? '').isEmpty
                     ? 'No technique description'
-                    : exercise.technique,
+                    : exercise.technique!,
               ),
               const SizedBox(height: 16),
               Text(
@@ -451,7 +451,9 @@ class _ExerciseDetailsSheet extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                exercise.notes.isEmpty ? 'No notes' : exercise.notes,
+                (exercise.notes ?? '').isEmpty
+                    ? 'No notes'
+                    : exercise.notes!,
               ),
               const SizedBox(height: 16),
               Text(

@@ -32,8 +32,8 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
     final exercise = widget.exercise;
     if (exercise != null) {
       _nameController.text = exercise.name;
-      _techniqueController.text = exercise.technique;
-      _notesController.text = exercise.notes;
+      _techniqueController.text = exercise.technique ?? '';
+      _notesController.text = exercise.notes ?? '';
       _usesWeights = exercise.usesWeights;
       if (exercise.links.isEmpty) {
         _linkControllers.add(TextEditingController());
@@ -89,10 +89,8 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
       _showMessage('Enter exercise name');
       return;
     }
-    if (technique.isEmpty) {
-      _showMessage('Enter technique description');
-      return;
-    }
+    final techniqueValue = technique.isEmpty ? null : technique;
+    final notesValue = notes.isEmpty ? null : notes;
 
     final links = _linkControllers
         .map((controller) => controller.text.trim())
@@ -103,16 +101,16 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
       final dto = UpdateExerciseDTO(
         exerciseId: widget.exercise!.id,
         name: name,
-        technique: technique,
-        notes: notes,
+        technique: techniqueValue,
+        notes: notesValue,
         links: links,
       );
       _updateExercise.execute(dto);
     } else {
       final dto = NewExerciseDTO(
         name: name,
-        technique: technique,
-        notes: notes,
+        technique: techniqueValue,
+        notes: notesValue,
         usesWeights: _usesWeights,
         links: links,
       );

@@ -189,6 +189,7 @@ class _HomePageState extends State<HomePage> {
         training: latest,
         canStartSession: _activeSession == null,
         onStartSession: () => _startTrainingSession(latest),
+        onViewExercise: _showExerciseDetails,
       ),
     );
   }
@@ -220,6 +221,7 @@ class _HomePageState extends State<HomePage> {
         onFinish: _handleFinishSession,
         onCompleteSet: _handleCompleteSet,
         onUndoSet: _handleUndoSet,
+        onViewExercise: _showExerciseDetails,
         onRefresh: _refreshAndGetActiveSession,
       ),
     );
@@ -243,7 +245,10 @@ class _HomePageState extends State<HomePage> {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => _SessionHistoryDetailsSheet(session: session),
+      builder: (context) => _SessionHistoryDetailsSheet(
+        session: session,
+        onViewExercise: _showExerciseDetails,
+      ),
     );
   }
 
@@ -531,11 +536,13 @@ class _TrainingDetailsSheet extends StatelessWidget {
     required this.training,
     required this.canStartSession,
     required this.onStartSession,
+    required this.onViewExercise,
   });
 
   final Training training;
   final bool canStartSession;
   final VoidCallback onStartSession;
+  final ValueChanged<Exercise> onViewExercise;
 
   @override
   Widget build(BuildContext context) {
@@ -571,6 +578,7 @@ class _TrainingDetailsSheet extends StatelessWidget {
                   (set) => Card(
                     margin: const EdgeInsets.only(bottom: 12),
                     child: ListTile(
+                      onTap: () => onViewExercise(set.exercise),
                       title: Text(set.exercise.name),
                       subtitle: Text(
                         '${set.targetRepetitions} repetitions'
@@ -770,9 +778,13 @@ class _HistorySheet extends StatelessWidget {
 }
 
 class _SessionHistoryDetailsSheet extends StatelessWidget {
-  const _SessionHistoryDetailsSheet({required this.session});
+  const _SessionHistoryDetailsSheet({
+    required this.session,
+    required this.onViewExercise,
+  });
 
   final Session session;
+  final ValueChanged<Exercise> onViewExercise;
 
   @override
   Widget build(BuildContext context) {
@@ -808,6 +820,7 @@ class _SessionHistoryDetailsSheet extends StatelessWidget {
                   (set) => Card(
                     margin: const EdgeInsets.only(bottom: 8),
                     child: ListTile(
+                      onTap: () => onViewExercise(set.exercise),
                       leading: Icon(
                         set.done
                             ? Icons.check_circle
@@ -843,6 +856,7 @@ class _SessionSheet extends StatefulWidget {
     required this.onCompleteSet,
     required this.onUndoSet,
     required this.onFinish,
+    required this.onViewExercise,
     required this.onRefresh,
   });
 
@@ -851,6 +865,7 @@ class _SessionSheet extends StatefulWidget {
       onCompleteSet;
   final Future<void> Function(WorkoutSet set) onUndoSet;
   final Future<void> Function() onFinish;
+  final ValueChanged<Exercise> onViewExercise;
   final Future<Session?> Function() onRefresh;
 
   @override
@@ -1006,6 +1021,7 @@ class _SessionSheetState extends State<_SessionSheet> {
                 ...sets.map(
                   (set) => Card(
                     child: ListTile(
+                      onTap: () => widget.onViewExercise(set.exercise),
                       leading: Icon(
                         set.done
                             ? Icons.check_circle

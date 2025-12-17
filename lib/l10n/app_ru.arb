@@ -1,0 +1,164 @@
+{
+  "@@locale": "ru",
+  "appTitle": "Fit App",
+  "tabWorkouts": "Тренировки",
+  "tabExercises": "Упражнения",
+  "searchHint": "Поиск",
+  "historyButton": "История",
+  "calendarButton": "Календарь",
+  "noWorkouts": "Тренировок пока нет",
+  "noExercises": "Упражнений пока нет",
+  "sessionHistoryTitle": "История сессий",
+  "sessionHistoryEmpty": "Завершённых сессий пока нет",
+  "sessionCalendarTitle": "Календарь сессий",
+  "sessionCalendarEmpty": "Завершённых сессий пока нет",
+  "sessionsOnDay": "Сессии на {date}",
+  "@sessionsOnDay": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionDayEmpty": "В этот день сессий не было",
+  "noTechniqueDescription": "Описание техники отсутствует",
+  "noNotes": "Заметок нет",
+  "startedLabel": "Начало {date}",
+  "@startedLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "finishedLabel": "Окончание {date}",
+  "@finishedLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "languageSelectorTooltip": "Язык",
+  "languageEnglish": "Английский",
+  "languageRussian": "Русский",
+  "fabActiveSessionTooltip": "Активная сессия",
+  "deleteExerciseTitle": "Удалить упражнение",
+  "deleteExerciseMessage": "Удалить упражнение «{name}»?",
+  "@deleteExerciseMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteWorkoutTitle": "Удалить тренировку",
+  "deleteWorkoutMessage": "Удалить тренировку «{name}»?",
+  "@deleteWorkoutMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cancelSessionTitle": "Отменить сессию",
+  "cancelSessionMessage": "Точно отменить сессию? Прогресс будет потерян.",
+  "cancelSessionKeep": "Оставить",
+  "cancelSessionConfirm": "Отменить сессию",
+  "buttonCancel": "Отмена",
+  "buttonDelete": "Удалить",
+  "buttonSave": "Сохранить",
+  "buttonClose": "Закрыть",
+  "buttonStartSession": "Начать сессию",
+  "buttonEditWorkout": "Изменить",
+  "buttonDeleteWorkout": "Удалить",
+  "buttonEditExercise": "Изменить",
+  "buttonDeleteExercise": "Удалить",
+  "buttonUndo": "Отменить",
+  "buttonFinishSession": "Завершить сессию",
+  "buttonCancelSession": "Отменить сессию",
+  "noPlannedSets": "У этой тренировки нет планов",
+  "noLinksAttached": "Ссылок нет",
+  "errorUnableToOpenLink": "Не удалось открыть ссылку",
+  "errorUnableToLoadPhoto": "Не удалось загрузить фото",
+  "sessionSummaryEmpty": "В этой сессии не отслеживались подходы",
+  "sessionSummaryTitle": "Итоги сессии",
+  "completeSetTitle": "Завершение подхода",
+  "errorEnterValidRepetitions": "Введите корректное количество повторений",
+  "errorEnterValidWeight": "Введите корректный вес",
+  "errorWeightRequired": "Для этого упражнения нужен вес",
+  "emptySessionSets": "В этой сессии нет подходов",
+  "errorFinishSession": "Не удалось завершить сессию",
+  "errorCancelSession": "Не удалось отменить сессию",
+  "errorCompleteSet": "Не удалось завершить подход",
+  "errorUndoSet": "Не удалось отменить подход",
+  "labelRepetitions": "Повторения",
+  "labelWeight": "Вес",
+  "helperWeightedExercise": "Нужно для упражнений с весом",
+  "bodyweightOnly": "Это упражнение только с собственным весом",
+  "sessionSheetTitle": "Сессия: {name}",
+  "@sessionSheetTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sectionPhoto": "Фото",
+  "sectionTechnique": "Техника",
+  "sectionNotes": "Заметки",
+  "sectionLinks": "Ссылки",
+  "exerciseUsesWeights": "С весами",
+  "exerciseBodyweight": "Без веса / собственный вес",
+  "plannedSetsCount": "{count, plural, one{{count} запланированный подход} few{{count} запланированных подхода} many{{count} запланированных подходов} other{{count} запланированных подходов}}",
+  "@plannedSetsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "completedSetsCount": "{count, plural, one{{count} завершённый подход} few{{count} завершённых подхода} many{{count} завершённых подходов} other{{count} завершённых подходов}}",
+  "@completedSetsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "buttonUpdate": "Обновить",
+  "buttonComplete": "Завершить",
+  "repetitionsWithUnit": "{count} повт.",
+  "@repetitionsWithUnit": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "weightDisplay": "@ {weight}",
+  "@weightDisplay": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "errorEnterTrainingName": "Введите название тренировки",
+  "errorFillSets": "Заполните новые подходы корректными упражнениями и повторениями",
+  "errorTrainingNeedsSet": "В тренировке должен быть хотя бы один подход",
+  "errorAddAtLeastOneSet": "Добавьте хотя бы один подход",
+  "editTrainingTitle": "Редактирование тренировки",
+  "createTrainingTitle": "Создание тренировки",
+  "labelTrainingName": "Название тренировки",
+  "existingSetsLabel": "Существующие подходы",
+  "newSetsLabel": "Новые подходы",
+  "setsLabel": "Подходы",
+  "labelExercise": "Упражнение",
+  "actionKeep": "Оставить",
+  "actionRemove": "Удалить",
+  "buttonAddSet": "Добавить подход",
+  "buttonAddNewSet": "Добавить новый подход",
+  "buttonSaveChanges": "Сохранить изменения",
+  "buttonAddTraining": "Добавить"
+}

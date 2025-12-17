@@ -6,6 +6,7 @@ import 'package:fit_app/application/interfaces/repo/exercise.dart';
 import 'package:fit_app/domain/entities/exercise.dart';
 import 'package:fit_app/domain/entities/training.dart';
 import 'package:fit_app/domain/entities/workout_set.dart';
+import 'package:fit_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -89,9 +90,10 @@ class _CreateTrainingSheetState extends State<CreateTrainingSheet> {
   }
 
   void _submit() {
+    final l10n = AppLocalizations.of(context)!;
     final trainingName = _nameController.text.trim();
     if (trainingName.isEmpty) {
-      _showMessage('Enter training name');
+      _showMessage(l10n.errorEnterTrainingName);
       return;
     }
 
@@ -100,7 +102,7 @@ class _CreateTrainingSheetState extends State<CreateTrainingSheet> {
       final exercise = setData.exercise;
       final reps = int.tryParse(setData.reps);
       if (exercise == null || reps == null || reps <= 0) {
-        _showMessage('Fill all new sets with valid exercises and repetitions');
+        _showMessage(l10n.errorFillSets);
         return;
       }
       newPlannedSets.add(
@@ -115,7 +117,7 @@ class _CreateTrainingSheetState extends State<CreateTrainingSheet> {
       final remainingExisting =
           _existingSets.where((set) => !set.remove).length;
       if (remainingExisting + newPlannedSets.length == 0) {
-        _showMessage('Training must have at least one planned set');
+        _showMessage(l10n.errorTrainingNeedsSet);
         return;
       }
       final dto = UpdateTrainingDTO(
@@ -130,7 +132,7 @@ class _CreateTrainingSheetState extends State<CreateTrainingSheet> {
       _updateTraining.execute(dto);
     } else {
       if (newPlannedSets.isEmpty) {
-        _showMessage('Add at least one set');
+        _showMessage(l10n.errorAddAtLeastOneSet);
         return;
       }
       _createTraining.execute(
@@ -152,6 +154,7 @@ class _CreateTrainingSheetState extends State<CreateTrainingSheet> {
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+    final l10n = AppLocalizations.of(context)!;
 
     return SafeArea(
       child: Padding(
@@ -162,28 +165,30 @@ class _CreateTrainingSheetState extends State<CreateTrainingSheet> {
           bottom: bottomPadding + 24,
         ),
         child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
               Text(
-                _isEditing ? 'Edit Training' : 'Create Training',
-                style: Theme.of(context).textTheme.headlineSmall,
+                _isEditing
+                    ? l10n.editTrainingTitle
+                    : l10n.createTrainingTitle,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.labelTrainingName,
+                border: const OutlineInputBorder(),
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Training name',
-                  border: OutlineInputBorder(),
-                ),
+            ),
+            const SizedBox(height: 24),
+            if (_existingSets.isNotEmpty) ...[
+              Text(
+                l10n.existingSetsLabel,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
-              const SizedBox(height: 24),
-              if (_existingSets.isNotEmpty) ...[
-                Text(
-                  'Existing sets',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
                 const SizedBox(height: 12),
                 ...List.generate(_existingSets.length, (index) {
                   final data = _existingSets[index];
@@ -192,12 +197,16 @@ class _CreateTrainingSheetState extends State<CreateTrainingSheet> {
                     child: Card(
                       child: ListTile(
                         title: Text(data.set.exercise.name),
-                        subtitle:
-                            Text('${data.set.targetRepetitions} repetitions'),
+                        subtitle: Text(
+                          l10n.repetitionsWithUnit(
+                            data.set.targetRepetitions,
+                          ),
+                        ),
                         trailing: TextButton(
                           onPressed: () => _toggleExistingRemoval(index),
-                          child:
-                              Text(data.remove ? 'Keep' : 'Remove'),
+                          child: Text(data.remove
+                              ? l10n.actionKeep
+                              : l10n.actionRemove),
                         ),
                       ),
                     ),
@@ -206,7 +215,7 @@ class _CreateTrainingSheetState extends State<CreateTrainingSheet> {
                 const SizedBox(height: 16),
               ],
               Text(
-                _isEditing ? 'New sets' : 'Sets',
+                _isEditing ? l10n.newSetsLabel : l10n.setsLabel,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 12),
@@ -232,14 +241,14 @@ class _CreateTrainingSheetState extends State<CreateTrainingSheet> {
                             onSelected: (value) {
                               setState(() => data.exercise = value);
                             },
-                            label: const Text('Exercise'),
+                            label: Text(l10n.labelExercise),
                           ),
                           const SizedBox(height: 12),
                           TextField(
                             keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                              labelText: 'Repetitions',
-                              border: OutlineInputBorder(),
+                            decoration: InputDecoration(
+                              labelText: l10n.labelRepetitions,
+                              border: const OutlineInputBorder(),
                             ),
                             onChanged: (value) => data.reps = value,
                           ),
@@ -260,14 +269,20 @@ class _CreateTrainingSheetState extends State<CreateTrainingSheet> {
                 onPressed:
                     _availableExercises.isEmpty ? null : _addSet,
                 icon: const Icon(Icons.add),
-                label: Text(_isEditing ? 'Add new set' : 'Add set'),
+                label: Text(
+                  _isEditing ? l10n.buttonAddNewSet : l10n.buttonAddSet,
+                ),
               ),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _submit,
-                  child: Text(_isEditing ? 'Save changes' : 'Add'),
+                  child: Text(
+                    _isEditing
+                        ? l10n.buttonSaveChanges
+                        : l10n.buttonAddTraining,
+                  ),
                 ),
               ),
             ],

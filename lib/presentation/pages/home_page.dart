@@ -15,6 +15,9 @@ import 'package:fit_app/domain/entities/exercise.dart';
 import 'package:fit_app/domain/entities/session.dart';
 import 'package:fit_app/domain/entities/training.dart';
 import 'package:fit_app/domain/entities/workout_set.dart';
+import 'package:fit_app/l10n/app_localizations.dart';
+import 'package:fit_app/presentation/providers/locale_controller.dart';
+import 'package:fit_app/presentation/scaffold_messenger_key.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -169,19 +172,20 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _onDeleteExercise(Exercise exercise) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete exercise'),
-        content: Text('Are you sure you want to delete "${exercise.name}"?'),
+        title: Text(l10n.deleteExerciseTitle),
+        content: Text(l10n.deleteExerciseMessage(exercise.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: Text(l10n.buttonCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Delete'),
+            child: Text(l10n.buttonDelete),
           ),
         ],
       ),
@@ -192,19 +196,20 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _onDeleteTraining(Training training) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete workout'),
-        content: Text('Delete workout "${training.name}"?'),
+        title: Text(l10n.deleteWorkoutTitle),
+        content: Text(l10n.deleteWorkoutMessage(training.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: Text(l10n.buttonCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Delete'),
+            child: Text(l10n.buttonDelete),
           ),
         ],
       ),
@@ -308,30 +313,30 @@ class _HomePageState extends State<HomePage> {
   Future<void> _handleFinishSession() async {
     final session = _activeSession;
     if (session == null) return;
+    final l10n = AppLocalizations.of(context)!;
     try {
       _finishSession.execute(session.id);
       _refreshActiveSession();
     } catch (error) {
-      _showError('Unable to finish session');
+      _showError(l10n.errorFinishSession);
     }
   }
 
   Future<void> _handleCancelSession() async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Cancel session'),
-        content: const Text(
-          'Are you sure you want to cancel this session? Progress will be lost.',
-        ),
+        title: Text(l10n.cancelSessionTitle),
+        content: Text(l10n.cancelSessionMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Keep session'),
+            child: Text(l10n.cancelSessionKeep),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Cancel session'),
+            child: Text(l10n.cancelSessionConfirm),
           ),
         ],
       ),
@@ -341,7 +346,7 @@ class _HomePageState extends State<HomePage> {
       _cancelSession.execute();
       _refreshActiveSession();
     } catch (_) {
-      _showError('Unable to cancel session');
+      _showError(l10n.errorCancelSession);
       rethrow;
     }
   }
@@ -351,6 +356,7 @@ class _HomePageState extends State<HomePage> {
     int repetitions,
     double? weight,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       _completeSet.execute(
         workoutSetId: set.id,
@@ -359,16 +365,17 @@ class _HomePageState extends State<HomePage> {
       );
       _refreshActiveSession();
     } catch (error) {
-      _showError('Unable to complete set');
+      _showError(l10n.errorCompleteSet);
     }
   }
 
   Future<void> _handleUndoSet(WorkoutSet set) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       _undoCompleteSet.execute(workoutSetId: set.id);
       _refreshActiveSession();
     } catch (error) {
-      _showError('Unable to undo set');
+      _showError(l10n.errorUndoSet);
     }
   }
 
@@ -391,17 +398,41 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final localeController = context.watch<LocaleController>();
+    final currentLocaleCode = localeController.locale?.languageCode;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Fit App'),
+        title: Text(l10n.appTitle),
         centerTitle: true,
+        actions: [
+          PopupMenuButton<String>(
+            tooltip: l10n.languageSelectorTooltip,
+            icon: const Icon(Icons.language),
+            onSelected: (code) {
+              context.read<LocaleController>().setLocale(Locale(code));
+            },
+            itemBuilder: (context) => [
+              _buildLocaleMenuItem(
+                label: l10n.languageEnglish,
+                value: 'en',
+                currentCode: currentLocaleCode,
+              ),
+              _buildLocaleMenuItem(
+                label: l10n.languageRussian,
+                value: 'ru',
+                currentCode: currentLocaleCode,
+              ),
+            ],
+          ),
+        ],
       ),
       body: Column(
         children: [
           SizedBox(
             height: 56,
             child: PrimaryNavBar(
-              tabs: const ['Workouts', 'Exercises'],
+              tabs: [l10n.tabWorkouts, l10n.tabExercises],
               selectedIndex: _selectedIndex,
               onTabSelected: _onNavTap,
             ),
@@ -412,10 +443,10 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Expanded(
                   child: TextField(
-                    decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.search),
-                      hintText: 'Search',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.search),
+                      hintText: l10n.searchHint,
+                      border: const OutlineInputBorder(),
                     ),
                     onChanged: _onSearchChanged,
                   ),
@@ -505,7 +536,7 @@ class _HomePageState extends State<HomePage> {
             FloatingActionButton(
               heroTag: 'active_session_fab',
               onPressed: _openActiveSessionSheet,
-              tooltip: 'View active session',
+              tooltip: l10n.fabActiveSessionTooltip,
               child: const Icon(Icons.play_arrow),
             ),
             const SizedBox(width: 12),
@@ -535,6 +566,7 @@ class _WorkoutsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final filtered = searchTerm.isEmpty
         ? trainings
         : trainings
@@ -542,15 +574,14 @@ class _WorkoutsList extends StatelessWidget {
                 training.name.toLowerCase().contains(searchTerm))
             .toList();
     if (filtered.isEmpty) {
-      return const _EmptyState(message: 'No workouts yet');
+      return _EmptyState(message: l10n.noWorkouts);
     }
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       itemBuilder: (context, index) {
         final training = filtered[index];
         final setsCount = training.plannedSets.length;
-        final subtitle =
-            setsCount == 1 ? '1 planned set' : '$setsCount planned sets';
+        final subtitle = l10n.plannedSetsCount(setsCount);
         return Card(
           child: ListTile(
             title: Text(training.name),
@@ -561,7 +592,7 @@ class _WorkoutsList extends StatelessWidget {
         );
       },
       separatorBuilder: (_, unused) => const SizedBox(height: 12),
-      itemCount: trainings.length,
+      itemCount: filtered.length,
     );
   }
 }
@@ -574,6 +605,7 @@ class _HistoryBubbleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
     final borderRadius = BorderRadius.circular(26);
     return Material(
       elevation: 4,
@@ -594,7 +626,7 @@ class _HistoryBubbleButton extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'History',
+                l10n.historyButton,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: colorScheme.primary,
                       fontWeight: FontWeight.w600,
@@ -616,6 +648,7 @@ class _CalendarBubbleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
     final borderRadius = BorderRadius.circular(26);
     return Material(
       elevation: 4,
@@ -636,7 +669,7 @@ class _CalendarBubbleButton extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Calendar',
+                l10n.calendarButton,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: colorScheme.primary,
                       fontWeight: FontWeight.w600,
@@ -665,6 +698,7 @@ class _ExercisesList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     Iterable<Exercise> candidates = exercises;
     if (searchTerm.isNotEmpty) {
       candidates = candidates.where((exercise) =>
@@ -678,7 +712,7 @@ class _ExercisesList extends StatelessWidget {
     }
     final filtered = candidates.toList();
     if (filtered.isEmpty) {
-      return const _EmptyState(message: 'No exercises yet');
+      return _EmptyState(message: l10n.noExercises);
     }
     final fileManager = context.read<FileManager>();
     return ListView.separated(
@@ -691,7 +725,7 @@ class _ExercisesList extends StatelessWidget {
             title: Text(exercise.name),
             subtitle: Text(
               (exercise.technique ?? '').isEmpty
-                  ? 'No technique description'
+                  ? l10n.noTechniqueDescription
                   : exercise.technique!,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -726,7 +760,7 @@ class _ExercisesList extends StatelessWidget {
         );
       },
       separatorBuilder: (_, separatorIndex) => const SizedBox(height: 12),
-      itemCount: exercises.length,
+      itemCount: filtered.length,
     );
   }
 }
@@ -752,6 +786,7 @@ class _TrainingDetailsSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final sets = training.plannedSets;
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+    final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.only(
@@ -771,12 +806,12 @@ class _TrainingDetailsSheet extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                '${sets.length} planned set${sets.length == 1 ? '' : 's'}',
+                l10n.plannedSetsCount(sets.length),
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 16),
               if (sets.isEmpty)
-                const Text('No planned sets for this training')
+                Text(l10n.noPlannedSets)
               else
                 ...sets.map(
                   (set) => Card(
@@ -795,9 +830,9 @@ class _TrainingDetailsSheet extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: OutlinedButton.icon(
-                      icon: const Icon(Icons.edit_outlined),
-                      label: const Text('Edit workout'),
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.edit_outlined),
+                        label: Text(l10n.buttonEditWorkout),
                       onPressed: () {
                         Navigator.of(context).pop();
                         onEdit(training);
@@ -806,9 +841,9 @@ class _TrainingDetailsSheet extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: OutlinedButton.icon(
-                      icon: const Icon(Icons.delete_outline),
-                      label: const Text('Delete workout'),
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.delete_outline),
+                        label: Text(l10n.buttonDeleteWorkout),
                       onPressed: () {
                         Navigator.of(context).pop();
                         onDelete(training);
@@ -821,20 +856,20 @@ class _TrainingDetailsSheet extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: ElevatedButton(
-                      onPressed: canStartSession
+                      child: ElevatedButton(
+                        onPressed: canStartSession
                           ? () {
                               Navigator.of(context).pop();
                               onStartSession();
                             }
                           : null,
-                      child: const Text('Start session'),
+                        child: Text(l10n.buttonStartSession),
                     ),
                   ),
                   const SizedBox(width: 12),
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Close'),
+                      child: Text(l10n.buttonClose),
                   ),
                 ],
               ),
@@ -860,6 +895,7 @@ class _ExerciseDetailsSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+    final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.only(
@@ -880,7 +916,7 @@ class _ExerciseDetailsSheet extends StatelessWidget {
               const SizedBox(height: 12),
               if (exercise.photoId != null) ...[
                 Text(
-                  'Photo',
+                  l10n.sectionPhoto,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 8),
@@ -897,41 +933,41 @@ class _ExerciseDetailsSheet extends StatelessWidget {
                   const SizedBox(width: 8),
                   Text(
                     exercise.usesWeights
-                        ? 'Uses weights'
-                        : 'Bodyweight / no weights',
+                        ? l10n.exerciseUsesWeights
+                        : l10n.exerciseBodyweight,
                   ),
                 ],
               ),
               const SizedBox(height: 16),
               Text(
-                'Technique',
+                l10n.sectionTechnique,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 4),
               Text(
                 (exercise.technique ?? '').isEmpty
-                    ? 'No technique description'
+                    ? l10n.noTechniqueDescription
                     : exercise.technique!,
               ),
               const SizedBox(height: 16),
               Text(
-                'Notes',
+                l10n.sectionNotes,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 4),
               Text(
                 (exercise.notes ?? '').isEmpty
-                    ? 'No notes'
+                    ? l10n.noNotes
                     : exercise.notes!,
               ),
               const SizedBox(height: 16),
               Text(
-                'Links',
+                l10n.sectionLinks,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
               if (exercise.links.isEmpty)
-                const Text('No links attached')
+                Text(l10n.noLinksAttached)
               else
                 ...exercise.links.map(
                   (link) => Padding(
@@ -948,7 +984,7 @@ class _ExerciseDetailsSheet extends StatelessWidget {
                   Expanded(
                     child: OutlinedButton.icon(
                       icon: const Icon(Icons.edit_outlined),
-                      label: const Text('Edit exercise'),
+                      label: Text(l10n.buttonEditExercise),
                       onPressed: () {
                         Navigator.of(context).pop();
                         onEdit(exercise);
@@ -959,7 +995,7 @@ class _ExerciseDetailsSheet extends StatelessWidget {
                   Expanded(
                     child: OutlinedButton.icon(
                       icon: const Icon(Icons.delete_outline),
-                      label: const Text('Delete exercise'),
+                      label: Text(l10n.buttonDeleteExercise),
                       onPressed: () {
                         Navigator.of(context).pop();
                         onDelete(exercise);
@@ -973,7 +1009,7 @@ class _ExerciseDetailsSheet extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Close'),
+                  child: Text(l10n.buttonClose),
                 ),
               ),
             ],
@@ -984,21 +1020,19 @@ class _ExerciseDetailsSheet extends StatelessWidget {
   }
 
   Future<void> _launchLink(BuildContext context, Uri uri) async {
-    final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
     try {
       final opened = await launchUrl(
         uri,
         mode: LaunchMode.externalApplication,
       );
+      if (!context.mounted) return;
       if (!opened) {
-        messenger.showSnackBar(
-          const SnackBar(content: Text('Unable to open link')),
-        );
+        _showTopSnackBar(context, l10n.errorUnableToOpenLink);
       }
     } catch (_) {
-      messenger.showSnackBar(
-        const SnackBar(content: Text('Unable to open link')),
-      );
+      if (!context.mounted) return;
+      _showTopSnackBar(context, l10n.errorUnableToOpenLink);
     }
   }
 }
@@ -1161,6 +1195,46 @@ String _formatTimeRange(Session session) {
 DateTime _startOfDay(DateTime dateTime) =>
     DateTime(dateTime.year, dateTime.month, dateTime.day);
 
+PopupMenuEntry<String> _buildLocaleMenuItem({
+  required String label,
+  required String value,
+  required String? currentCode,
+}) {
+  final selected = currentCode == value;
+  return PopupMenuItem<String>(
+    value: value,
+    child: Row(
+      children: [
+        selected
+            ? const Icon(Icons.check, size: 18)
+            : const SizedBox(width: 18),
+        const SizedBox(width: 8),
+        Text(label),
+      ],
+    ),
+  );
+}
+
+void _showTopSnackBar(BuildContext context, String message) {
+  final messenger =
+      rootScaffoldMessengerKey.currentState ?? ScaffoldMessenger.maybeOf(context);
+  if (messenger == null) return;
+  final paddingContext =
+      rootScaffoldMessengerKey.currentContext ?? context;
+  final mediaQuery = MediaQuery.maybeOf(paddingContext);
+  final topPadding = (mediaQuery?.padding.top ?? 0) + kToolbarHeight + 16;
+  messenger.clearSnackBars();
+  messenger.showSnackBar(
+    SnackBar(
+      content: Text(message),
+      behavior: SnackBarBehavior.floating,
+      dismissDirection: DismissDirection.up,
+      duration: const Duration(seconds: 3),
+      margin: EdgeInsets.fromLTRB(16, topPadding, 16, 0),
+    ),
+  );
+}
+
 class _ExercisePhotoViewer extends StatelessWidget {
   const _ExercisePhotoViewer({required this.photoId});
 
@@ -1169,6 +1243,7 @@ class _ExercisePhotoViewer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fileManager = context.read<FileManager>();
+    final l10n = AppLocalizations.of(context)!;
     return FutureBuilder<Uint8List>(
       future: Future<Uint8List>(() => fileManager.read(photoId)),
       builder: (context, snapshot) {
@@ -1188,7 +1263,7 @@ class _ExercisePhotoViewer extends StatelessWidget {
               border: Border.all(color: Colors.white24),
             ),
             alignment: Alignment.center,
-            child: const Text('Unable to load photo'),
+            child: Text(l10n.errorUnableToLoadPhoto),
           );
         }
         return ClipRRect(
@@ -1216,6 +1291,7 @@ class _HistorySheet extends StatelessWidget {
     final listHeight = (MediaQuery.of(context).size.height * 0.5)
         .clamp(240.0, 520.0)
         .toDouble();
+    final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.only(
@@ -1229,12 +1305,12 @@ class _HistorySheet extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Session history',
+              l10n.sessionHistoryTitle,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 12),
             if (sessions.isEmpty)
-              const Text('No completed sessions yet')
+              Text(l10n.sessionHistoryEmpty)
             else
               SizedBox(
                 height: listHeight,
@@ -1246,9 +1322,8 @@ class _HistorySheet extends StatelessWidget {
                     return Card(
                       child: ListTile(
                         title: Text(session.training.name),
-                        subtitle: Text(
-                          '$completedSets completed set${completedSets == 1 ? '' : 's'}',
-                        ),
+                        subtitle:
+                            Text(l10n.completedSetsCount(completedSets)),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () => Navigator.of(context).pop(session),
                       ),
@@ -1263,7 +1338,7 @@ class _HistorySheet extends StatelessWidget {
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
+                child: Text(l10n.buttonClose),
               ),
             ),
           ],
@@ -1315,6 +1390,7 @@ class _CalendarSheetState extends State<_CalendarSheet> {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
     final selectedSessions =
         _sessionsByDay[_selectedDay] ?? const <Session>[];
+    final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.only(
@@ -1328,12 +1404,12 @@ class _CalendarSheetState extends State<_CalendarSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Session calendar',
+              l10n.sessionCalendarTitle,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 12),
             if (widget.sessions.isEmpty)
-              const Text('No completed sessions yet')
+              Text(l10n.sessionCalendarEmpty)
             else
               CalendarDatePicker(
                 initialDate: _selectedDay,
@@ -1348,12 +1424,12 @@ class _CalendarSheetState extends State<_CalendarSheet> {
               ),
             const SizedBox(height: 12),
             Text(
-              'Sessions on ${_formatDate(_selectedDay)}',
+              l10n.sessionsOnDay(_formatDate(_selectedDay)),
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
             if (selectedSessions.isEmpty)
-              const Text('No sessions on this day')
+              Text(l10n.sessionDayEmpty)
             else
               ...selectedSessions.map(
                 (session) => ListTile(
@@ -1383,6 +1459,7 @@ class _SessionHistoryDetailsSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
     final sets = session.workoutSets;
+    final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.only(
@@ -1401,19 +1478,25 @@ class _SessionHistoryDetailsSheet extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 4),
-              Text('Started ${_formatDateTime(session.startedAt)}'),
+              Text(
+                AppLocalizations.of(context)!
+                    .startedLabel(_formatDateTime(session.startedAt)),
+              ),
               if (session.finishedAt != null) ...[
                 const SizedBox(height: 2),
-                Text('Finished ${_formatDateTime(session.finishedAt!)}'),
+                Text(
+                  AppLocalizations.of(context)!
+                      .finishedLabel(_formatDateTime(session.finishedAt!)),
+                ),
               ],
               const SizedBox(height: 8),
               Text(
-                'Completed session summary',
+                AppLocalizations.of(context)!.sessionSummaryTitle,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 16),
               if (sets.isEmpty)
-                const Text('No sets were tracked in this session')
+                Text(AppLocalizations.of(context)!.sessionSummaryEmpty)
               else
                 ...sets.map(
                   (set) => Card(
@@ -1427,8 +1510,10 @@ class _SessionHistoryDetailsSheet extends StatelessWidget {
                       ),
                       title: Text(set.exercise.name),
                       subtitle: Text(
-                        '${set.repetitions} reps'
-                        '${set.exercise.usesWeights && set.weight != null ? ' @ ${set.weight}' : ''}',
+                        l10n.repetitionsWithUnit(set.repetitions) +
+                            (set.exercise.usesWeights && set.weight != null
+                                ? ' ${l10n.weightDisplay(set.weight!.toString())}'
+                                : ''),
                       ),
                     ),
                   ),
@@ -1438,7 +1523,7 @@ class _SessionHistoryDetailsSheet extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Close'),
+                  child: Text(AppLocalizations.of(context)!.buttonClose),
                 ),
               ),
             ],
@@ -1483,6 +1568,7 @@ class _SessionSheetState extends State<_SessionSheet> {
   }
 
   Future<void> _completeSet(WorkoutSet set) async {
+    final l10n = AppLocalizations.of(context)!;
     final repsController =
         TextEditingController(text: set.repetitions.toString());
     final usesWeights = set.exercise.usesWeights;
@@ -1492,15 +1578,15 @@ class _SessionSheetState extends State<_SessionSheet> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Complete set'),
+        title: Text(l10n.completeSetTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: repsController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Repetitions',
+              decoration: InputDecoration(
+                labelText: l10n.labelRepetitions,
               ),
             ),
             const SizedBox(height: 12),
@@ -1509,17 +1595,17 @@ class _SessionSheetState extends State<_SessionSheet> {
                 controller: weightController,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(
-                  labelText: 'Weight',
-                  helperText: 'Required for weighted exercises',
+                decoration: InputDecoration(
+                  labelText: l10n.labelWeight,
+                  helperText: l10n.helperWeightedExercise,
                 ),
               )
             else
-              const Align(
+              Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'This exercise is bodyweight only',
-                  style: TextStyle(fontStyle: FontStyle.italic),
+                  l10n.bodyweightOnly,
+                  style: const TextStyle(fontStyle: FontStyle.italic),
                 ),
               ),
           ],
@@ -1527,11 +1613,11 @@ class _SessionSheetState extends State<_SessionSheet> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: Text(l10n.buttonCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Save'),
+            child: Text(l10n.buttonSave),
           ),
         ],
       ),
@@ -1543,9 +1629,7 @@ class _SessionSheetState extends State<_SessionSheet> {
         ? set.repetitions.toString()
         : repsController.text.trim());
     if (repetitions == null || repetitions <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter valid repetitions')),
-      );
+      _showTopSnackBar(context, l10n.errorEnterValidRepetitions);
       return;
     }
     double? weight;
@@ -1554,15 +1638,11 @@ class _SessionSheetState extends State<_SessionSheet> {
       if (weightText.isNotEmpty) {
         weight = double.tryParse(weightText);
         if (weight == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Enter valid weight')),
-          );
+          _showTopSnackBar(context, l10n.errorEnterValidWeight);
           return;
         }
       } else if (set.weight == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Weight required for this exercise')),
-        );
+        _showTopSnackBar(context, l10n.errorWeightRequired);
         return;
       }
     }
@@ -1607,6 +1687,7 @@ class _SessionSheetState extends State<_SessionSheet> {
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+    final l10n = AppLocalizations.of(context)!;
     final sets = _session.workoutSets;
     return SafeArea(
       child: Padding(
@@ -1622,14 +1703,17 @@ class _SessionSheetState extends State<_SessionSheet> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Session: ${_session.training.name}',
+                l10n.sessionSheetTitle(_session.training.name),
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 4),
-              Text('Started ${_formatDateTime(_session.startedAt)}'),
+              Text(
+                AppLocalizations.of(context)!
+                    .startedLabel(_formatDateTime(_session.startedAt)),
+              ),
               const SizedBox(height: 16),
               if (sets.isEmpty)
-                const Text('No sets in this session')
+                Text(l10n.emptySessionSets)
               else
                 ...sets.map(
                   (set) => Card(
@@ -1642,8 +1726,10 @@ class _SessionSheetState extends State<_SessionSheet> {
                       ),
                       title: Text(set.exercise.name),
                       subtitle: Text(
-                        '${set.repetitions} reps'
-                        '${set.exercise.usesWeights && set.weight != null ? ' @ ${set.weight}' : ''}',
+                        l10n.repetitionsWithUnit(set.repetitions) +
+                            (set.exercise.usesWeights && set.weight != null
+                                ? ' ${l10n.weightDisplay(set.weight!.toString())}'
+                                : ''),
                       ),
                       trailing: Wrap(
                         spacing: 8,
@@ -1651,11 +1737,15 @@ class _SessionSheetState extends State<_SessionSheet> {
                           if (set.done)
                             TextButton(
                               onPressed: () => _undoSet(set),
-                              child: const Text('Undo'),
+                              child: Text(l10n.buttonUndo),
                             ),
                           TextButton(
                             onPressed: () => _completeSet(set),
-                            child: Text(set.done ? 'Update' : 'Complete'),
+                            child: Text(
+                              set.done
+                                  ? l10n.buttonUpdate
+                                  : l10n.buttonComplete,
+                            ),
                           ),
                         ],
                       ),
@@ -1668,14 +1758,14 @@ class _SessionSheetState extends State<_SessionSheet> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: _finishSession,
-                      child: const Text('Finish session'),
+                      child: Text(l10n.buttonFinishSession),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: OutlinedButton(
                       onPressed: _cancelSession,
-                      child: const Text('Cancel session'),
+                      child: Text(l10n.buttonCancelSession),
                     ),
                   ),
                 ],
@@ -1685,7 +1775,7 @@ class _SessionSheetState extends State<_SessionSheet> {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Close'),
+                  child: Text(l10n.buttonClose),
                 ),
               ),
             ],

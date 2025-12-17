@@ -1,0 +1,164 @@
+{
+  "@@locale": "en",
+  "appTitle": "Fit App",
+  "tabWorkouts": "Workouts",
+  "tabExercises": "Exercises",
+  "searchHint": "Search",
+  "historyButton": "History",
+  "calendarButton": "Calendar",
+  "noWorkouts": "No workouts yet",
+  "noExercises": "No exercises yet",
+  "sessionHistoryTitle": "Session history",
+  "sessionHistoryEmpty": "No completed sessions yet",
+  "sessionCalendarTitle": "Session calendar",
+  "sessionCalendarEmpty": "No completed sessions yet",
+  "sessionsOnDay": "Sessions on {date}",
+  "@sessionsOnDay": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionDayEmpty": "No sessions on this day",
+  "noTechniqueDescription": "No technique description",
+  "noNotes": "No notes",
+  "startedLabel": "Started {date}",
+  "@startedLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "finishedLabel": "Finished {date}",
+  "@finishedLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "languageSelectorTooltip": "Language",
+  "languageEnglish": "English",
+  "languageRussian": "Russian",
+  "fabActiveSessionTooltip": "View active session",
+  "deleteExerciseTitle": "Delete exercise",
+  "deleteExerciseMessage": "Are you sure you want to delete \"{name}\"?",
+  "@deleteExerciseMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteWorkoutTitle": "Delete workout",
+  "deleteWorkoutMessage": "Delete workout \"{name}\"?",
+  "@deleteWorkoutMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cancelSessionTitle": "Cancel session",
+  "cancelSessionMessage": "Are you sure you want to cancel this session? Progress will be lost.",
+  "cancelSessionKeep": "Keep session",
+  "cancelSessionConfirm": "Cancel session",
+  "buttonCancel": "Cancel",
+  "buttonDelete": "Delete",
+  "buttonSave": "Save",
+  "buttonClose": "Close",
+  "buttonStartSession": "Start session",
+  "buttonEditWorkout": "Edit workout",
+  "buttonDeleteWorkout": "Delete workout",
+  "buttonEditExercise": "Edit exercise",
+  "buttonDeleteExercise": "Delete exercise",
+  "buttonUndo": "Undo",
+  "buttonFinishSession": "Finish session",
+  "buttonCancelSession": "Cancel session",
+  "noPlannedSets": "No planned sets for this training",
+  "noLinksAttached": "No links attached",
+  "errorUnableToOpenLink": "Unable to open link",
+  "errorUnableToLoadPhoto": "Unable to load photo",
+  "sessionSummaryEmpty": "No sets were tracked in this session",
+  "sessionSummaryTitle": "Completed session summary",
+  "completeSetTitle": "Complete set",
+  "errorEnterValidRepetitions": "Enter valid repetitions",
+  "errorEnterValidWeight": "Enter valid weight",
+  "errorWeightRequired": "Weight required for this exercise",
+  "emptySessionSets": "No sets in this session",
+  "errorFinishSession": "Unable to finish session",
+  "errorCancelSession": "Unable to cancel session",
+  "errorCompleteSet": "Unable to complete set",
+  "errorUndoSet": "Unable to undo set",
+  "labelRepetitions": "Repetitions",
+  "labelWeight": "Weight",
+  "helperWeightedExercise": "Required for weighted exercises",
+  "bodyweightOnly": "This exercise is bodyweight only",
+  "sessionSheetTitle": "Session: {name}",
+  "@sessionSheetTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sectionPhoto": "Photo",
+  "sectionTechnique": "Technique",
+  "sectionNotes": "Notes",
+  "sectionLinks": "Links",
+  "exerciseUsesWeights": "Uses weights",
+  "exerciseBodyweight": "Bodyweight / no weights",
+  "plannedSetsCount": "{count, plural, one{{count} planned set} other{{count} planned sets}}",
+  "@plannedSetsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "completedSetsCount": "{count, plural, one{{count} completed set} other{{count} completed sets}}",
+  "@completedSetsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "buttonUpdate": "Update",
+  "buttonComplete": "Complete",
+  "repetitionsWithUnit": "{count} reps",
+  "@repetitionsWithUnit": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "weightDisplay": "@ {weight}",
+  "@weightDisplay": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "errorEnterTrainingName": "Enter training name",
+  "errorFillSets": "Fill all new sets with valid exercises and repetitions",
+  "errorTrainingNeedsSet": "Training must have at least one planned set",
+  "errorAddAtLeastOneSet": "Add at least one set",
+  "editTrainingTitle": "Edit Training",
+  "createTrainingTitle": "Create Training",
+  "labelTrainingName": "Training name",
+  "existingSetsLabel": "Existing sets",
+  "newSetsLabel": "New sets",
+  "setsLabel": "Sets",
+  "labelExercise": "Exercise",
+  "actionKeep": "Keep",
+  "actionRemove": "Remove",
+  "buttonAddSet": "Add set",
+  "buttonAddNewSet": "Add new set",
+  "buttonSaveChanges": "Save changes",
+  "buttonAddTraining": "Add"
+}

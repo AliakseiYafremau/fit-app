@@ -13,3 +13,19 @@ class NewExerciseDTO {
     this.links = const [],
   });
 }
+
+class UpdateExerciseDTO {
+  final String exerciseId;
+  final String name;
+  final String technique;
+  final String notes;
+  final List<String> links;
+
+  UpdateExerciseDTO({
+    required this.exerciseId,
+    required this.name,
+    required this.technique,
+    this.notes = '',
+    this.links = const [],
+  });
+}

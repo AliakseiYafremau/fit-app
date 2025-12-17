@@ -8,6 +8,8 @@ import 'package:fit_app/application/interactors/create_exercise.dart';
 import 'package:fit_app/application/interactors/create_training.dart';
 import 'package:fit_app/application/interactors/delete_exercise.dart';
 import 'package:fit_app/application/interactors/delete_training.dart';
+import 'package:fit_app/application/interactors/update_exercise.dart';
+import 'package:fit_app/application/interactors/update_training.dart';
 import 'package:fit_app/application/interfaces/id_generator.dart';
 import 'package:fit_app/application/interfaces/repo/exercise.dart';
 import 'package:fit_app/application/interfaces/repo/session.dart';
@@ -48,6 +50,22 @@ List<SingleChildWidget> buildAppProviders(Isar isar) => [
         update: (_, trainingRepository, exerciseRepository,
                 plannedSetRepository, idGenerator, previous) =>
             CreateTraining(
+          trainingRepository: trainingRepository,
+          exerciseRepository: exerciseRepository,
+          plannedSetRepository: plannedSetRepository,
+          idGenerator: idGenerator,
+        ),
+      ),
+      ProxyProvider<ExerciseRepository, UpdateExercise>(
+        update: (_, exerciseRepository, previous) => UpdateExercise(
+          exerciseRepository: exerciseRepository,
+        ),
+      ),
+      ProxyProvider4<TrainingRepository, ExerciseRepository,
+          PlannedSetRepository, IdGenerator, UpdateTraining>(
+        update: (_, trainingRepository, exerciseRepository,
+                plannedSetRepository, idGenerator, previous) =>
+            UpdateTraining(
           trainingRepository: trainingRepository,
           exerciseRepository: exerciseRepository,
           plannedSetRepository: plannedSetRepository,

@@ -42,6 +42,21 @@ class IsarExerciseRepository implements ExerciseRepository {
   }
 
   @override
+  void update(Exercise exercise) {
+    _isar.writeTxnSync(() {
+      final existing =
+          _collection.where().entityIdEqualTo(exercise.id).findFirstSync();
+      if (existing == null) {
+        throw StateError('Exercise with id ${exercise.id} not found');
+      }
+      final model =
+          mapExerciseToModel(exercise, existing: existing);
+      model.isarId = existing.isarId;
+      _collection.putSync(model);
+    });
+  }
+
+  @override
   void delete(domain_id.Id exerciseId) {
     _isar.writeTxnSync(() {
       final model =

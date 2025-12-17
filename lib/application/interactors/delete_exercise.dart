@@ -61,7 +61,7 @@ class DeleteExercise {
         name: training.name,
         plannedSets: updatedPlannedSets,
       );
-      trainingRepository.add(updatedTraining);
+      trainingRepository.update(updatedTraining);
       trainingsById[training.id] = updatedTraining;
     }
 

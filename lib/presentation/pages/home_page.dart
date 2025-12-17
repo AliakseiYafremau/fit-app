@@ -87,6 +87,26 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> _onEditExercise(Exercise exercise) async {
+    final updated = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => CreateExerciseSheet(exercise: exercise),
+    );
+    if (!mounted || updated != true) return;
+    _refreshExercises();
+  }
+
+  Future<void> _onEditTraining(Training training) async {
+    final updated = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => CreateTrainingSheet(training: training),
+    );
+    if (!mounted || updated != true) return;
+    _refreshTrainings();
+  }
+
   Future<void> _onDeleteExercise(Exercise exercise) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -152,10 +172,12 @@ class _HomePageState extends State<HomePage> {
                 ? _WorkoutsList(
                     trainings: _trainings,
                     onDelete: _onDeleteTraining,
+                    onEdit: _onEditTraining,
                   )
                 : _ExercisesList(
                     exercises: _exercises,
                     onDelete: _onDeleteExercise,
+                    onEdit: _onEditExercise,
                   ),
           ),
         ],
@@ -173,10 +195,12 @@ class _WorkoutsList extends StatelessWidget {
   const _WorkoutsList({
     required this.trainings,
     required this.onDelete,
+    required this.onEdit,
   });
 
   final List<Training> trainings;
   final ValueChanged<Training> onDelete;
+  final ValueChanged<Training> onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -195,10 +219,20 @@ class _WorkoutsList extends StatelessWidget {
           child: ListTile(
             title: Text(training.name),
             subtitle: Text(subtitle),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete_outline),
-              tooltip: 'Delete workout',
-              onPressed: () => onDelete(training),
+            trailing: Wrap(
+              spacing: 4,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined),
+                  tooltip: 'Edit workout',
+                  onPressed: () => onEdit(training),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline),
+                  tooltip: 'Delete workout',
+                  onPressed: () => onDelete(training),
+                ),
+              ],
             ),
           ),
         );
@@ -213,10 +247,12 @@ class _ExercisesList extends StatelessWidget {
   const _ExercisesList({
     required this.exercises,
     required this.onDelete,
+    required this.onEdit,
   });
 
   final List<Exercise> exercises;
   final ValueChanged<Exercise> onDelete;
+  final ValueChanged<Exercise> onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -244,6 +280,11 @@ class _ExercisesList extends StatelessWidget {
                   exercise.usesWeights
                       ? Icons.fitness_center
                       : Icons.directions_run,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined),
+                  tooltip: 'Edit exercise',
+                  onPressed: () => onEdit(exercise),
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete_outline),

@@ -5,5 +5,6 @@ abstract class TrainingRepository {
   Training? getById(Id trainingId);
   Training getByPlannedSetId(Id plannedSetId);
   List<Training> getAll();
+  void update(Training training);
   void delete(Id trainingId);
 }

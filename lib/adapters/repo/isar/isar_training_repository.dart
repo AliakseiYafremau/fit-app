@@ -71,6 +71,23 @@ class IsarTrainingRepository implements TrainingRepository {
     });
   }
 
+  @override
+  void update(Training training) {
+    _isar.writeTxnSync(() {
+      final existing =
+          _collection.where().entityIdEqualTo(training.id).findFirstSync();
+      if (existing == null) {
+        throw StateError('Training with id ${training.id} not found');
+      }
+      final model = mapTrainingToModel(
+        training,
+        existing: existing,
+      );
+      model.isarId = existing.isarId;
+      _collection.putSync(model);
+    });
+  }
+
   Training _mapTrainingFromModel(TrainingModel model) {
     final plannedSets = <PlannedSet>[];
 

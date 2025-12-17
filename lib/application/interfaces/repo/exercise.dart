@@ -4,5 +4,6 @@ abstract class ExerciseRepository {
   Exercise? getById(Id exerciseId);
   List<Exercise> getAll();
   void add(Exercise exercise);
+  void update(Exercise exercise);
   void delete(Id exerciseId);
 }

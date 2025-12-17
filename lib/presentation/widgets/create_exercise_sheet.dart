@@ -1,10 +1,14 @@
 import 'package:fit_app/application/dto/exercise.dart';
 import 'package:fit_app/application/interactors/create_exercise.dart';
+import 'package:fit_app/application/interactors/update_exercise.dart';
+import 'package:fit_app/domain/entities/exercise.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CreateExerciseSheet extends StatefulWidget {
-  const CreateExerciseSheet({super.key});
+  const CreateExerciseSheet({super.key, this.exercise});
+
+  final Exercise? exercise;
 
   @override
   State<CreateExerciseSheet> createState() => _CreateExerciseSheetState();
@@ -18,12 +22,29 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
   bool _usesWeights = true;
 
   late final CreateExercise _createExercise;
+  late final UpdateExercise _updateExercise;
   bool _dependenciesReady = false;
+  bool get _isEditing => widget.exercise != null;
 
   @override
   void initState() {
     super.initState();
-    _linkControllers.add(TextEditingController());
+    final exercise = widget.exercise;
+    if (exercise != null) {
+      _nameController.text = exercise.name;
+      _techniqueController.text = exercise.technique;
+      _notesController.text = exercise.notes;
+      _usesWeights = exercise.usesWeights;
+      if (exercise.links.isEmpty) {
+        _linkControllers.add(TextEditingController());
+      } else {
+        for (final link in exercise.links) {
+          _linkControllers.add(TextEditingController(text: link));
+        }
+      }
+    } else {
+      _linkControllers.add(TextEditingController());
+    }
   }
 
   @override
@@ -31,6 +52,7 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
     super.didChangeDependencies();
     if (_dependenciesReady) return;
     _createExercise = context.read<CreateExercise>();
+    _updateExercise = context.read<UpdateExercise>();
     _dependenciesReady = true;
   }
 
@@ -77,15 +99,26 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
         .where((link) => link.isNotEmpty)
         .toList();
 
-    final dto = NewExerciseDTO(
-      name: name,
-      technique: technique,
-      notes: notes,
-      usesWeights: _usesWeights,
-      links: links,
-    );
+    if (_isEditing) {
+      final dto = UpdateExerciseDTO(
+        exerciseId: widget.exercise!.id,
+        name: name,
+        technique: technique,
+        notes: notes,
+        links: links,
+      );
+      _updateExercise.execute(dto);
+    } else {
+      final dto = NewExerciseDTO(
+        name: name,
+        technique: technique,
+        notes: notes,
+        usesWeights: _usesWeights,
+        links: links,
+      );
 
-    _createExercise.execute(dto);
+      _createExercise.execute(dto);
+    }
     Navigator.of(context).pop(true);
   }
 
@@ -112,7 +145,7 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Create Exercise',
+                _isEditing ? 'Edit Exercise' : 'Create Exercise',
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 16),
@@ -145,7 +178,9 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
               SwitchListTile(
                 value: _usesWeights,
                 title: const Text('Uses weights'),
-                onChanged: (value) => setState(() => _usesWeights = value),
+                onChanged: _isEditing
+                    ? null
+                    : (value) => setState(() => _usesWeights = value),
               ),
               const SizedBox(height: 12),
               Text(
@@ -188,7 +223,7 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _submit,
-                  child: const Text('Add exercise'),
+                  child: Text(_isEditing ? 'Save changes' : 'Add exercise'),
                 ),
               ),
             ],

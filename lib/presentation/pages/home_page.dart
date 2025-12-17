@@ -529,10 +529,12 @@ class _ExercisesList extends StatelessWidget {
     if (exercises.isEmpty) {
       return const _EmptyState(message: 'No exercises yet');
     }
+    final fileManager = context.read<FileManager>();
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       itemBuilder: (context, index) {
         final exercise = exercises[index];
+        final photoId = exercise.photoId;
         return Card(
           child: ListTile(
             title: Text(exercise.name),
@@ -544,10 +546,30 @@ class _ExercisesList extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             onTap: () => onView(exercise),
-            trailing: Icon(
-              exercise.usesWeights
-                  ? Icons.fitness_center
-                  : Icons.directions_run,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (photoId != null && fileManager.exists(photoId))
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: SizedBox(
+                        width: 48,
+                        height: 48,
+                        child: Image.memory(
+                          fileManager.read(photoId),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                Icon(
+                  exercise.usesWeights
+                      ? Icons.fitness_center
+                      : Icons.directions_run,
+                ),
+              ],
             ),
           ),
         );

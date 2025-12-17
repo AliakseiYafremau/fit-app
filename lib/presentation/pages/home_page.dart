@@ -287,18 +287,6 @@ class _HomePageState extends State<HomePage> {
     _showSessionHistoryDetails(selectedSession);
   }
 
-  Future<void> _openCalendarSheet() async {
-    final sessions = _sessionRepository.getCompleted();
-    if (!mounted) return;
-    final selectedSession = await showModalBottomSheet<Session>(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) => _CalendarSheet(sessions: sessions),
-    );
-    if (!mounted || selectedSession == null) return;
-    _showSessionHistoryDetails(selectedSession);
-  }
-
   Future<void> _showSessionHistoryDetails(Session session) async {
     await showModalBottomSheet<void>(
       context: context,
@@ -515,14 +503,7 @@ class _HomePageState extends State<HomePage> {
                 Positioned(
                   left: 16,
                   bottom: 24,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _CalendarBubbleButton(onTap: _openCalendarSheet),
-                      const SizedBox(height: 12),
-                      _HistoryBubbleButton(onTap: _openHistorySheet),
-                    ],
-                  ),
+                  child: _HistoryBubbleButton(onTap: _openHistorySheet),
                 ),
               ],
             ),
@@ -627,49 +608,6 @@ class _HistoryBubbleButton extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 l10n.historyButton,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _CalendarBubbleButton extends StatelessWidget {
-  const _CalendarBubbleButton({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final l10n = AppLocalizations.of(context)!;
-    final borderRadius = BorderRadius.circular(26);
-    return Material(
-      elevation: 4,
-      color: colorScheme.surface,
-      borderRadius: borderRadius,
-      child: InkWell(
-        borderRadius: borderRadius,
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.calendar_month,
-                color: colorScheme.primary,
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                l10n.calendarButton,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: colorScheme.primary,
                       fontWeight: FontWeight.w600,
@@ -1280,84 +1218,17 @@ class _ExercisePhotoViewer extends StatelessWidget {
   }
 }
 
-class _HistorySheet extends StatelessWidget {
+class _HistorySheet extends StatefulWidget {
   const _HistorySheet({required this.sessions});
 
   final List<Session> sessions;
 
   @override
-  Widget build(BuildContext context) {
-    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
-    final listHeight = (MediaQuery.of(context).size.height * 0.5)
-        .clamp(240.0, 520.0)
-        .toDouble();
-    final l10n = AppLocalizations.of(context)!;
-    return SafeArea(
-      child: Padding(
-        padding: EdgeInsets.only(
-          left: 20,
-          right: 20,
-          top: 24,
-          bottom: bottomPadding + 24,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l10n.sessionHistoryTitle,
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 12),
-            if (sessions.isEmpty)
-              Text(l10n.sessionHistoryEmpty)
-            else
-              SizedBox(
-                height: listHeight,
-                child: ListView.separated(
-                  itemBuilder: (context, index) {
-                    final session = sessions[index];
-                    final completedSets =
-                        session.workoutSets.where((set) => set.done).length;
-                    return Card(
-                      child: ListTile(
-                        title: Text(session.training.name),
-                        subtitle:
-                            Text(l10n.completedSetsCount(completedSets)),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () => Navigator.of(context).pop(session),
-                      ),
-                    );
-                  },
-                  separatorBuilder: (_, unused) => const SizedBox(height: 8),
-                  itemCount: sessions.length,
-                ),
-              ),
-            const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(l10n.buttonClose),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  State<_HistorySheet> createState() => _HistorySheetState();
 }
 
-class _CalendarSheet extends StatefulWidget {
-  const _CalendarSheet({required this.sessions});
-
-  final List<Session> sessions;
-
-  @override
-  State<_CalendarSheet> createState() => _CalendarSheetState();
-}
-
-class _CalendarSheetState extends State<_CalendarSheet> {
+class _HistorySheetState extends State<_HistorySheet> {
+  bool _showCalendar = false;
   late final Map<DateTime, List<Session>> _sessionsByDay;
   late final DateTime _firstDate;
   late final DateTime _lastDate;
@@ -1388,9 +1259,12 @@ class _CalendarSheetState extends State<_CalendarSheet> {
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
-    final selectedSessions =
-        _sessionsByDay[_selectedDay] ?? const <Session>[];
+    final listHeight = (MediaQuery.of(context).size.height * 0.5)
+        .clamp(240.0, 520.0)
+        .toDouble();
     final l10n = AppLocalizations.of(context)!;
+    final sessions = widget.sessions;
+    final selectedSessions = _sessionsByDay[_selectedDay] ?? const <Session>[];
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.only(
@@ -1404,41 +1278,102 @@ class _CalendarSheetState extends State<_CalendarSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              l10n.sessionCalendarTitle,
+              l10n.sessionHistoryTitle,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 12),
-            if (widget.sessions.isEmpty)
-              Text(l10n.sessionCalendarEmpty)
-            else
-              CalendarDatePicker(
-                initialDate: _selectedDay,
-                firstDate: _firstDate,
-                lastDate: DateTime.now().isAfter(_lastDate)
-                    ? DateTime.now()
-                    : _lastDate,
-                currentDate: DateTime.now(),
-                onDateChanged: (date) {
-                  setState(() => _selectedDay = _startOfDay(date));
+            if (sessions.isEmpty)
+              Text(l10n.sessionHistoryEmpty)
+            else ...[
+              ToggleButtons(
+                isSelected: [!_showCalendar, _showCalendar],
+                onPressed: (index) {
+                  setState(() => _showCalendar = index == 1);
                 },
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    child: Text(l10n.historyViewList),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    child: Text(l10n.historyViewCalendar),
+                  ),
+                ],
               ),
-            const SizedBox(height: 12),
-            Text(
-              l10n.sessionsOnDay(_formatDate(_selectedDay)),
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            if (selectedSessions.isEmpty)
-              Text(l10n.sessionDayEmpty)
-            else
-              ...selectedSessions.map(
-                (session) => ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(session.training.name),
-                  subtitle: Text(_formatTimeRange(session)),
-                  onTap: () => Navigator.of(context).pop(session),
+              const SizedBox(height: 12),
+              if (!_showCalendar)
+                SizedBox(
+                  height: listHeight,
+                  child: ListView.separated(
+                    itemBuilder: (context, index) {
+                      final session = sessions[index];
+                      final completedSets =
+                          session.workoutSets.where((set) => set.done).length;
+                      return Card(
+                        child: ListTile(
+                          title: Text(session.training.name),
+                          subtitle:
+                              Text(l10n.completedSetsCount(completedSets)),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () => Navigator.of(context).pop(session),
+                        ),
+                      );
+                    },
+                    separatorBuilder: (_, unused) => const SizedBox(height: 8),
+                    itemCount: sessions.length,
+                  ),
+                )
+              else ...[
+                Text(
+                  l10n.sessionCalendarTitle,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
+                const SizedBox(height: 8),
+                CalendarDatePicker(
+                  initialDate: _selectedDay,
+                  firstDate: _firstDate,
+                  lastDate: DateTime.now().isAfter(_lastDate)
+                      ? DateTime.now()
+                      : _lastDate,
+                  currentDate: DateTime.now(),
+                  onDateChanged: (date) {
+                    setState(() => _selectedDay = _startOfDay(date));
+                  },
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  l10n.sessionsOnDay(_formatDate(_selectedDay)),
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                if (selectedSessions.isEmpty)
+                  Text(l10n.sessionDayEmpty)
+                else
+                  ...selectedSessions.map(
+                    (session) => ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(session.training.name),
+                      subtitle: Text(_formatTimeRange(session)),
+                      onTap: () => Navigator.of(context).pop(session),
+                    ),
+                  ),
+              ],
+            ],
+            const SizedBox(height: 16),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(l10n.buttonClose),
               ),
+            ),
           ],
         ),
       ),

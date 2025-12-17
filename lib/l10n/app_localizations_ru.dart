@@ -27,6 +27,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get calendarButton => 'Календарь';
 
   @override
+  String get historyViewList => 'Список';
+
+  @override
+  String get historyViewCalendar => 'Календарь';
+
+  @override
   String get noWorkouts => 'Тренировок пока нет';
 
   @override

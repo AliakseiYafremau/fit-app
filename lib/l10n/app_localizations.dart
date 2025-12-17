@@ -134,6 +134,18 @@ abstract class AppLocalizations {
   /// **'Calendar'**
   String get calendarButton;
 
+  /// No description provided for @historyViewList.
+  ///
+  /// In en, this message translates to:
+  /// **'List'**
+  String get historyViewList;
+
+  /// No description provided for @historyViewCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar'**
+  String get historyViewCalendar;
+
   /// No description provided for @noWorkouts.
   ///
   /// In en, this message translates to:

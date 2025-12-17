@@ -6,6 +6,8 @@
   "searchHint": "Search",
   "historyButton": "History",
   "calendarButton": "Calendar",
+  "historyViewList": "List",
+  "historyViewCalendar": "Calendar",
   "noWorkouts": "No workouts yet",
   "noExercises": "No exercises yet",
   "sessionHistoryTitle": "Session history",

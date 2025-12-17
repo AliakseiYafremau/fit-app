@@ -27,6 +27,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get calendarButton => 'Calendar';
 
   @override
+  String get historyViewList => 'List';
+
+  @override
+  String get historyViewCalendar => 'Calendar';
+
+  @override
   String get noWorkouts => 'No workouts yet';
 
   @override

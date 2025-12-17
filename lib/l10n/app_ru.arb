@@ -6,6 +6,8 @@
   "searchHint": "Поиск",
   "historyButton": "История",
   "calendarButton": "Календарь",
+  "historyViewList": "Список",
+  "historyViewCalendar": "Календарь",
   "noWorkouts": "Тренировок пока нет",
   "noExercises": "Упражнений пока нет",
   "sessionHistoryTitle": "История сессий",

@@ -1,32 +1,37 @@
 import 'package:fit_app/adapters/models.dart';
 import 'package:fit_app/adapters/repo/isar/mappers.dart';
+import 'package:fit_app/application/interfaces/file_manager.dart';
 import 'package:fit_app/application/interfaces/repo/exercise.dart';
 import 'package:fit_app/domain/entities/exercise.dart';
 import 'package:fit_app/domain/entities/id.dart' as domain_id;
 import 'package:isar/isar.dart';
 
 class IsarExerciseRepository implements ExerciseRepository {
-  IsarExerciseRepository(this._isar);
+  IsarExerciseRepository(this._isar, {required FileManager fileManager})
+      : _fileManager = fileManager;
 
   final Isar _isar;
+  final FileManager _fileManager;
 
   IsarCollection<ExerciseModel> get _collection =>
       _isar.collection<ExerciseModel>();
 
   @override
   Exercise? getById(domain_id.Id id) {
-    final model =
-        _collection.where().entityIdEqualTo(id).findFirstSync();
+    final model = _collection.where().entityIdEqualTo(id).findFirstSync();
     if (model == null) {
       return null;
     }
-    return mapExerciseFromModel(model);
+    return _attachPhoto(mapExerciseFromModel(model));
   }
 
   @override
   List<Exercise> getAll() {
     final models = _collection.where().findAllSync();
-    return models.map(mapExerciseFromModel).toList(growable: false);
+    return models
+        .map(mapExerciseFromModel)
+        .map(_attachPhoto)
+        .toList(growable: false);
   }
 
   @override
@@ -65,5 +70,23 @@ class IsarExerciseRepository implements ExerciseRepository {
         _collection.deleteSync(model!.isarId!);
       }
     });
+  }
+  Exercise _attachPhoto(Exercise exercise) {
+    final photoId = '${exercise.id}_photo';
+    final hasPhoto = _fileManager.exists(photoId);
+    if (hasPhoto == (exercise.photoId != null)) {
+      if (!hasPhoto || exercise.photoId == photoId) {
+        return exercise;
+      }
+    }
+    return Exercise(
+      id: exercise.id,
+      name: exercise.name,
+      photoId: hasPhoto ? photoId : null,
+      technique: exercise.technique,
+      notes: exercise.notes,
+      usesWeights: exercise.usesWeights,
+      links: exercise.links,
+    );
   }
 }

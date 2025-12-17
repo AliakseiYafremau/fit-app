@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fit_app/adapters/models.dart';
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
@@ -23,18 +25,22 @@ Future<void> main() async {
     ],
     directory: dir.path,
   );
-  runApp(FitApp(isar: isar));
+  runApp(FitApp(
+    isar: isar,
+    appDirectory: dir,
+  ));
 }
 
 class FitApp extends StatelessWidget {
-  const FitApp({super.key, required this.isar});
+  const FitApp({super.key, required this.isar, required this.appDirectory});
 
   final Isar isar;
+  final Directory appDirectory;
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: buildAppProviders(isar),
+      providers: buildAppProviders(isar, appDirectory),
       child: MaterialApp(
         title: 'Fit App',
         theme: AppTheme.darkTheme,

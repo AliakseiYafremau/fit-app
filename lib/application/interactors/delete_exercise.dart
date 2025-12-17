@@ -1,3 +1,4 @@
+import 'package:fit_app/application/interfaces/file_manager.dart';
 import 'package:fit_app/application/interfaces/repo/exercise.dart';
 import 'package:fit_app/application/interfaces/repo/session.dart';
 import 'package:fit_app/application/interfaces/repo/training.dart';
@@ -12,6 +13,7 @@ class DeleteExercise {
   final WorkoutSetRepository workoutSetRepository;
   final TrainingRepository trainingRepository;
   final SessionRepository sessionRepository;
+  final FileManager? fileManager;
 
   DeleteExercise({
     required this.exerciseRepository,
@@ -19,6 +21,7 @@ class DeleteExercise {
     required this.workoutSetRepository,
     required this.trainingRepository,
     required this.sessionRepository,
+    this.fileManager,
   });
 
   void execute(Id exerciseId) {
@@ -91,5 +94,9 @@ class DeleteExercise {
     }
 
     exerciseRepository.delete(exerciseId);
+    final photoId = exercise.photoId ?? '${exerciseId}_photo';
+    if (fileManager?.exists(photoId) == true) {
+      fileManager?.delete(photoId);
+    }
   }
 }

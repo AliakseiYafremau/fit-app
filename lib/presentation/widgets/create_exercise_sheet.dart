@@ -1,8 +1,12 @@
+import 'dart:typed_data';
+
 import 'package:fit_app/application/dto/exercise.dart';
 import 'package:fit_app/application/interactors/create_exercise.dart';
 import 'package:fit_app/application/interactors/update_exercise.dart';
+import 'package:fit_app/application/interfaces/file_manager.dart';
 import 'package:fit_app/domain/entities/exercise.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class CreateExerciseSheet extends StatefulWidget {
@@ -20,9 +24,15 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
   final _notesController = TextEditingController();
   final List<TextEditingController> _linkControllers = [];
   bool _usesWeights = true;
+  Uint8List? _photoPreviewBytes;
+  Uint8List? _pendingPhotoBytes;
+  bool _removePhoto = false;
+  bool _loadingExistingPhoto = false;
+  final ImagePicker _imagePicker = ImagePicker();
 
   late final CreateExercise _createExercise;
   late final UpdateExercise _updateExercise;
+  late final FileManager _fileManager;
   bool _dependenciesReady = false;
   bool get _isEditing => widget.exercise != null;
 
@@ -53,7 +63,12 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
     if (_dependenciesReady) return;
     _createExercise = context.read<CreateExercise>();
     _updateExercise = context.read<UpdateExercise>();
+    _fileManager = context.read<FileManager>();
     _dependenciesReady = true;
+    final exercise = widget.exercise;
+    if (exercise?.photoId != null) {
+      _loadExistingPhoto(exercise!.photoId!);
+    }
   }
 
   @override
@@ -81,6 +96,47 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
     setState(() {});
   }
 
+  Future<void> _loadExistingPhoto(String photoId) async {
+    setState(() => _loadingExistingPhoto = true);
+    await Future<void>.delayed(Duration.zero);
+    try {
+      final bytes = _fileManager.read(photoId);
+      if (!mounted) return;
+      setState(() {
+        _photoPreviewBytes = bytes;
+        _loadingExistingPhoto = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _loadingExistingPhoto = false);
+    }
+  }
+
+  Future<void> _pickPhoto() async {
+    final picked = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1600,
+      imageQuality: 85,
+    );
+    if (picked == null) return;
+    final bytes = await picked.readAsBytes();
+    if (!mounted) return;
+    setState(() {
+      _photoPreviewBytes = bytes;
+      _pendingPhotoBytes = bytes;
+      _removePhoto = false;
+    });
+  }
+
+  void _removePhotoSelection() {
+    final hadExisting = widget.exercise?.photoId != null;
+    setState(() {
+      _photoPreviewBytes = null;
+      _pendingPhotoBytes = null;
+      _removePhoto = hadExisting;
+    });
+  }
+
   void _submit() {
     final name = _nameController.text.trim();
     final technique = _techniqueController.text.trim();
@@ -104,6 +160,8 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
         technique: techniqueValue,
         notes: notesValue,
         links: links,
+        photoBytes: _pendingPhotoBytes,
+        removePhoto: _removePhoto,
       );
       _updateExercise.execute(dto);
     } else {
@@ -113,6 +171,7 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
         notes: notesValue,
         usesWeights: _usesWeights,
         links: links,
+        photoBytes: _pendingPhotoBytes,
       );
 
       _createExercise.execute(dto);
@@ -153,6 +212,58 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
                   labelText: 'Exercise name',
                   border: OutlineInputBorder(),
                 ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Photo',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              _loadingExistingPhoto
+                  ? const SizedBox(
+                      height: 180,
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  : _photoPreviewBytes != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.memory(
+                            _photoPreviewBytes!,
+                            height: 180,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : Container(
+                          height: 180,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.black12,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.white24),
+                          ),
+                          alignment: Alignment.center,
+                          child: const Text('No photo selected'),
+                        ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: _pickPhoto,
+                    icon: const Icon(Icons.photo_library_outlined),
+                    label: Text(_photoPreviewBytes == null
+                        ? 'Add photo'
+                        : 'Change photo'),
+                  ),
+                  const SizedBox(width: 12),
+                  if (_photoPreviewBytes != null ||
+                      (widget.exercise?.photoId != null && !_removePhoto))
+                    TextButton.icon(
+                      onPressed: _removePhotoSelection,
+                      icon: const Icon(Icons.delete_outline),
+                      label: const Text('Remove'),
+                    ),
+                ],
               ),
               const SizedBox(height: 12),
               TextField(

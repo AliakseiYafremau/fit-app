@@ -1,6 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:fit_app/application/interactors/cancel_session.dart';
 import 'package:fit_app/application/interactors/complete_set.dart';
 import 'package:fit_app/application/interactors/undo_complete_set.dart';
+import 'package:fit_app/application/interfaces/file_manager.dart';
 import 'package:fit_app/application/interactors/delete_exercise.dart';
 import 'package:fit_app/application/interactors/delete_training.dart';
 import 'package:fit_app/application/interactors/finish_session.dart';
@@ -702,6 +705,15 @@ class _ExerciseDetailsSheet extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 12),
+              if (exercise.photoId != null) ...[
+                Text(
+                  'Photo',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                _ExercisePhotoViewer(photoId: exercise.photoId!),
+                const SizedBox(height: 16),
+              ],
               Row(
                 children: [
                   Icon(
@@ -946,6 +958,50 @@ String? _extractYoutubeId(Uri uri) {
     }
   }
   return null;
+}
+
+class _ExercisePhotoViewer extends StatelessWidget {
+  const _ExercisePhotoViewer({required this.photoId});
+
+  final String photoId;
+
+  @override
+  Widget build(BuildContext context) {
+    final fileManager = context.read<FileManager>();
+    return FutureBuilder<Uint8List>(
+      future: Future<Uint8List>(() => fileManager.read(photoId)),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SizedBox(
+            height: 180,
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (!snapshot.hasData || snapshot.hasError) {
+          return Container(
+            height: 180,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.black12,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white24),
+            ),
+            alignment: Alignment.center,
+            child: const Text('Unable to load photo'),
+          );
+        }
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.memory(
+            snapshot.data!,
+            height: 180,
+            width: double.infinity,
+            fit: BoxFit.cover,
+          ),
+        );
+      },
+    );
+  }
 }
 
 class _HistorySheet extends StatelessWidget {

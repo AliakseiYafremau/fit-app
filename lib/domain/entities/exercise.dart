@@ -6,6 +6,7 @@ import 'package:fit_app/domain/entities/id.dart';
 class Exercise {
   final Id id;
   final String name;
+  final Id? photoId;
   final String? technique;
   final String? notes;
   final bool usesWeights;
@@ -14,6 +15,7 @@ class Exercise {
   Exercise({
     required this.id,
     required this.name,
+    this.photoId,
     this.technique,
     this.notes,
     required this.usesWeights,

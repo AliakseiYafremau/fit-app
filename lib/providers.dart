@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:fit_app/adapters/file/local_file_manager.dart';
 import 'package:fit_app/adapters/repo/isar/isar_exercise_repository.dart';
 import 'package:fit_app/adapters/repo/isar/isar_planned_set_repository.dart';
 import 'package:fit_app/adapters/repo/isar/isar_session_repository.dart';
@@ -15,6 +18,7 @@ import 'package:fit_app/application/interactors/finish_session.dart';
 import 'package:fit_app/application/interactors/update_exercise.dart';
 import 'package:fit_app/application/interactors/update_training.dart';
 import 'package:fit_app/application/interactors/undo_complete_set.dart';
+import 'package:fit_app/application/interfaces/file_manager.dart';
 import 'package:fit_app/application/interfaces/id_generator.dart';
 import 'package:fit_app/application/interfaces/repo/exercise.dart';
 import 'package:fit_app/application/interfaces/repo/session.dart';
@@ -25,12 +29,16 @@ import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
 /// Builds the registry of all application-level dependencies.
-List<SingleChildWidget> buildAppProviders(Isar isar) => [
+List<SingleChildWidget> buildAppProviders(Isar isar, Directory appDirectory) => [
       Provider<IdGenerator>(
         create: (_) => UuidGenerator(),
       ),
-      Provider<ExerciseRepository>(
-        create: (_) => IsarExerciseRepository(isar),
+      Provider<FileManager>(
+        create: (_) => LocalFileManager(rootDirectory: appDirectory),
+      ),
+      ProxyProvider<FileManager, ExerciseRepository>(
+        update: (_, fileManager, previous) =>
+            IsarExerciseRepository(isar, fileManager: fileManager),
       ),
       Provider<TrainingRepository>(
         create: (_) => IsarTrainingRepository(isar),
@@ -44,10 +52,12 @@ List<SingleChildWidget> buildAppProviders(Isar isar) => [
       Provider<SessionRepository>(
         create: (_) => IsarSessionRepository(isar),
       ),
-      ProxyProvider2<ExerciseRepository, IdGenerator, CreateExercise>(
-        update: (_, exerciseRepository, idGenerator, previous) => CreateExercise(
+      ProxyProvider3<ExerciseRepository, IdGenerator, FileManager, CreateExercise>(
+        update: (_, exerciseRepository, idGenerator, fileManager, previous) =>
+            CreateExercise(
           exerciseRepository: exerciseRepository,
           idGenerator: idGenerator,
+          fileManager: fileManager,
         ),
       ),
       ProxyProvider4<TrainingRepository, ExerciseRepository,
@@ -61,9 +71,10 @@ List<SingleChildWidget> buildAppProviders(Isar isar) => [
           idGenerator: idGenerator,
         ),
       ),
-      ProxyProvider<ExerciseRepository, UpdateExercise>(
-        update: (_, exerciseRepository, previous) => UpdateExercise(
+      ProxyProvider2<ExerciseRepository, FileManager, UpdateExercise>(
+        update: (_, exerciseRepository, fileManager, previous) => UpdateExercise(
           exerciseRepository: exerciseRepository,
+          fileManager: fileManager,
         ),
       ),
       ProxyProvider4<TrainingRepository, ExerciseRepository,
@@ -110,18 +121,19 @@ List<SingleChildWidget> buildAppProviders(Isar isar) => [
           plannedSetRepository: plannedSetRepository,
         ),
       ),
-      ProxyProvider5<ExerciseRepository, PlannedSetRepository,
-          WorkoutSetRepository, TrainingRepository, SessionRepository,
+      ProxyProvider6<ExerciseRepository, PlannedSetRepository,
+          WorkoutSetRepository, TrainingRepository, SessionRepository, FileManager,
           DeleteExercise>(
         update: (_, exerciseRepository, plannedSetRepository,
                 workoutSetRepository, trainingRepository, sessionRepository,
-                previous) =>
+                fileManager, previous) =>
             DeleteExercise(
           exerciseRepository: exerciseRepository,
           plannedSetRepository: plannedSetRepository,
           workoutSetRepository: workoutSetRepository,
           trainingRepository: trainingRepository,
           sessionRepository: sessionRepository,
+          fileManager: fileManager,
         ),
       ),
       ProxyProvider<SessionRepository, CancelSession>(

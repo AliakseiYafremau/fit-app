@@ -44,6 +44,7 @@ class StartSession {
       training: training,
       workoutSets: workoutSets,
       active: true,
+      startedAt: DateTime.now(),
     );
 
     sessionRepository.add(session);

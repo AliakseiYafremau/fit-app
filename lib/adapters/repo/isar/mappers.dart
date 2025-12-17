@@ -75,6 +75,8 @@ SessionModel mapSessionToModel(
   model.trainingId = session.training.id;
   model.workoutSetIds = List<String>.from(workoutSetIds);
   model.active = session.active;
+  model.startedAt = session.startedAt;
+  model.finishedAt = session.finishedAt;
   return model;
 }
 
@@ -88,6 +90,8 @@ Session mapSessionFromModel(
     training: training,
     workoutSets: workoutSets,
     active: model.active,
+    startedAt: model.startedAt,
+    finishedAt: model.finishedAt,
   );
 }
 

@@ -26,6 +26,8 @@ class SessionModel {
   late String trainingId;
   List<String> workoutSetIds = [];
   bool active = true;
+  DateTime startedAt = DateTime.now();
+  DateTime? finishedAt;
 }
 
 @collection

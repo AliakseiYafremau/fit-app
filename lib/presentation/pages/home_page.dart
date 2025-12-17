@@ -274,6 +274,18 @@ class _HomePageState extends State<HomePage> {
     _showSessionHistoryDetails(selectedSession);
   }
 
+  Future<void> _openCalendarSheet() async {
+    final sessions = _sessionRepository.getCompleted();
+    if (!mounted) return;
+    final selectedSession = await showModalBottomSheet<Session>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => _CalendarSheet(sessions: sessions),
+    );
+    if (!mounted || selectedSession == null) return;
+    _showSessionHistoryDetails(selectedSession);
+  }
+
   Future<void> _showSessionHistoryDetails(Session session) async {
     await showModalBottomSheet<void>(
       context: context,
@@ -406,7 +418,13 @@ class _HomePageState extends State<HomePage> {
                 Positioned(
                   left: 16,
                   bottom: 24,
-                  child: _HistoryBubbleButton(onTap: _openHistorySheet),
+                  child: Row(
+                    children: [
+                      _CalendarBubbleButton(onTap: _openCalendarSheet),
+                      const SizedBox(width: 12),
+                      _HistoryBubbleButton(onTap: _openHistorySheet),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -502,6 +520,48 @@ class _HistoryBubbleButton extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 'History',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CalendarBubbleButton extends StatelessWidget {
+  const _CalendarBubbleButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final borderRadius = BorderRadius.circular(26);
+    return Material(
+      elevation: 4,
+      color: colorScheme.surface,
+      borderRadius: borderRadius,
+      child: InkWell(
+        borderRadius: borderRadius,
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.calendar_month,
+                color: colorScheme.primary,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Calendar',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: colorScheme.primary,
                       fontWeight: FontWeight.w600,
@@ -982,6 +1042,34 @@ String? _extractYoutubeId(Uri uri) {
   return null;
 }
 
+String _formatDateTime(DateTime dateTime) {
+  return '${dateTime.year.toString().padLeft(4, '0')}-'
+      '${dateTime.month.toString().padLeft(2, '0')}-'
+      '${dateTime.day.toString().padLeft(2, '0')} '
+      '${dateTime.hour.toString().padLeft(2, '0')}:'
+      '${dateTime.minute.toString().padLeft(2, '0')}';
+}
+
+String _formatDate(DateTime dateTime) {
+  return '${dateTime.year.toString().padLeft(4, '0')}-'
+      '${dateTime.month.toString().padLeft(2, '0')}-'
+      '${dateTime.day.toString().padLeft(2, '0')}';
+}
+
+String _formatTime(DateTime dateTime) {
+  return '${dateTime.hour.toString().padLeft(2, '0')}:'
+      '${dateTime.minute.toString().padLeft(2, '0')}';
+}
+
+String _formatTimeRange(Session session) {
+  final start = _formatTime(session.startedAt);
+  final end = session.finishedAt != null ? _formatTime(session.finishedAt!) : null;
+  return end == null ? start : '$start – $end';
+}
+
+DateTime _startOfDay(DateTime dateTime) =>
+    DateTime(dateTime.year, dateTime.month, dateTime.day);
+
 class _ExercisePhotoViewer extends StatelessWidget {
   const _ExercisePhotoViewer({required this.photoId});
 
@@ -1094,6 +1182,103 @@ class _HistorySheet extends StatelessWidget {
   }
 }
 
+class _CalendarSheet extends StatefulWidget {
+  const _CalendarSheet({required this.sessions});
+
+  final List<Session> sessions;
+
+  @override
+  State<_CalendarSheet> createState() => _CalendarSheetState();
+}
+
+class _CalendarSheetState extends State<_CalendarSheet> {
+  late final Map<DateTime, List<Session>> _sessionsByDay;
+  late final DateTime _firstDate;
+  late final DateTime _lastDate;
+  late DateTime _selectedDay;
+
+  @override
+  void initState() {
+    super.initState();
+    final sorted = List<Session>.from(widget.sessions)
+      ..sort((a, b) => a.startedAt.compareTo(b.startedAt));
+    _sessionsByDay = {};
+    for (final session in sorted) {
+      final key = _startOfDay(session.startedAt);
+      _sessionsByDay.putIfAbsent(key, () => []).add(session);
+    }
+    if (sorted.isNotEmpty) {
+      _firstDate = _startOfDay(sorted.first.startedAt);
+      _lastDate = _startOfDay(sorted.last.startedAt);
+      _selectedDay = _lastDate;
+    } else {
+      final today = _startOfDay(DateTime.now());
+      _firstDate = today.subtract(const Duration(days: 365));
+      _lastDate = today;
+      _selectedDay = today;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+    final selectedSessions =
+        _sessionsByDay[_selectedDay] ?? const <Session>[];
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 24,
+          bottom: bottomPadding + 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Session calendar',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 12),
+            if (widget.sessions.isEmpty)
+              const Text('No completed sessions yet')
+            else
+              CalendarDatePicker(
+                initialDate: _selectedDay,
+                firstDate: _firstDate,
+                lastDate: DateTime.now().isAfter(_lastDate)
+                    ? DateTime.now()
+                    : _lastDate,
+                currentDate: DateTime.now(),
+                onDateChanged: (date) {
+                  setState(() => _selectedDay = _startOfDay(date));
+                },
+              ),
+            const SizedBox(height: 12),
+            Text(
+              'Sessions on ${_formatDate(_selectedDay)}',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            if (selectedSessions.isEmpty)
+              const Text('No sessions on this day')
+            else
+              ...selectedSessions.map(
+                (session) => ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(session.training.name),
+                  subtitle: Text(_formatTimeRange(session)),
+                  onTap: () => Navigator.of(context).pop(session),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _SessionHistoryDetailsSheet extends StatelessWidget {
   const _SessionHistoryDetailsSheet({
     required this.session,
@@ -1124,6 +1309,12 @@ class _SessionHistoryDetailsSheet extends StatelessWidget {
                 session.training.name,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
+              const SizedBox(height: 4),
+              Text('Started ${_formatDateTime(session.startedAt)}'),
+              if (session.finishedAt != null) ...[
+                const SizedBox(height: 2),
+                Text('Finished ${_formatDateTime(session.finishedAt!)}'),
+              ],
               const SizedBox(height: 8),
               Text(
                 'Completed session summary',
@@ -1343,6 +1534,8 @@ class _SessionSheetState extends State<_SessionSheet> {
                 'Session: ${_session.training.name}',
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
+              const SizedBox(height: 4),
+              Text('Started ${_formatDateTime(_session.startedAt)}'),
               const SizedBox(height: 16),
               if (sets.isEmpty)
                 const Text('No sets in this session')

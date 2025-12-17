@@ -11,11 +11,15 @@ class Session {
   final Training training;
   final List<WorkoutSet> workoutSets;
   final bool active;
+  final DateTime startedAt;
+  final DateTime? finishedAt;
 
   Session({
     required this.id,
     required this.training,
     List<WorkoutSet>? workoutSets,
     this.active = true,
+    required this.startedAt,
+    this.finishedAt,
   }) : workoutSets = workoutSets ?? [];
 }

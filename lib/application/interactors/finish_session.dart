@@ -20,6 +20,8 @@ class FinishSession {
       training: session.training,
       workoutSets: session.workoutSets,
       active: false,
+      startedAt: session.startedAt,
+      finishedAt: DateTime.now(),
     );
     sessionRepository.update(updated);
   }

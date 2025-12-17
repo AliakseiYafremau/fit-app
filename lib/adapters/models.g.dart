@@ -1459,13 +1459,23 @@ const SessionModelSchema = CollectionSchema(
       name: r'entityId',
       type: IsarType.string,
     ),
-    r'trainingId': PropertySchema(
+    r'finishedAt': PropertySchema(
       id: 2,
+      name: r'finishedAt',
+      type: IsarType.dateTime,
+    ),
+    r'startedAt': PropertySchema(
+      id: 3,
+      name: r'startedAt',
+      type: IsarType.dateTime,
+    ),
+    r'trainingId': PropertySchema(
+      id: 4,
       name: r'trainingId',
       type: IsarType.string,
     ),
     r'workoutSetIds': PropertySchema(
-      id: 3,
+      id: 5,
       name: r'workoutSetIds',
       type: IsarType.stringList,
     )
@@ -1524,8 +1534,10 @@ void _sessionModelSerialize(
 ) {
   writer.writeBool(offsets[0], object.active);
   writer.writeString(offsets[1], object.entityId);
-  writer.writeString(offsets[2], object.trainingId);
-  writer.writeStringList(offsets[3], object.workoutSetIds);
+  writer.writeDateTime(offsets[2], object.finishedAt);
+  writer.writeDateTime(offsets[3], object.startedAt);
+  writer.writeString(offsets[4], object.trainingId);
+  writer.writeStringList(offsets[5], object.workoutSetIds);
 }
 
 SessionModel _sessionModelDeserialize(
@@ -1537,9 +1549,11 @@ SessionModel _sessionModelDeserialize(
   final object = SessionModel();
   object.active = reader.readBool(offsets[0]);
   object.entityId = reader.readString(offsets[1]);
+  object.finishedAt = reader.readDateTimeOrNull(offsets[2]);
   object.isarId = id;
-  object.trainingId = reader.readString(offsets[2]);
-  object.workoutSetIds = reader.readStringList(offsets[3]) ?? [];
+  object.startedAt = reader.readDateTime(offsets[3]);
+  object.trainingId = reader.readString(offsets[4]);
+  object.workoutSetIds = reader.readStringList(offsets[5]) ?? [];
   return object;
 }
 
@@ -1555,8 +1569,12 @@ P _sessionModelDeserializeProp<P>(
     case 1:
       return (reader.readString(offset)) as P;
     case 2:
-      return (reader.readString(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 3:
+      return (reader.readDateTime(offset)) as P;
+    case 4:
+      return (reader.readString(offset)) as P;
+    case 5:
       return (reader.readStringList(offset) ?? []) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1906,6 +1924,80 @@ extension SessionModelQueryFilter
   }
 
   QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
+      finishedAtIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'finishedAt',
+      ));
+    });
+  }
+
+  QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
+      finishedAtIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'finishedAt',
+      ));
+    });
+  }
+
+  QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
+      finishedAtEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'finishedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
+      finishedAtGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'finishedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
+      finishedAtLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'finishedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
+      finishedAtBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'finishedAt',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
       isarIdIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -1970,6 +2062,62 @@ extension SessionModelQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
         property: r'isarId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
+      startedAtEqualTo(DateTime value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'startedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
+      startedAtGreaterThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'startedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
+      startedAtLessThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'startedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
+      startedAtBetween(
+    DateTime lower,
+    DateTime upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'startedAt',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -2372,6 +2520,31 @@ extension SessionModelQuerySortBy
     });
   }
 
+  QueryBuilder<SessionModel, SessionModel, QAfterSortBy> sortByFinishedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'finishedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<SessionModel, SessionModel, QAfterSortBy>
+      sortByFinishedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'finishedAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<SessionModel, SessionModel, QAfterSortBy> sortByStartedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'startedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<SessionModel, SessionModel, QAfterSortBy> sortByStartedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'startedAt', Sort.desc);
+    });
+  }
+
   QueryBuilder<SessionModel, SessionModel, QAfterSortBy> sortByTrainingId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'trainingId', Sort.asc);
@@ -2412,6 +2585,19 @@ extension SessionModelQuerySortThenBy
     });
   }
 
+  QueryBuilder<SessionModel, SessionModel, QAfterSortBy> thenByFinishedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'finishedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<SessionModel, SessionModel, QAfterSortBy>
+      thenByFinishedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'finishedAt', Sort.desc);
+    });
+  }
+
   QueryBuilder<SessionModel, SessionModel, QAfterSortBy> thenByIsarId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isarId', Sort.asc);
@@ -2421,6 +2607,18 @@ extension SessionModelQuerySortThenBy
   QueryBuilder<SessionModel, SessionModel, QAfterSortBy> thenByIsarIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isarId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<SessionModel, SessionModel, QAfterSortBy> thenByStartedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'startedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<SessionModel, SessionModel, QAfterSortBy> thenByStartedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'startedAt', Sort.desc);
     });
   }
 
@@ -2450,6 +2648,18 @@ extension SessionModelQueryWhereDistinct
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'entityId', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<SessionModel, SessionModel, QDistinct> distinctByFinishedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'finishedAt');
+    });
+  }
+
+  QueryBuilder<SessionModel, SessionModel, QDistinct> distinctByStartedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'startedAt');
     });
   }
 
@@ -2485,6 +2695,18 @@ extension SessionModelQueryProperty
   QueryBuilder<SessionModel, String, QQueryOperations> entityIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'entityId');
+    });
+  }
+
+  QueryBuilder<SessionModel, DateTime?, QQueryOperations> finishedAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'finishedAt');
+    });
+  }
+
+  QueryBuilder<SessionModel, DateTime, QQueryOperations> startedAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'startedAt');
     });
   }
 

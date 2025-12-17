@@ -10,10 +10,12 @@ class Session {
   final Id id;
   final Training training;
   final List<WorkoutSet> workoutSets;
+  final bool active;
 
   Session({
     required this.id,
     required this.training,
     List<WorkoutSet>? workoutSets,
+    this.active = true,
   }) : workoutSets = workoutSets ?? [];
 }

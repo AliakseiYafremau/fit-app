@@ -25,7 +25,11 @@ class IsarWorkoutSetRepository implements WorkoutSetRepository {
         existing: existing,
       );
       model.isarId = existing?.isarId;
-      _collection.putSync(model);
+      if (existing == null) {
+        _collection.putByEntityIdSync(model);
+      } else {
+        _collection.putSync(model);
+      }
     });
   }
 
@@ -49,6 +53,33 @@ class IsarWorkoutSetRepository implements WorkoutSetRepository {
   }
 
   @override
+  WorkoutSet? getById(domain_id.Id workoutSetId) {
+    final model =
+        _collection.where().entityIdEqualTo(workoutSetId).findFirstSync();
+    if (model == null) {
+      return null;
+    }
+    return _mapWorkoutSetFromModel(model);
+  }
+
+  @override
+  void update(WorkoutSet workoutSet) {
+    _isar.writeTxnSync(() {
+      final existing =
+          _collection.where().entityIdEqualTo(workoutSet.id).findFirstSync();
+      if (existing == null) {
+        throw StateError('WorkoutSet with id ${workoutSet.id} not found');
+      }
+      final model = mapWorkoutSetToModel(
+        workoutSet,
+        existing: existing,
+      );
+      model.isarId = existing.isarId;
+      _collection.putSync(model);
+    });
+  }
+
+  @override
   void delete(domain_id.Id workoutSetId) {
     _isar.writeTxnSync(() {
       final model =
@@ -57,5 +88,17 @@ class IsarWorkoutSetRepository implements WorkoutSetRepository {
         _collection.deleteSync(model!.isarId!);
       }
     });
+  }
+
+  WorkoutSet? _mapWorkoutSetFromModel(WorkoutSetModel model) {
+    final exerciseModel = _exerciseCollection
+        .where()
+        .entityIdEqualTo(model.exerciseId)
+        .findFirstSync();
+    if (exerciseModel == null) {
+      return null;
+    }
+    final exercise = mapExerciseFromModel(exerciseModel);
+    return mapWorkoutSetFromModel(model, exercise);
   }
 }

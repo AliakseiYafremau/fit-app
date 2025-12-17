@@ -1449,18 +1449,23 @@ const SessionModelSchema = CollectionSchema(
   name: r'SessionModel',
   id: 3961338372060081682,
   properties: {
-    r'entityId': PropertySchema(
+    r'active': PropertySchema(
       id: 0,
+      name: r'active',
+      type: IsarType.bool,
+    ),
+    r'entityId': PropertySchema(
+      id: 1,
       name: r'entityId',
       type: IsarType.string,
     ),
     r'trainingId': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'trainingId',
       type: IsarType.string,
     ),
     r'workoutSetIds': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'workoutSetIds',
       type: IsarType.stringList,
     )
@@ -1517,9 +1522,10 @@ void _sessionModelSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.entityId);
-  writer.writeString(offsets[1], object.trainingId);
-  writer.writeStringList(offsets[2], object.workoutSetIds);
+  writer.writeBool(offsets[0], object.active);
+  writer.writeString(offsets[1], object.entityId);
+  writer.writeString(offsets[2], object.trainingId);
+  writer.writeStringList(offsets[3], object.workoutSetIds);
 }
 
 SessionModel _sessionModelDeserialize(
@@ -1529,10 +1535,11 @@ SessionModel _sessionModelDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = SessionModel();
-  object.entityId = reader.readString(offsets[0]);
+  object.active = reader.readBool(offsets[0]);
+  object.entityId = reader.readString(offsets[1]);
   object.isarId = id;
-  object.trainingId = reader.readString(offsets[1]);
-  object.workoutSetIds = reader.readStringList(offsets[2]) ?? [];
+  object.trainingId = reader.readString(offsets[2]);
+  object.workoutSetIds = reader.readStringList(offsets[3]) ?? [];
   return object;
 }
 
@@ -1544,10 +1551,12 @@ P _sessionModelDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readString(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 1:
       return (reader.readString(offset)) as P;
     case 2:
+      return (reader.readString(offset)) as P;
+    case 3:
       return (reader.readStringList(offset) ?? []) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1750,6 +1759,16 @@ extension SessionModelQueryWhere
 
 extension SessionModelQueryFilter
     on QueryBuilder<SessionModel, SessionModel, QFilterCondition> {
+  QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition> activeEqualTo(
+      bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'active',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
       entityIdEqualTo(
     String value, {
@@ -2329,6 +2348,18 @@ extension SessionModelQueryLinks
 
 extension SessionModelQuerySortBy
     on QueryBuilder<SessionModel, SessionModel, QSortBy> {
+  QueryBuilder<SessionModel, SessionModel, QAfterSortBy> sortByActive() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'active', Sort.asc);
+    });
+  }
+
+  QueryBuilder<SessionModel, SessionModel, QAfterSortBy> sortByActiveDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'active', Sort.desc);
+    });
+  }
+
   QueryBuilder<SessionModel, SessionModel, QAfterSortBy> sortByEntityId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'entityId', Sort.asc);
@@ -2357,6 +2388,18 @@ extension SessionModelQuerySortBy
 
 extension SessionModelQuerySortThenBy
     on QueryBuilder<SessionModel, SessionModel, QSortThenBy> {
+  QueryBuilder<SessionModel, SessionModel, QAfterSortBy> thenByActive() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'active', Sort.asc);
+    });
+  }
+
+  QueryBuilder<SessionModel, SessionModel, QAfterSortBy> thenByActiveDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'active', Sort.desc);
+    });
+  }
+
   QueryBuilder<SessionModel, SessionModel, QAfterSortBy> thenByEntityId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'entityId', Sort.asc);
@@ -2397,6 +2440,12 @@ extension SessionModelQuerySortThenBy
 
 extension SessionModelQueryWhereDistinct
     on QueryBuilder<SessionModel, SessionModel, QDistinct> {
+  QueryBuilder<SessionModel, SessionModel, QDistinct> distinctByActive() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'active');
+    });
+  }
+
   QueryBuilder<SessionModel, SessionModel, QDistinct> distinctByEntityId(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -2424,6 +2473,12 @@ extension SessionModelQueryProperty
   QueryBuilder<SessionModel, int, QQueryOperations> isarIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'isarId');
+    });
+  }
+
+  QueryBuilder<SessionModel, bool, QQueryOperations> activeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'active');
     });
   }
 
@@ -3466,23 +3521,28 @@ const WorkoutSetModelSchema = CollectionSchema(
   name: r'WorkoutSetModel',
   id: -3704114633859064905,
   properties: {
-    r'entityId': PropertySchema(
+    r'done': PropertySchema(
       id: 0,
+      name: r'done',
+      type: IsarType.bool,
+    ),
+    r'entityId': PropertySchema(
+      id: 1,
       name: r'entityId',
       type: IsarType.string,
     ),
     r'exerciseId': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'exerciseId',
       type: IsarType.string,
     ),
     r'repetitions': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'repetitions',
       type: IsarType.long,
     ),
     r'weight': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'weight',
       type: IsarType.double,
     )
@@ -3532,10 +3592,11 @@ void _workoutSetModelSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.entityId);
-  writer.writeString(offsets[1], object.exerciseId);
-  writer.writeLong(offsets[2], object.repetitions);
-  writer.writeDouble(offsets[3], object.weight);
+  writer.writeBool(offsets[0], object.done);
+  writer.writeString(offsets[1], object.entityId);
+  writer.writeString(offsets[2], object.exerciseId);
+  writer.writeLong(offsets[3], object.repetitions);
+  writer.writeDouble(offsets[4], object.weight);
 }
 
 WorkoutSetModel _workoutSetModelDeserialize(
@@ -3545,11 +3606,12 @@ WorkoutSetModel _workoutSetModelDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = WorkoutSetModel();
-  object.entityId = reader.readString(offsets[0]);
-  object.exerciseId = reader.readString(offsets[1]);
+  object.done = reader.readBool(offsets[0]);
+  object.entityId = reader.readString(offsets[1]);
+  object.exerciseId = reader.readString(offsets[2]);
   object.isarId = id;
-  object.repetitions = reader.readLong(offsets[2]);
-  object.weight = reader.readDoubleOrNull(offsets[3]);
+  object.repetitions = reader.readLong(offsets[3]);
+  object.weight = reader.readDoubleOrNull(offsets[4]);
   return object;
 }
 
@@ -3561,12 +3623,14 @@ P _workoutSetModelDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readString(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 1:
       return (reader.readString(offset)) as P;
     case 2:
-      return (reader.readLong(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 3:
+      return (reader.readLong(offset)) as P;
+    case 4:
       return (reader.readDoubleOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -3768,6 +3832,16 @@ extension WorkoutSetModelQueryWhere
 
 extension WorkoutSetModelQueryFilter
     on QueryBuilder<WorkoutSetModel, WorkoutSetModel, QFilterCondition> {
+  QueryBuilder<WorkoutSetModel, WorkoutSetModel, QAfterFilterCondition>
+      doneEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'done',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<WorkoutSetModel, WorkoutSetModel, QAfterFilterCondition>
       entityIdEqualTo(
     String value, {
@@ -4263,6 +4337,19 @@ extension WorkoutSetModelQueryLinks
 
 extension WorkoutSetModelQuerySortBy
     on QueryBuilder<WorkoutSetModel, WorkoutSetModel, QSortBy> {
+  QueryBuilder<WorkoutSetModel, WorkoutSetModel, QAfterSortBy> sortByDone() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'done', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutSetModel, WorkoutSetModel, QAfterSortBy>
+      sortByDoneDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'done', Sort.desc);
+    });
+  }
+
   QueryBuilder<WorkoutSetModel, WorkoutSetModel, QAfterSortBy>
       sortByEntityId() {
     return QueryBuilder.apply(this, (query) {
@@ -4321,6 +4408,19 @@ extension WorkoutSetModelQuerySortBy
 
 extension WorkoutSetModelQuerySortThenBy
     on QueryBuilder<WorkoutSetModel, WorkoutSetModel, QSortThenBy> {
+  QueryBuilder<WorkoutSetModel, WorkoutSetModel, QAfterSortBy> thenByDone() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'done', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WorkoutSetModel, WorkoutSetModel, QAfterSortBy>
+      thenByDoneDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'done', Sort.desc);
+    });
+  }
+
   QueryBuilder<WorkoutSetModel, WorkoutSetModel, QAfterSortBy>
       thenByEntityId() {
     return QueryBuilder.apply(this, (query) {
@@ -4392,6 +4492,12 @@ extension WorkoutSetModelQuerySortThenBy
 
 extension WorkoutSetModelQueryWhereDistinct
     on QueryBuilder<WorkoutSetModel, WorkoutSetModel, QDistinct> {
+  QueryBuilder<WorkoutSetModel, WorkoutSetModel, QDistinct> distinctByDone() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'done');
+    });
+  }
+
   QueryBuilder<WorkoutSetModel, WorkoutSetModel, QDistinct> distinctByEntityId(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -4425,6 +4531,12 @@ extension WorkoutSetModelQueryProperty
   QueryBuilder<WorkoutSetModel, int, QQueryOperations> isarIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'isarId');
+    });
+  }
+
+  QueryBuilder<WorkoutSetModel, bool, QQueryOperations> doneProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'done');
     });
   }
 

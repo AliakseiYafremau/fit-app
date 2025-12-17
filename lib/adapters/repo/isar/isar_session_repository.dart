@@ -57,6 +57,17 @@ class IsarSessionRepository implements SessionRepository {
   }
 
   @override
+  Session? getById(domain_id.Id sessionId) {
+    final model = _sessions.where().entityIdEqualTo(sessionId).findFirstSync();
+    return _mapSessionFromModel(model);
+  }
+
+  @override
+  void update(Session session) {
+    add(session);
+  }
+
+  @override
   List<Session> getByTrainingId(domain_id.Id trainingId) {
     final models = _sessions
         .filter()
@@ -80,6 +91,28 @@ class IsarSessionRepository implements SessionRepository {
       throw StateError('Session with workout set $workoutId not found');
     }
     return session;
+  }
+
+  @override
+  Session? getActive() {
+    SessionModel? activeModel;
+    for (final model in _sessions.where().findAllSync()) {
+      if (model.active) {
+        activeModel = model;
+        break;
+      }
+    }
+    return _mapSessionFromModel(activeModel);
+  }
+
+  @override
+  List<Session> getCompleted() {
+    final models = _sessions.filter().activeEqualTo(false).findAllSync();
+    return models
+        .map(_mapSessionFromModel)
+        .where((session) => session != null)
+        .cast<Session>()
+        .toList(growable: false);
   }
 
   @override
@@ -120,10 +153,10 @@ class IsarSessionRepository implements SessionRepository {
         workoutSets.add(set);
       }
     }
-    return Session(
-      id: model.entityId,
-      training: training,
-      workoutSets: workoutSets,
+    return mapSessionFromModel(
+      model,
+      training,
+      workoutSets,
     );
   }
 

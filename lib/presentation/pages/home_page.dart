@@ -1,9 +1,16 @@
+import 'package:fit_app/application/interactors/complete_set.dart';
+import 'package:fit_app/application/interactors/undo_complete_set.dart';
 import 'package:fit_app/application/interactors/delete_exercise.dart';
 import 'package:fit_app/application/interactors/delete_training.dart';
+import 'package:fit_app/application/interactors/finish_session.dart';
+import 'package:fit_app/application/interactors/start_session.dart';
 import 'package:fit_app/application/interfaces/repo/exercise.dart';
+import 'package:fit_app/application/interfaces/repo/session.dart';
 import 'package:fit_app/application/interfaces/repo/training.dart';
 import 'package:fit_app/domain/entities/exercise.dart';
+import 'package:fit_app/domain/entities/session.dart';
 import 'package:fit_app/domain/entities/training.dart';
+import 'package:fit_app/domain/entities/workout_set.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -24,11 +31,17 @@ class _HomePageState extends State<HomePage> {
 
   late final TrainingRepository _trainingRepository;
   late final ExerciseRepository _exerciseRepository;
+  late final SessionRepository _sessionRepository;
   late final DeleteExercise _deleteExercise;
   late final DeleteTraining _deleteTraining;
+  late final StartSession _startSession;
+  late final FinishSession _finishSession;
+  late final CompleteSet _completeSet;
+  late final UndoCompleteSet _undoCompleteSet;
 
   List<Training> _trainings = const [];
   List<Exercise> _exercises = const [];
+  Session? _activeSession;
 
   @override
   void didChangeDependencies() {
@@ -36,10 +49,16 @@ class _HomePageState extends State<HomePage> {
     if (_dependenciesReady) return;
     _trainingRepository = context.read<TrainingRepository>();
     _exerciseRepository = context.read<ExerciseRepository>();
+    _sessionRepository = context.read<SessionRepository>();
     _deleteExercise = context.read<DeleteExercise>();
     _deleteTraining = context.read<DeleteTraining>();
+    _startSession = context.read<StartSession>();
+    _finishSession = context.read<FinishSession>();
+    _completeSet = context.read<CompleteSet>();
+    _undoCompleteSet = context.read<UndoCompleteSet>();
     _trainings = _trainingRepository.getAll();
     _exercises = _exerciseRepository.getAll();
+    _activeSession = _sessionRepository.getActive();
     _dependenciesReady = true;
   }
 
@@ -76,6 +95,12 @@ class _HomePageState extends State<HomePage> {
   void _refreshExercises() {
     setState(() {
       _exercises = _exerciseRepository.getAll();
+    });
+  }
+
+  void _refreshActiveSession() {
+    setState(() {
+      _activeSession = _sessionRepository.getActive();
     });
   }
 
@@ -160,7 +185,11 @@ class _HomePageState extends State<HomePage> {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => _TrainingDetailsSheet(training: latest),
+      builder: (context) => _TrainingDetailsSheet(
+        training: latest,
+        canStartSession: _activeSession == null,
+        onStartSession: () => _startTrainingSession(latest),
+      ),
     );
   }
 
@@ -173,6 +202,105 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Future<void> _startTrainingSession(Training training) async {
+      _startSession.execute(training.id);
+      _refreshActiveSession();
+      if (!mounted) return;
+      _openActiveSessionSheet();
+  }
+
+  Future<void> _openActiveSessionSheet() async {
+    final session = _activeSession;
+    if (session == null) return;
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => _SessionSheet(
+        session: session,
+        onFinish: _handleFinishSession,
+        onCompleteSet: _handleCompleteSet,
+        onUndoSet: _handleUndoSet,
+        onRefresh: _refreshAndGetActiveSession,
+      ),
+    );
+    if (!mounted) return;
+    _refreshActiveSession();
+  }
+
+  Future<void> _openHistorySheet() async {
+    final completedSessions = _sessionRepository.getCompleted();
+    if (!mounted) return;
+    final selectedSession = await showModalBottomSheet<Session>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => _HistorySheet(sessions: completedSessions),
+    );
+    if (!mounted || selectedSession == null) return;
+    _showSessionHistoryDetails(selectedSession);
+  }
+
+  Future<void> _showSessionHistoryDetails(Session session) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => _SessionHistoryDetailsSheet(session: session),
+    );
+  }
+
+  Future<void> _handleFinishSession() async {
+    final session = _activeSession;
+    if (session == null) return;
+    try {
+      _finishSession.execute(session.id);
+      _refreshActiveSession();
+    } catch (error) {
+      _showError('Unable to finish session');
+    }
+  }
+
+  Future<void> _handleCompleteSet(
+    WorkoutSet set,
+    int repetitions,
+    double? weight,
+  ) async {
+    try {
+      _completeSet.execute(
+        workoutSetId: set.id,
+        repetitions: repetitions,
+        weight: weight,
+      );
+      _refreshActiveSession();
+    } catch (error) {
+      _showError('Unable to complete set');
+    }
+  }
+
+  Future<void> _handleUndoSet(WorkoutSet set) async {
+    try {
+      _undoCompleteSet.execute(workoutSetId: set.id);
+      _refreshActiveSession();
+    } catch (error) {
+      _showError('Unable to undo set');
+    }
+  }
+
+  Future<Session?> _refreshAndGetActiveSession() async {
+    final session = _sessionRepository.getActive();
+    if (mounted) {
+      setState(() {
+        _activeSession = session;
+      });
+    }
+    return session;
+  }
+
+  void _showError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -182,31 +310,58 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Column(
         children: [
-          PrimaryNavBar(
-            tabs: const ['Workouts', 'Exercises'],
-            selectedIndex: _selectedIndex,
-            onTabSelected: _onNavTap,
+          SizedBox(
+            height: 56,
+            child: PrimaryNavBar(
+              tabs: const ['Workouts', 'Exercises'],
+              selectedIndex: _selectedIndex,
+              onTabSelected: _onNavTap,
+            ),
           ),
           Expanded(
-            child: _selectedIndex == 0
-                ? _WorkoutsList(
-                    trainings: _trainings,
-                    onDelete: _onDeleteTraining,
-                    onEdit: _onEditTraining,
-                    onView: _showTrainingDetails,
-                  )
-                : _ExercisesList(
-                    exercises: _exercises,
-                    onDelete: _onDeleteExercise,
-                    onEdit: _onEditExercise,
-                    onView: _showExerciseDetails,
-                  ),
+            child: Stack(
+              children: [
+                _selectedIndex == 0
+                    ? _WorkoutsList(
+                        trainings: _trainings,
+                        onDelete: _onDeleteTraining,
+                        onEdit: _onEditTraining,
+                        onView: _showTrainingDetails,
+                      )
+                    : _ExercisesList(
+                        exercises: _exercises,
+                        onDelete: _onDeleteExercise,
+                        onEdit: _onEditExercise,
+                        onView: _showExerciseDetails,
+                      ),
+                Positioned(
+                  left: 16,
+                  bottom: 24,
+                  child: _HistoryBubbleButton(onTap: _openHistorySheet),
+                ),
+              ],
+            ),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _onFabPressed,
-        child: const Icon(Icons.add),
+      floatingActionButton: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (_activeSession != null) ...[
+            FloatingActionButton(
+              heroTag: 'active_session_fab',
+              onPressed: _openActiveSessionSheet,
+              tooltip: 'View active session',
+              child: const Icon(Icons.play_arrow),
+            ),
+            const SizedBox(width: 12),
+          ],
+          FloatingActionButton(
+            heroTag: 'main_fab',
+            onPressed: _onFabPressed,
+            child: const Icon(Icons.add),
+          ),
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
@@ -236,9 +391,8 @@ class _WorkoutsList extends StatelessWidget {
       itemBuilder: (context, index) {
         final training = trainings[index];
         final setsCount = training.plannedSets.length;
-        final subtitle = setsCount == 1
-            ? '1 planned set'
-            : '$setsCount planned sets';
+        final subtitle =
+            setsCount == 1 ? '1 planned set' : '$setsCount planned sets';
         return Card(
           child: ListTile(
             title: Text(training.name),
@@ -262,8 +416,50 @@ class _WorkoutsList extends StatelessWidget {
           ),
         );
       },
-      separatorBuilder: (_, separatorIndex) => const SizedBox(height: 12),
+      separatorBuilder: (_, unused) => const SizedBox(height: 12),
       itemCount: trainings.length,
+    );
+  }
+}
+
+class _HistoryBubbleButton extends StatelessWidget {
+  const _HistoryBubbleButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final borderRadius = BorderRadius.circular(26);
+    return Material(
+      elevation: 4,
+      color: colorScheme.surface,
+      borderRadius: borderRadius,
+      child: InkWell(
+        borderRadius: borderRadius,
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.history,
+                color: colorScheme.primary,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'History',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -331,9 +527,15 @@ class _ExercisesList extends StatelessWidget {
 }
 
 class _TrainingDetailsSheet extends StatelessWidget {
-  const _TrainingDetailsSheet({required this.training});
+  const _TrainingDetailsSheet({
+    required this.training,
+    required this.canStartSession,
+    required this.onStartSession,
+  });
 
   final Training training;
+  final bool canStartSession;
+  final VoidCallback onStartSession;
 
   @override
   Widget build(BuildContext context) {
@@ -377,12 +579,26 @@ class _TrainingDetailsSheet extends StatelessWidget {
                     ),
                   ),
                 ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Close'),
-                ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: canStartSession
+                          ? () {
+                              Navigator.of(context).pop();
+                              onStartSession();
+                            }
+                          : null,
+                      child: const Text('Start session'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Close'),
+                  ),
+                ],
               ),
             ],
           ),
@@ -476,6 +692,362 @@ class _ExerciseDetailsSheet extends StatelessWidget {
                   onPressed: () => Navigator.of(context).pop(),
                   child: const Text('Close'),
                 ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HistorySheet extends StatelessWidget {
+  const _HistorySheet({required this.sessions});
+
+  final List<Session> sessions;
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+    final listHeight = (MediaQuery.of(context).size.height * 0.5)
+        .clamp(240.0, 520.0)
+        .toDouble();
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 24,
+          bottom: bottomPadding + 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Session history',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 12),
+            if (sessions.isEmpty)
+              const Text('No completed sessions yet')
+            else
+              SizedBox(
+                height: listHeight,
+                child: ListView.separated(
+                  itemBuilder: (context, index) {
+                    final session = sessions[index];
+                    final completedSets =
+                        session.workoutSets.where((set) => set.done).length;
+                    return Card(
+                      child: ListTile(
+                        title: Text(session.training.name),
+                        subtitle: Text(
+                          '$completedSets completed set${completedSets == 1 ? '' : 's'}',
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => Navigator.of(context).pop(session),
+                      ),
+                    );
+                  },
+                  separatorBuilder: (_, unused) => const SizedBox(height: 8),
+                  itemCount: sessions.length,
+                ),
+              ),
+            const SizedBox(height: 16),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Close'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SessionHistoryDetailsSheet extends StatelessWidget {
+  const _SessionHistoryDetailsSheet({required this.session});
+
+  final Session session;
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+    final sets = session.workoutSets;
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 24,
+          bottom: bottomPadding + 24,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                session.training.name,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Completed session summary',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 16),
+              if (sets.isEmpty)
+                const Text('No sets were tracked in this session')
+              else
+                ...sets.map(
+                  (set) => Card(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    child: ListTile(
+                      leading: Icon(
+                        set.done
+                            ? Icons.check_circle
+                            : Icons.radio_button_unchecked,
+                      ),
+                      title: Text(set.exercise.name),
+                      subtitle: Text(
+                        '${set.repetitions} reps'
+                        '${set.exercise.usesWeights && set.weight != null ? ' @ ${set.weight}' : ''}',
+                      ),
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 12),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Close'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SessionSheet extends StatefulWidget {
+  const _SessionSheet({
+    required this.session,
+    required this.onCompleteSet,
+    required this.onUndoSet,
+    required this.onFinish,
+    required this.onRefresh,
+  });
+
+  final Session session;
+  final Future<void> Function(WorkoutSet set, int repetitions, double? weight)
+      onCompleteSet;
+  final Future<void> Function(WorkoutSet set) onUndoSet;
+  final Future<void> Function() onFinish;
+  final Future<Session?> Function() onRefresh;
+
+  @override
+  State<_SessionSheet> createState() => _SessionSheetState();
+}
+
+class _SessionSheetState extends State<_SessionSheet> {
+  late Session _session;
+
+  @override
+  void initState() {
+    super.initState();
+    _session = widget.session;
+  }
+
+  Future<void> _completeSet(WorkoutSet set) async {
+    final repsController =
+        TextEditingController(text: set.repetitions.toString());
+    final usesWeights = set.exercise.usesWeights;
+    final weightController = usesWeights
+        ? TextEditingController(text: set.weight?.toString() ?? '')
+        : null;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Complete set'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: repsController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Repetitions',
+              ),
+            ),
+            const SizedBox(height: 12),
+            if (usesWeights)
+              TextField(
+                controller: weightController,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(
+                  labelText: 'Weight',
+                  helperText: 'Required for weighted exercises',
+                ),
+              )
+            else
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'This exercise is bodyweight only',
+                  style: TextStyle(fontStyle: FontStyle.italic),
+                ),
+              ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    if (!mounted) return;
+
+    final repetitions = int.tryParse(repsController.text.trim() == ''
+        ? set.repetitions.toString()
+        : repsController.text.trim());
+    if (repetitions == null || repetitions <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter valid repetitions')),
+      );
+      return;
+    }
+    double? weight;
+    if (usesWeights) {
+      final weightText = weightController!.text.trim();
+      if (weightText.isNotEmpty) {
+        weight = double.tryParse(weightText);
+        if (weight == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Enter valid weight')),
+          );
+          return;
+        }
+      } else if (set.weight == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Weight required for this exercise')),
+        );
+        return;
+      }
+    }
+
+    await widget.onCompleteSet(set, repetitions, weight);
+    await _refreshSession();
+  }
+
+  Future<void> _undoSet(WorkoutSet set) async {
+    await widget.onUndoSet(set);
+    await _refreshSession();
+  }
+
+  Future<void> _finishSession() async {
+    await widget.onFinish();
+    if (!mounted) return;
+    Navigator.of(context).pop();
+  }
+
+  Future<void> _refreshSession() async {
+    final refreshed = await widget.onRefresh();
+    if (!mounted) return;
+    if (refreshed == null) {
+      Navigator.of(context).pop();
+    } else {
+      setState(() {
+        _session = refreshed;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+    final sets = _session.workoutSets;
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 24,
+          bottom: bottomPadding + 24,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Session: ${_session.training.name}',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 16),
+              if (sets.isEmpty)
+                const Text('No sets in this session')
+              else
+                ...sets.map(
+                  (set) => Card(
+                    child: ListTile(
+                      leading: Icon(
+                        set.done
+                            ? Icons.check_circle
+                            : Icons.radio_button_unchecked,
+                      ),
+                      title: Text(set.exercise.name),
+                      subtitle: Text(
+                        '${set.repetitions} reps'
+                        '${set.exercise.usesWeights && set.weight != null ? ' @ ${set.weight}' : ''}',
+                      ),
+                      trailing: Wrap(
+                        spacing: 8,
+                        children: [
+                          if (set.done)
+                            TextButton(
+                              onPressed: () => _undoSet(set),
+                              child: const Text('Undo'),
+                            ),
+                          TextButton(
+                            onPressed: () => _completeSet(set),
+                            child: Text(set.done ? 'Update' : 'Complete'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _finishSession,
+                      child: const Text('Finish session'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Close'),
+                  ),
+                ],
               ),
             ],
           ),

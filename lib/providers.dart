@@ -4,12 +4,16 @@ import 'package:fit_app/adapters/repo/isar/isar_session_repository.dart';
 import 'package:fit_app/adapters/repo/isar/isar_workout_set_repository.dart';
 import 'package:fit_app/adapters/repo/isar/isar_training_repository.dart';
 import 'package:fit_app/adapters/uuid_generator.dart';
+import 'package:fit_app/application/interactors/complete_set.dart';
 import 'package:fit_app/application/interactors/create_exercise.dart';
 import 'package:fit_app/application/interactors/create_training.dart';
 import 'package:fit_app/application/interactors/delete_exercise.dart';
 import 'package:fit_app/application/interactors/delete_training.dart';
+import 'package:fit_app/application/interactors/start_session.dart';
+import 'package:fit_app/application/interactors/finish_session.dart';
 import 'package:fit_app/application/interactors/update_exercise.dart';
 import 'package:fit_app/application/interactors/update_training.dart';
+import 'package:fit_app/application/interactors/undo_complete_set.dart';
 import 'package:fit_app/application/interfaces/id_generator.dart';
 import 'package:fit_app/application/interfaces/repo/exercise.dart';
 import 'package:fit_app/application/interfaces/repo/session.dart';
@@ -70,6 +74,32 @@ List<SingleChildWidget> buildAppProviders(Isar isar) => [
           exerciseRepository: exerciseRepository,
           plannedSetRepository: plannedSetRepository,
           idGenerator: idGenerator,
+        ),
+      ),
+      ProxyProvider4<TrainingRepository, SessionRepository,
+          WorkoutSetRepository, IdGenerator, StartSession>(
+        update: (_, trainingRepository, sessionRepository,
+                workoutSetRepository, idGenerator, previous) =>
+            StartSession(
+          trainingRepository: trainingRepository,
+          sessionRepository: sessionRepository,
+          workoutSetRepository: workoutSetRepository,
+          idGenerator: idGenerator,
+        ),
+      ),
+      ProxyProvider<SessionRepository, FinishSession>(
+        update: (_, sessionRepository, previous) => FinishSession(
+          sessionRepository: sessionRepository,
+        ),
+      ),
+      ProxyProvider<WorkoutSetRepository, CompleteSet>(
+        update: (_, workoutSetRepository, previous) => CompleteSet(
+          workoutSetRepository: workoutSetRepository,
+        ),
+      ),
+      ProxyProvider<WorkoutSetRepository, UndoCompleteSet>(
+        update: (_, workoutSetRepository, previous) => UndoCompleteSet(
+          workoutSetRepository: workoutSetRepository,
         ),
       ),
       ProxyProvider2<TrainingRepository, PlannedSetRepository, DeleteTraining>(

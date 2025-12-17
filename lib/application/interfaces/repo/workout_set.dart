@@ -10,5 +10,7 @@ abstract class PlannedSetRepository {
 abstract class WorkoutSetRepository {
   void add(WorkoutSet workoutSet);
   List<WorkoutSet> getByExerciseId(Id exerciseId);
+  WorkoutSet? getById(Id workoutSetId);
+  void update(WorkoutSet workoutSet);
   void delete(Id workoutSetId);
 }

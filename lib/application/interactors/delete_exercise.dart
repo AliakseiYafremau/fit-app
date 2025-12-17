@@ -78,6 +78,7 @@ class DeleteExercise {
         id: session.id,
         training: sessionTraining,
         workoutSets: filteredWorkoutSets,
+        active: session.active,
       );
       sessionRepository.add(updatedSession);
     }

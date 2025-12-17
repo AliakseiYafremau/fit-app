@@ -25,6 +25,7 @@ class SessionModel {
 
   late String trainingId;
   List<String> workoutSetIds = [];
+  bool active = true;
 }
 
 @collection
@@ -48,6 +49,7 @@ class WorkoutSetModel {
   late String exerciseId;
   late int repetitions;
   double? weight;
+  bool done = false;
 }
 
 @collection

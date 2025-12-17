@@ -21,7 +21,7 @@ class CreateTrainingSheet extends StatefulWidget {
 class _SetFormData {
   Exercise? exercise;
   String reps;
-  _SetFormData({this.exercise, this.reps = ''});
+  _SetFormData() : reps = '';
 }
 
 class _ExistingSetData {

@@ -38,6 +38,7 @@ class FitApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Fit App',
         theme: AppTheme.darkTheme,
+        debugShowCheckedModeBanner: false,
         home: const HomePage(),
       ),
     );

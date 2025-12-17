@@ -13,6 +13,7 @@ import 'package:fit_app/domain/entities/training.dart';
 import 'package:fit_app/domain/entities/workout_set.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../widgets/create_exercise_sheet.dart';
 import '../widgets/create_training_sheet.dart';
@@ -690,8 +691,11 @@ class _ExerciseDetailsSheet extends StatelessWidget {
               else
                 ...exercise.links.map(
                   (link) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Text(link),
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _ExerciseLinkPreview(
+                      link: link,
+                      launcher: (uri) => _launchLink(context, uri),
+                    ),
                   ),
                 ),
               Align(
@@ -707,6 +711,155 @@ class _ExerciseDetailsSheet extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> _launchLink(BuildContext context, Uri uri) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final opened = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!opened) {
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Unable to open link')),
+        );
+      }
+    } catch (_) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Unable to open link')),
+      );
+    }
+  }
+}
+
+class _ExerciseLinkPreview extends StatelessWidget {
+  const _ExerciseLinkPreview({
+    required this.link,
+    required this.launcher,
+  });
+
+  final String link;
+  final Future<void> Function(Uri uri) launcher;
+
+  @override
+  Widget build(BuildContext context) {
+    final uri = _normalizeLinkUri(link);
+    if (uri == null) {
+      return Text(link);
+    }
+    final videoId = _extractYoutubeId(uri);
+    if (videoId != null) {
+      return Card(
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => launcher(uri),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AspectRatio(
+                aspectRatio: 16 / 9,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.network(
+                      'https://img.youtube.com/vi/$videoId/0.jpg',
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.black12,
+                        alignment: Alignment.center,
+                        child: const Icon(Icons.play_circle_outline),
+                      ),
+                    ),
+                    Container(
+                      color: Colors.black26,
+                      child: const Center(
+                        child: Icon(
+                          Icons.play_circle_fill,
+                          color: Colors.white,
+                          size: 48,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.ondemand_video),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        uri.toString(),
+                        style: const TextStyle(
+                          decoration: TextDecoration.underline,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(Icons.open_in_new),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Card(
+      child: ListTile(
+        onTap: () => launcher(uri),
+        leading: const Icon(Icons.link),
+        title: Text(
+          uri.toString(),
+          style: const TextStyle(decoration: TextDecoration.underline),
+        ),
+        trailing: const Icon(Icons.open_in_new),
+      ),
+    );
+  }
+}
+
+Uri? _normalizeLinkUri(String? raw) {
+  final trimmed = raw?.trim() ?? '';
+  if (trimmed.isEmpty) return null;
+  Uri? uri = Uri.tryParse(trimmed);
+  if (uri == null) return null;
+  if (!uri.hasScheme) {
+    uri = Uri.tryParse('https://$trimmed');
+  }
+  return uri;
+}
+
+String? _extractYoutubeId(Uri uri) {
+  final host = uri.host.toLowerCase();
+  if (host.contains('youtu.be')) {
+    if (uri.pathSegments.isNotEmpty) {
+      return uri.pathSegments.first;
+    }
+    return null;
+  }
+  if (host.contains('youtube.com')) {
+    if (uri.pathSegments.isNotEmpty) {
+      if (uri.pathSegments.first == 'shorts' && uri.pathSegments.length >= 2) {
+        return uri.pathSegments[1];
+      }
+      if (uri.pathSegments.first == 'embed' && uri.pathSegments.length >= 2) {
+        return uri.pathSegments[1];
+      }
+    }
+    final videoId = uri.queryParameters['v'];
+    if (videoId != null && videoId.isNotEmpty) {
+      return videoId;
+    }
+  }
+  return null;
 }
 
 class _HistorySheet extends StatelessWidget {

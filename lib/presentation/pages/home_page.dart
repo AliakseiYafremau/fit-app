@@ -35,6 +35,8 @@ class _HomePageState extends State<HomePage> {
   bool _dependenciesReady = false;
   late final PageController _pageController =
       PageController(initialPage: _selectedIndex);
+  String _searchTerm = '';
+  bool? _usesWeightsFilter;
 
   late final TrainingRepository _trainingRepository;
   late final ExerciseRepository _exerciseRepository;
@@ -79,6 +81,12 @@ class _HomePageState extends State<HomePage> {
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeInOut,
     );
+  }
+
+  void _onSearchChanged(String value) {
+    setState(() {
+      _searchTerm = value.trim().toLowerCase();
+    });
   }
 
   void _onPageChanged(int index) {
@@ -398,6 +406,61 @@ class _HomePageState extends State<HomePage> {
               onTabSelected: _onNavTap,
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.search),
+                      hintText: 'Search',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: _onSearchChanged,
+                  ),
+                ),
+                if (_selectedIndex == 1) ...[
+                  const SizedBox(width: 12),
+                  ToggleButtons(
+                    isSelected: [
+                      _usesWeightsFilter == null,
+                      _usesWeightsFilter == true,
+                      _usesWeightsFilter == false,
+                    ],
+                    borderRadius: BorderRadius.circular(8),
+                    onPressed: (index) {
+                      setState(() {
+                        if (index == 0) {
+                          _usesWeightsFilter = null;
+                        } else if (index == 1) {
+                          _usesWeightsFilter =
+                              _usesWeightsFilter == true ? null : true;
+                        } else {
+                          _usesWeightsFilter =
+                              _usesWeightsFilter == false ? null : false;
+                        }
+                      });
+                    },
+                    children: const [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8),
+                        child: Icon(Icons.remove_circle_outline),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8),
+                        child: Icon(Icons.fitness_center),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8),
+                        child: Icon(Icons.directions_run),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
           Expanded(
             child: Stack(
               children: [
@@ -407,10 +470,13 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     _WorkoutsList(
                       trainings: _trainings,
+                      searchTerm: _searchTerm,
                       onView: _showTrainingDetails,
                     ),
                     _ExercisesList(
                       exercises: _exercises,
+                      searchTerm: _searchTerm,
+                      usesWeightsFilter: _usesWeightsFilter,
                       onView: _showExerciseDetails,
                     ),
                   ],
@@ -418,10 +484,11 @@ class _HomePageState extends State<HomePage> {
                 Positioned(
                   left: 16,
                   bottom: 24,
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _CalendarBubbleButton(onTap: _openCalendarSheet),
-                      const SizedBox(width: 12),
+                      const SizedBox(height: 12),
                       _HistoryBubbleButton(onTap: _openHistorySheet),
                     ],
                   ),
@@ -458,21 +525,29 @@ class _HomePageState extends State<HomePage> {
 class _WorkoutsList extends StatelessWidget {
   const _WorkoutsList({
     required this.trainings,
+    required this.searchTerm,
     required this.onView,
   });
 
   final List<Training> trainings;
+  final String searchTerm;
   final ValueChanged<Training> onView;
 
   @override
   Widget build(BuildContext context) {
-    if (trainings.isEmpty) {
+    final filtered = searchTerm.isEmpty
+        ? trainings
+        : trainings
+            .where((training) =>
+                training.name.toLowerCase().contains(searchTerm))
+            .toList();
+    if (filtered.isEmpty) {
       return const _EmptyState(message: 'No workouts yet');
     }
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       itemBuilder: (context, index) {
-        final training = trainings[index];
+        final training = filtered[index];
         final setsCount = training.plannedSets.length;
         final subtitle =
             setsCount == 1 ? '1 planned set' : '$setsCount planned sets';
@@ -578,22 +653,38 @@ class _CalendarBubbleButton extends StatelessWidget {
 class _ExercisesList extends StatelessWidget {
   const _ExercisesList({
     required this.exercises,
+    required this.searchTerm,
+    required this.usesWeightsFilter,
     required this.onView,
   });
 
   final List<Exercise> exercises;
+  final String searchTerm;
+  final bool? usesWeightsFilter;
   final ValueChanged<Exercise> onView;
 
   @override
   Widget build(BuildContext context) {
-    if (exercises.isEmpty) {
+    Iterable<Exercise> candidates = exercises;
+    if (searchTerm.isNotEmpty) {
+      candidates = candidates.where((exercise) =>
+          exercise.name.toLowerCase().contains(searchTerm) ||
+          (exercise.technique ?? '').toLowerCase().contains(searchTerm));
+    }
+    if (usesWeightsFilter != null) {
+      candidates = candidates.where(
+        (exercise) => exercise.usesWeights == usesWeightsFilter,
+      );
+    }
+    final filtered = candidates.toList();
+    if (filtered.isEmpty) {
       return const _EmptyState(message: 'No exercises yet');
     }
     final fileManager = context.read<FileManager>();
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       itemBuilder: (context, index) {
-        final exercise = exercises[index];
+        final exercise = filtered[index];
         final photoId = exercise.photoId;
         return Card(
           child: ListTile(

@@ -4,6 +4,7 @@ import 'package:fit_app/adapters/repo/isar/isar_session_repository.dart';
 import 'package:fit_app/adapters/repo/isar/isar_workout_set_repository.dart';
 import 'package:fit_app/adapters/repo/isar/isar_training_repository.dart';
 import 'package:fit_app/adapters/uuid_generator.dart';
+import 'package:fit_app/application/interactors/cancel_session.dart';
 import 'package:fit_app/application/interactors/complete_set.dart';
 import 'package:fit_app/application/interactors/create_exercise.dart';
 import 'package:fit_app/application/interactors/create_training.dart';
@@ -120,6 +121,11 @@ List<SingleChildWidget> buildAppProviders(Isar isar) => [
           plannedSetRepository: plannedSetRepository,
           workoutSetRepository: workoutSetRepository,
           trainingRepository: trainingRepository,
+          sessionRepository: sessionRepository,
+        ),
+      ),
+      ProxyProvider<SessionRepository, CancelSession>(
+        update: (_, sessionRepository, previous) => CancelSession(
           sessionRepository: sessionRepository,
         ),
       ),

@@ -1,3 +1,4 @@
+import 'package:fit_app/application/interactors/cancel_session.dart';
 import 'package:fit_app/application/interactors/complete_set.dart';
 import 'package:fit_app/application/interactors/undo_complete_set.dart';
 import 'package:fit_app/application/interactors/delete_exercise.dart';
@@ -29,6 +30,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   bool _dependenciesReady = false;
+  late final PageController _pageController =
+      PageController(initialPage: _selectedIndex);
 
   late final TrainingRepository _trainingRepository;
   late final ExerciseRepository _exerciseRepository;
@@ -37,6 +40,7 @@ class _HomePageState extends State<HomePage> {
   late final DeleteTraining _deleteTraining;
   late final StartSession _startSession;
   late final FinishSession _finishSession;
+  late final CancelSession _cancelSession;
   late final CompleteSet _completeSet;
   late final UndoCompleteSet _undoCompleteSet;
 
@@ -55,6 +59,7 @@ class _HomePageState extends State<HomePage> {
     _deleteTraining = context.read<DeleteTraining>();
     _startSession = context.read<StartSession>();
     _finishSession = context.read<FinishSession>();
+    _cancelSession = context.read<CancelSession>();
     _completeSet = context.read<CompleteSet>();
     _undoCompleteSet = context.read<UndoCompleteSet>();
     _trainings = _trainingRepository.getAll();
@@ -64,7 +69,24 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onNavTap(int index) {
+    if (_selectedIndex == index) return;
     setState(() => _selectedIndex = index);
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void _onPageChanged(int index) {
+    if (_selectedIndex == index) return;
+    setState(() => _selectedIndex = index);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   Future<void> _openCreateTraining() async {
@@ -191,6 +213,8 @@ class _HomePageState extends State<HomePage> {
         canStartSession: _activeSession == null,
         onStartSession: () => _startTrainingSession(latest),
         onViewExercise: _showExerciseDetails,
+        onEdit: _onEditTraining,
+        onDelete: _onDeleteTraining,
       ),
     );
   }
@@ -200,7 +224,11 @@ class _HomePageState extends State<HomePage> {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => _ExerciseDetailsSheet(exercise: latest),
+      builder: (context) => _ExerciseDetailsSheet(
+        exercise: latest,
+        onEdit: _onEditExercise,
+        onDelete: _onDeleteExercise,
+      ),
     );
   }
 
@@ -220,6 +248,7 @@ class _HomePageState extends State<HomePage> {
       builder: (context) => _SessionSheet(
         session: session,
         onFinish: _handleFinishSession,
+        onCancel: _handleCancelSession,
         onCompleteSet: _handleCompleteSet,
         onUndoSet: _handleUndoSet,
         onViewExercise: _showExerciseDetails,
@@ -261,6 +290,36 @@ class _HomePageState extends State<HomePage> {
       _refreshActiveSession();
     } catch (error) {
       _showError('Unable to finish session');
+    }
+  }
+
+  Future<void> _handleCancelSession() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cancel session'),
+        content: const Text(
+          'Are you sure you want to cancel this session? Progress will be lost.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Keep session'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Cancel session'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || confirmed != true) return;
+    try {
+      _cancelSession.execute();
+      _refreshActiveSession();
+    } catch (_) {
+      _showError('Unable to cancel session');
+      rethrow;
     }
   }
 
@@ -327,19 +386,20 @@ class _HomePageState extends State<HomePage> {
           Expanded(
             child: Stack(
               children: [
-                _selectedIndex == 0
-                    ? _WorkoutsList(
-                        trainings: _trainings,
-                        onDelete: _onDeleteTraining,
-                        onEdit: _onEditTraining,
-                        onView: _showTrainingDetails,
-                      )
-                    : _ExercisesList(
-                        exercises: _exercises,
-                        onDelete: _onDeleteExercise,
-                        onEdit: _onEditExercise,
-                        onView: _showExerciseDetails,
-                      ),
+                PageView(
+                  controller: _pageController,
+                  onPageChanged: _onPageChanged,
+                  children: [
+                    _WorkoutsList(
+                      trainings: _trainings,
+                      onView: _showTrainingDetails,
+                    ),
+                    _ExercisesList(
+                      exercises: _exercises,
+                      onView: _showExerciseDetails,
+                    ),
+                  ],
+                ),
                 Positioned(
                   left: 16,
                   bottom: 24,
@@ -377,14 +437,10 @@ class _HomePageState extends State<HomePage> {
 class _WorkoutsList extends StatelessWidget {
   const _WorkoutsList({
     required this.trainings,
-    required this.onDelete,
-    required this.onEdit,
     required this.onView,
   });
 
   final List<Training> trainings;
-  final ValueChanged<Training> onDelete;
-  final ValueChanged<Training> onEdit;
   final ValueChanged<Training> onView;
 
   @override
@@ -404,21 +460,7 @@ class _WorkoutsList extends StatelessWidget {
             title: Text(training.name),
             subtitle: Text(subtitle),
             onTap: () => onView(training),
-            trailing: Wrap(
-              spacing: 4,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.edit_outlined),
-                  tooltip: 'Edit workout',
-                  onPressed: () => onEdit(training),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete_outline),
-                  tooltip: 'Delete workout',
-                  onPressed: () => onDelete(training),
-                ),
-              ],
-            ),
+            trailing: const Icon(Icons.chevron_right),
           ),
         );
       },
@@ -473,14 +515,10 @@ class _HistoryBubbleButton extends StatelessWidget {
 class _ExercisesList extends StatelessWidget {
   const _ExercisesList({
     required this.exercises,
-    required this.onDelete,
-    required this.onEdit,
     required this.onView,
   });
 
   final List<Exercise> exercises;
-  final ValueChanged<Exercise> onDelete;
-  final ValueChanged<Exercise> onEdit;
   final ValueChanged<Exercise> onView;
 
   @override
@@ -503,25 +541,10 @@ class _ExercisesList extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             onTap: () => onView(exercise),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  exercise.usesWeights
-                      ? Icons.fitness_center
-                      : Icons.directions_run,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.edit_outlined),
-                  tooltip: 'Edit exercise',
-                  onPressed: () => onEdit(exercise),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete_outline),
-                  tooltip: 'Delete exercise',
-                  onPressed: () => onDelete(exercise),
-                ),
-              ],
+            trailing: Icon(
+              exercise.usesWeights
+                  ? Icons.fitness_center
+                  : Icons.directions_run,
             ),
           ),
         );
@@ -538,12 +561,16 @@ class _TrainingDetailsSheet extends StatelessWidget {
     required this.canStartSession,
     required this.onStartSession,
     required this.onViewExercise,
+    required this.onEdit,
+    required this.onDelete,
   });
 
   final Training training;
   final bool canStartSession;
   final VoidCallback onStartSession;
   final ValueChanged<Exercise> onViewExercise;
+  final ValueChanged<Training> onEdit;
+  final ValueChanged<Training> onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -592,6 +619,32 @@ class _TrainingDetailsSheet extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.edit_outlined),
+                      label: const Text('Edit workout'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        onEdit(training);
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.delete_outline),
+                      label: const Text('Delete workout'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        onDelete(training);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
                     child: ElevatedButton(
                       onPressed: canStartSession
                           ? () {
@@ -618,9 +671,15 @@ class _TrainingDetailsSheet extends StatelessWidget {
 }
 
 class _ExerciseDetailsSheet extends StatelessWidget {
-  const _ExerciseDetailsSheet({required this.exercise});
+  const _ExerciseDetailsSheet({
+    required this.exercise,
+    required this.onEdit,
+    required this.onDelete,
+  });
 
   final Exercise exercise;
+  final ValueChanged<Exercise> onEdit;
+  final ValueChanged<Exercise> onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -698,6 +757,33 @@ class _ExerciseDetailsSheet extends StatelessWidget {
                     ),
                   ),
                 ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.edit_outlined),
+                      label: const Text('Edit exercise'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        onEdit(exercise);
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.delete_outline),
+                      label: const Text('Delete exercise'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        onDelete(exercise);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
@@ -1009,6 +1095,7 @@ class _SessionSheet extends StatefulWidget {
     required this.onCompleteSet,
     required this.onUndoSet,
     required this.onFinish,
+    required this.onCancel,
     required this.onViewExercise,
     required this.onRefresh,
   });
@@ -1018,6 +1105,7 @@ class _SessionSheet extends StatefulWidget {
       onCompleteSet;
   final Future<void> Function(WorkoutSet set) onUndoSet;
   final Future<void> Function() onFinish;
+  final Future<void> Function() onCancel;
   final ValueChanged<Exercise> onViewExercise;
   final Future<Session?> Function() onRefresh;
 
@@ -1134,6 +1222,16 @@ class _SessionSheetState extends State<_SessionSheet> {
     Navigator.of(context).pop();
   }
 
+  Future<void> _cancelSession() async {
+    try {
+      await widget.onCancel();
+    } catch (_) {
+      return;
+    }
+    if (!mounted) return;
+    Navigator.of(context).pop();
+  }
+
   Future<void> _refreshSession() async {
     final refreshed = await widget.onRefresh();
     if (!mounted) return;
@@ -1212,11 +1310,21 @@ class _SessionSheetState extends State<_SessionSheet> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Close'),
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _cancelSession,
+                      child: const Text('Cancel session'),
+                    ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 12),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Close'),
+                ),
               ),
             ],
           ),

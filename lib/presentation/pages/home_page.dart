@@ -88,20 +88,22 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _onEditExercise(Exercise exercise) async {
+    final latest = _exerciseRepository.getById(exercise.id) ?? exercise;
     final updated = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => CreateExerciseSheet(exercise: exercise),
+      builder: (context) => CreateExerciseSheet(exercise: latest),
     );
     if (!mounted || updated != true) return;
     _refreshExercises();
   }
 
   Future<void> _onEditTraining(Training training) async {
+    final latest = _trainingRepository.getById(training.id) ?? training;
     final updated = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => CreateTrainingSheet(training: training),
+      builder: (context) => CreateTrainingSheet(training: latest),
     );
     if (!mounted || updated != true) return;
     _refreshTrainings();
@@ -153,6 +155,24 @@ class _HomePageState extends State<HomePage> {
     _refreshTrainings();
   }
 
+  Future<void> _showTrainingDetails(Training training) async {
+    final latest = _trainingRepository.getById(training.id) ?? training;
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => _TrainingDetailsSheet(training: latest),
+    );
+  }
+
+  Future<void> _showExerciseDetails(Exercise exercise) async {
+    final latest = _exerciseRepository.getById(exercise.id) ?? exercise;
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => _ExerciseDetailsSheet(exercise: latest),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -173,11 +193,13 @@ class _HomePageState extends State<HomePage> {
                     trainings: _trainings,
                     onDelete: _onDeleteTraining,
                     onEdit: _onEditTraining,
+                    onView: _showTrainingDetails,
                   )
                 : _ExercisesList(
                     exercises: _exercises,
                     onDelete: _onDeleteExercise,
                     onEdit: _onEditExercise,
+                    onView: _showExerciseDetails,
                   ),
           ),
         ],
@@ -196,11 +218,13 @@ class _WorkoutsList extends StatelessWidget {
     required this.trainings,
     required this.onDelete,
     required this.onEdit,
+    required this.onView,
   });
 
   final List<Training> trainings;
   final ValueChanged<Training> onDelete;
   final ValueChanged<Training> onEdit;
+  final ValueChanged<Training> onView;
 
   @override
   Widget build(BuildContext context) {
@@ -219,6 +243,7 @@ class _WorkoutsList extends StatelessWidget {
           child: ListTile(
             title: Text(training.name),
             subtitle: Text(subtitle),
+            onTap: () => onView(training),
             trailing: Wrap(
               spacing: 4,
               children: [
@@ -248,11 +273,13 @@ class _ExercisesList extends StatelessWidget {
     required this.exercises,
     required this.onDelete,
     required this.onEdit,
+    required this.onView,
   });
 
   final List<Exercise> exercises;
   final ValueChanged<Exercise> onDelete;
   final ValueChanged<Exercise> onEdit;
+  final ValueChanged<Exercise> onView;
 
   @override
   Widget build(BuildContext context) {
@@ -273,6 +300,7 @@ class _ExercisesList extends StatelessWidget {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
+            onTap: () => onView(exercise),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -298,6 +326,159 @@ class _ExercisesList extends StatelessWidget {
       },
       separatorBuilder: (_, separatorIndex) => const SizedBox(height: 12),
       itemCount: exercises.length,
+    );
+  }
+}
+
+class _TrainingDetailsSheet extends StatelessWidget {
+  const _TrainingDetailsSheet({required this.training});
+
+  final Training training;
+
+  @override
+  Widget build(BuildContext context) {
+    final sets = training.plannedSets;
+    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 24,
+          bottom: bottomPadding + 24,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                training.name,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '${sets.length} planned set${sets.length == 1 ? '' : 's'}',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 16),
+              if (sets.isEmpty)
+                const Text('No planned sets for this training')
+              else
+                ...sets.map(
+                  (set) => Card(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    child: ListTile(
+                      title: Text(set.exercise.name),
+                      subtitle: Text(
+                        '${set.targetRepetitions} repetitions'
+                        '${set.exercise.usesWeights ? ' with weights' : ''}',
+                      ),
+                    ),
+                  ),
+                ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Close'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ExerciseDetailsSheet extends StatelessWidget {
+  const _ExerciseDetailsSheet({required this.exercise});
+
+  final Exercise exercise;
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 24,
+          bottom: bottomPadding + 24,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                exercise.name,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Icon(
+                    exercise.usesWeights
+                        ? Icons.fitness_center
+                        : Icons.directions_run,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    exercise.usesWeights
+                        ? 'Uses weights'
+                        : 'Bodyweight / no weights',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Technique',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                exercise.technique.isEmpty
+                    ? 'No technique description'
+                    : exercise.technique,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Notes',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                exercise.notes.isEmpty ? 'No notes' : exercise.notes,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Links',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              if (exercise.links.isEmpty)
+                const Text('No links attached')
+              else
+                ...exercise.links.map(
+                  (link) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Text(link),
+                  ),
+                ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Close'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

@@ -4,7 +4,7 @@ import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
-import 'application/di/providers.dart';
+import 'providers.dart';
 import 'domain/logs.dart';
 import 'presentation/pages/home_page.dart';
 import 'presentation/theme.dart';

@@ -1316,9 +1316,11 @@ class _HistorySheetState extends State<_HistorySheet> {
                       final session = sessions[index];
                       final completedSets =
                           session.workoutSets.where((set) => set.done).length;
+                      final trainingName =
+                          session.training?.name ?? l10n.deletedTrainingName;
                       return Card(
                         child: ListTile(
-                          title: Text(session.training.name),
+                          title: Text(trainingName),
                           subtitle:
                               Text(l10n.completedSetsCount(completedSets)),
                           trailing: const Icon(Icons.chevron_right),
@@ -1359,7 +1361,9 @@ class _HistorySheetState extends State<_HistorySheet> {
                   ...selectedSessions.map(
                     (session) => ListTile(
                       contentPadding: EdgeInsets.zero,
-                      title: Text(session.training.name),
+                      title: Text(
+                        session.training?.name ?? l10n.deletedTrainingName,
+                      ),
                       subtitle: Text(_formatTimeRange(session)),
                       onTap: () => Navigator.of(context).pop(session),
                     ),
@@ -1395,6 +1399,7 @@ class _SessionHistoryDetailsSheet extends StatelessWidget {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
     final sets = session.workoutSets;
     final l10n = AppLocalizations.of(context)!;
+    final trainingName = session.training?.name ?? l10n.deletedTrainingName;
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.only(
@@ -1409,7 +1414,7 @@ class _SessionHistoryDetailsSheet extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                session.training.name,
+                trainingName,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 4),
@@ -1624,6 +1629,8 @@ class _SessionSheetState extends State<_SessionSheet> {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
     final l10n = AppLocalizations.of(context)!;
     final sets = _session.workoutSets;
+    final trainingName =
+        _session.training?.name ?? l10n.deletedTrainingName;
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.only(
@@ -1638,7 +1645,7 @@ class _SessionSheetState extends State<_SessionSheet> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                l10n.sessionSheetTitle(_session.training.name),
+                l10n.sessionSheetTitle(trainingName),
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 4),

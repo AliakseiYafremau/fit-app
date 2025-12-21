@@ -142,9 +142,9 @@ class IsarSessionRepository implements SessionRepository {
     if (model == null) {
       return null;
     }
-    final training = _mapTrainingById(model.trainingId);
-    if (training == null) {
-      return null;
+    Training? training;
+    if (model.trainingId.isNotEmpty) {
+      training = _mapTrainingById(model.trainingId);
     }
     final workoutSets = <WorkoutSet>[];
     for (final workoutSetId in model.workoutSetIds) {

@@ -114,15 +114,14 @@ List<SingleChildWidget> buildAppProviders(Isar isar, Directory appDirectory) => 
           workoutSetRepository: workoutSetRepository,
         ),
       ),
-      ProxyProvider4<TrainingRepository, PlannedSetRepository,
-          SessionRepository, WorkoutSetRepository, DeleteTraining>(
+      ProxyProvider3<TrainingRepository, PlannedSetRepository,
+          SessionRepository, DeleteTraining>(
         update: (_, trainingRepository, plannedSetRepository,
-                sessionRepository, workoutSetRepository, previous) =>
+                sessionRepository, previous) =>
             DeleteTraining(
           trainingRepository: trainingRepository,
           plannedSetRepository: plannedSetRepository,
           sessionRepository: sessionRepository,
-          workoutSetRepository: workoutSetRepository,
         ),
       ),
       ProxyProvider6<ExerciseRepository, PlannedSetRepository,

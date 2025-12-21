@@ -8,7 +8,7 @@ import 'package:fit_app/domain/entities/training.dart';
 /// Uses a base training plan and stores completed exercises for that session.
 class Session {
   final Id id;
-  final Training training;
+  final Training? training;
   final List<WorkoutSet> workoutSets;
   final bool active;
   final DateTime startedAt;
@@ -16,7 +16,7 @@ class Session {
 
   Session({
     required this.id,
-    required this.training,
+    this.training,
     List<WorkoutSet>? workoutSets,
     this.active = true,
     required this.startedAt,

@@ -482,6 +482,12 @@ abstract class AppLocalizations {
   /// **'Session: {name}'**
   String sessionSheetTitle(String name);
 
+  /// Shown when a session's original training has been removed
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted training'**
+  String get deletedTrainingName;
+
   /// No description provided for @sectionPhoto.
   ///
   /// In en, this message translates to:

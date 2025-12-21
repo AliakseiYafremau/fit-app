@@ -72,7 +72,7 @@ SessionModel mapSessionToModel(
 }) {
   final model = existing ?? SessionModel();
   model.entityId = session.id;
-  model.trainingId = session.training.id;
+  model.trainingId = session.training?.id ?? '';
   model.workoutSetIds = List<String>.from(workoutSetIds);
   model.active = session.active;
   model.startedAt = session.startedAt;
@@ -82,7 +82,7 @@ SessionModel mapSessionToModel(
 
 Session mapSessionFromModel(
   SessionModel model,
-  Training training,
+  Training? training,
   List<WorkoutSet> workoutSets,
 ) {
   return Session(

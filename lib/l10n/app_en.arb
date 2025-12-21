@@ -106,6 +106,10 @@
       }
     }
   },
+  "deletedTrainingName": "Deleted training",
+  "@deletedTrainingName": {
+    "description": "Shown when a session's original training has been removed"
+  },
   "sectionPhoto": "Photo",
   "sectionTechnique": "Technique",
   "sectionNotes": "Notes",

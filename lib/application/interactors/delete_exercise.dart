@@ -75,8 +75,9 @@ class DeleteExercise {
       if (filteredWorkoutSets.length == session.workoutSets.length) {
         continue;
       }
+      final training = session.training;
       final sessionTraining =
-          trainingsById[session.training.id] ?? session.training;
+          training == null ? null : (trainingsById[training.id] ?? training);
       final updatedSession = Session(
         id: session.id,
         training: sessionTraining,

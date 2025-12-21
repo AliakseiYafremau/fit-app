@@ -215,6 +215,9 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get deletedTrainingName => 'Удаленная тренировка';
+
+  @override
   String get sectionPhoto => 'Фото';
 
   @override

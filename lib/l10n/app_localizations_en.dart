@@ -214,6 +214,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get deletedTrainingName => 'Deleted training';
+
+  @override
   String get sectionPhoto => 'Photo';
 
   @override

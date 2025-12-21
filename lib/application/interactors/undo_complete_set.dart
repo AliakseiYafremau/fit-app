@@ -20,7 +20,7 @@ class UndoCompleteSet {
       id: set.id,
       exercise: set.exercise,
       repetitions: set.repetitions,
-      weight: set.exercise.usesWeights ? set.weight : null,
+      weight: null,
       done: false,
     );
     workoutSetRepository.update(reverted);

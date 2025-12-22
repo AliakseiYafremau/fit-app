@@ -482,6 +482,42 @@ abstract class AppLocalizations {
   /// **'Session'**
   String get sessionSheetTitle;
 
+  /// No description provided for @sessionAddSetButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Add set'**
+  String get sessionAddSetButton;
+
+  /// No description provided for @sessionAddSetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add workout set'**
+  String get sessionAddSetTitle;
+
+  /// No description provided for @sessionAddSetExerciseLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise'**
+  String get sessionAddSetExerciseLabel;
+
+  /// No description provided for @sessionAddSetNoExercises.
+  ///
+  /// In en, this message translates to:
+  /// **'No exercises available'**
+  String get sessionAddSetNoExercises;
+
+  /// No description provided for @sessionDeleteSetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete workout set'**
+  String get sessionDeleteSetTitle;
+
+  /// No description provided for @sessionDeleteSetMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {exercise} from this session?'**
+  String sessionDeleteSetMessage(Object exercise);
+
   /// No description provided for @categoriesSheetTitle.
   ///
   /// In en, this message translates to:

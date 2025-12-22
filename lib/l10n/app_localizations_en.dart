@@ -212,6 +212,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sessionSheetTitle => 'Session';
 
   @override
+  String get sessionAddSetButton => 'Add set';
+
+  @override
+  String get sessionAddSetTitle => 'Add workout set';
+
+  @override
+  String get sessionAddSetExerciseLabel => 'Exercise';
+
+  @override
+  String get sessionAddSetNoExercises => 'No exercises available';
+
+  @override
+  String get sessionDeleteSetTitle => 'Delete workout set';
+
+  @override
+  String sessionDeleteSetMessage(Object exercise) {
+    return 'Remove $exercise from this session?';
+  }
+
+  @override
   String get categoriesSheetTitle => 'Categories';
 
   @override

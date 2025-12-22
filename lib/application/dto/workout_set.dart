@@ -10,3 +10,15 @@ class NewPlannedSetDTO {
     required this.exerciseId,
   });
 }
+
+class NewWorkoutSetDTO {
+  final Id exerciseId;
+  final int repetitions;
+  final double? weight;
+
+  NewWorkoutSetDTO({
+    required this.exerciseId,
+    required this.repetitions,
+    this.weight,
+  });
+}

@@ -213,6 +213,26 @@ class AppLocalizationsRu extends AppLocalizations {
   String get sessionSheetTitle => 'Сессия';
 
   @override
+  String get sessionAddSetButton => 'Добавить подход';
+
+  @override
+  String get sessionAddSetTitle => 'Добавить подход';
+
+  @override
+  String get sessionAddSetExerciseLabel => 'Упражнение';
+
+  @override
+  String get sessionAddSetNoExercises => 'Нет доступных упражнений';
+
+  @override
+  String get sessionDeleteSetTitle => 'Удалить подход';
+
+  @override
+  String sessionDeleteSetMessage(Object exercise) {
+    return 'Удалить $exercise из этой сессии?';
+  }
+
+  @override
   String get categoriesSheetTitle => 'Категории';
 
   @override

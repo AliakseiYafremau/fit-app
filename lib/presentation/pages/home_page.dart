@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:fit_app/application/dto/workout_set.dart';
+import 'package:fit_app/application/interactors/add_workout_set.dart';
 import 'package:fit_app/application/interactors/cancel_session.dart';
 import 'package:fit_app/application/interactors/complete_set.dart';
 import 'package:fit_app/application/interactors/create_category.dart';
@@ -11,6 +13,7 @@ import 'package:fit_app/application/interactors/finish_session.dart';
 import 'package:fit_app/application/interactors/update_category.dart';
 import 'package:fit_app/application/interactors/start_session.dart';
 import 'package:fit_app/application/interactors/undo_complete_set.dart';
+import 'package:fit_app/application/interactors/delete_workout_set.dart';
 import 'package:fit_app/application/interfaces/repo/category.dart';
 import 'package:fit_app/application/interfaces/repo/exercise.dart';
 import 'package:fit_app/application/interfaces/repo/session.dart';
@@ -415,32 +418,58 @@ class _HomePageState extends State<HomePage> {
 
   void _openDashboard() {
     final l10n = AppLocalizations.of(context)!;
-    showModalBottomSheet(
+    final size = MediaQuery.of(context).size;
+    final panelWidth = size.width < 480 ? size.width * 0.85 : 360.0;
+    showGeneralDialog(
       context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-              child: Text(
-                l10n.dashboardTitle,
-                style: Theme.of(context).textTheme.titleMedium,
+      barrierDismissible: true,
+      barrierLabel: l10n.dashboardTitle,
+      barrierColor: Colors.black54,
+      transitionDuration: const Duration(milliseconds: 250),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Align(
+          alignment: Alignment.centerLeft,
+          child: SafeArea(
+            child: SizedBox(
+              width: panelWidth,
+              height: double.infinity,
+              child: Material(
+                color: Theme.of(context).colorScheme.surface,
+                elevation: 12,
+                clipBehavior: Clip.antiAlias,
+                shape: const RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.horizontal(right: Radius.circular(24)),
+                ),
+                child: _DashboardSheet(
+                  onClose: () => Navigator.of(context).pop(),
+                  onOpenCategories: () {
+                    Navigator.of(context).pop();
+                    _openCategoriesSheet();
+                  },
+                  onOpenHistory: () {
+                    Navigator.of(context).pop();
+                    _openHistorySheet();
+                  },
+                ),
               ),
             ),
-            ListTile(
-              leading: const Icon(Icons.category),
-              title: Text(l10n.dashboardCategories),
-              onTap: () {
-                Navigator.of(context).pop();
-                _openCategoriesSheet();
-              },
-            ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        final offsetAnimation = Tween<Offset>(
+          begin: const Offset(-1, 0),
+          end: Offset.zero,
+        ).animate(CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutCubic,
+        ));
+        return SlideTransition(
+          position: offsetAnimation,
+          child: child,
+        );
+      },
     );
   }
 
@@ -565,11 +594,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 ),
-                Positioned(
-                  left: 16,
-                  bottom: 24,
-                  child: _HistoryBubbleButton(onTap: _openHistorySheet),
-                ),
               ],
             ),
           ),
@@ -595,6 +619,57 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    );
+  }
+}
+
+class _DashboardSheet extends StatelessWidget {
+  const _DashboardSheet({
+    required this.onOpenCategories,
+    required this.onOpenHistory,
+    required this.onClose,
+  });
+
+  final VoidCallback onOpenCategories;
+  final VoidCallback onOpenHistory;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l10n.dashboardTitle,
+                  style: theme.textTheme.titleLarge,
+                ),
+              ),
+              IconButton(
+                onPressed: onClose,
+                icon: const Icon(Icons.close),
+                tooltip: l10n.buttonClose,
+              ),
+            ],
+          ),
+        ),
+        ListTile(
+          leading: const Icon(Icons.category),
+          title: Text(l10n.dashboardCategories),
+          onTap: onOpenCategories,
+        ),
+        ListTile(
+          leading: const Icon(Icons.history),
+          title: Text(l10n.historyButton),
+          onTap: onOpenHistory,
+        ),
+      ],
     );
   }
 }
@@ -639,49 +714,6 @@ class _WorkoutsList extends StatelessWidget {
       },
       separatorBuilder: (_, unused) => const SizedBox(height: 12),
       itemCount: filtered.length,
-    );
-  }
-}
-
-class _HistoryBubbleButton extends StatelessWidget {
-  const _HistoryBubbleButton({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final l10n = AppLocalizations.of(context)!;
-    final borderRadius = BorderRadius.circular(26);
-    return Material(
-      elevation: 4,
-      color: colorScheme.surface,
-      borderRadius: borderRadius,
-      child: InkWell(
-        borderRadius: borderRadius,
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.history,
-                color: colorScheme.primary,
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                l10n.historyButton,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
@@ -1608,11 +1640,27 @@ class _SessionSheet extends StatefulWidget {
 
 class _SessionSheetState extends State<_SessionSheet> {
   late Session _session;
+  List<Exercise> _availableExercises = const [];
+  AddWorkoutSet? _addWorkoutSetInteractor;
+  SessionRepository? _sessionRepository;
+  DeleteWorkoutSet? _deleteWorkoutSet;
+  bool _depsReady = false;
 
   @override
   void initState() {
     super.initState();
     _session = widget.session;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_depsReady) return;
+    _availableExercises = context.read<ExerciseRepository>().getAll();
+    _addWorkoutSetInteractor = context.read<AddWorkoutSet>();
+    _sessionRepository = context.read<SessionRepository>();
+    _deleteWorkoutSet = context.read<DeleteWorkoutSet>();
+    _depsReady = true;
   }
 
   Future<void> _completeSet(WorkoutSet set) async {
@@ -1710,6 +1758,198 @@ class _SessionSheetState extends State<_SessionSheet> {
     Navigator.of(context).pop();
   }
 
+  Future<void> _deleteSet(WorkoutSet set) async {
+    final deleteWorkoutSet = _deleteWorkoutSet;
+    if (deleteWorkoutSet == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.sessionDeleteSetTitle),
+        content: Text(l10n.sessionDeleteSetMessage(set.exercise.name)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.buttonCancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.buttonDelete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) {
+      return;
+    }
+    deleteWorkoutSet.execute(set.id);
+    await _refreshSession();
+  }
+
+  Future<_AddWorkoutSetResult?> _showAddSetDialog(
+    List<Exercise> exercises,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    final repsController = TextEditingController();
+    final weightController = TextEditingController();
+    Exercise selectedExercise = exercises.first;
+    String? repsError;
+    String? weightError;
+    final result = await showDialog<_AddWorkoutSetResult>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setStateDialog) => AlertDialog(
+          title: Text(l10n.sessionAddSetTitle),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                DropdownButtonFormField<Exercise>(
+                  initialValue: selectedExercise,
+                  decoration: InputDecoration(
+                    labelText: l10n.sessionAddSetExerciseLabel,
+                  ),
+                  items: exercises
+                      .map(
+                        (exercise) => DropdownMenuItem<Exercise>(
+                          value: exercise,
+                          child: Text(exercise.name),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setStateDialog(() {
+                      selectedExercise = value;
+                      if (!selectedExercise.usesWeights) {
+                        weightError = null;
+                        weightController.clear();
+                      }
+                    });
+                  },
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: repsController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: l10n.labelRepetitions,
+                    errorText: repsError,
+                  ),
+                  onChanged: (_) {
+                    if (repsError != null) {
+                      setStateDialog(() => repsError = null);
+                    }
+                  },
+                ),
+                const SizedBox(height: 12),
+                if (selectedExercise.usesWeights)
+                  TextField(
+                    controller: weightController,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    decoration: InputDecoration(
+                      labelText: l10n.labelWeight,
+                      helperText: l10n.helperWeightedExercise,
+                      errorText: weightError,
+                    ),
+                    onChanged: (_) {
+                      if (weightError != null) {
+                        setStateDialog(() => weightError = null);
+                      }
+                    },
+                  ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l10n.buttonCancel),
+            ),
+            FilledButton(
+              onPressed: () {
+                final repetitions =
+                    int.tryParse(repsController.text.trim());
+                if (repetitions == null || repetitions <= 0) {
+                  setStateDialog(
+                    () => repsError = l10n.errorEnterValidRepetitions,
+                  );
+                  return;
+                }
+                double? weight;
+                if (selectedExercise.usesWeights) {
+                  final text = weightController.text.trim();
+                  if (text.isEmpty) {
+                    setStateDialog(
+                      () => weightError = l10n.errorWeightRequired,
+                    );
+                    return;
+                  }
+                  weight = double.tryParse(text);
+                  if (weight == null) {
+                    setStateDialog(
+                      () => weightError = l10n.errorEnterValidWeight,
+                    );
+                    return;
+                  }
+                }
+                Navigator.of(context).pop(
+                  _AddWorkoutSetResult(
+                    exercise: selectedExercise,
+                    repetitions: repetitions,
+                    weight: weight,
+                  ),
+                );
+              },
+              child: Text(l10n.buttonSave),
+            ),
+          ],
+        ),
+      ),
+    );
+    return result;
+  }
+
+  Future<void> _addWorkoutSet() async {
+    final addWorkoutSet = _addWorkoutSetInteractor;
+    final sessionRepository = _sessionRepository;
+    final l10n = AppLocalizations.of(context)!;
+    if (addWorkoutSet == null || sessionRepository == null) {
+      return;
+    }
+    if (_availableExercises.isEmpty) {
+      _showTopSnackBar(context, l10n.sessionAddSetNoExercises);
+      return;
+    }
+    final result = await _showAddSetDialog(_availableExercises);
+    if (result == null) {
+      return;
+    }
+    try {
+      final newWorkoutSet = addWorkoutSet.execute(
+        NewWorkoutSetDTO(
+          exerciseId: result.exercise.id,
+          repetitions: result.repetitions,
+          weight: result.weight,
+        ),
+      );
+      final updatedSession = Session(
+        id: _session.id,
+        workoutSets: [..._session.workoutSets, newWorkoutSet],
+        active: _session.active,
+        startedAt: _session.startedAt,
+        finishedAt: _session.finishedAt,
+      );
+      sessionRepository.update(updatedSession);
+      await _refreshSession();
+      if (!mounted) return;
+    } catch (_) {
+      if (!mounted) return;
+      _showTopSnackBar(context, l10n.errorEnterValidRepetitions);
+    }
+  }
+
   Future<void> _cancelSession() async {
     try {
       await widget.onCancel();
@@ -1782,6 +2022,11 @@ class _SessionSheetState extends State<_SessionSheet> {
                       trailing: Wrap(
                         spacing: 8,
                         children: [
+                          IconButton(
+                            tooltip: l10n.buttonDelete,
+                            onPressed: () => _deleteSet(set),
+                            icon: const Icon(Icons.delete_outline),
+                          ),
                           if (set.done)
                             TextButton(
                               onPressed: () => _undoSet(set),
@@ -1800,6 +2045,15 @@ class _SessionSheetState extends State<_SessionSheet> {
                     ),
                   ),
                 ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed:
+                      _availableExercises.isEmpty ? null : _addWorkoutSet,
+                  icon: const Icon(Icons.add),
+                  label: Text(l10n.sessionAddSetButton),
+                ),
+              ),
               const SizedBox(height: 16),
               Row(
                 children: [
@@ -1832,6 +2086,18 @@ class _SessionSheetState extends State<_SessionSheet> {
       ),
     );
   }
+}
+
+class _AddWorkoutSetResult {
+  final Exercise exercise;
+  final int repetitions;
+  final double? weight;
+
+  _AddWorkoutSetResult({
+    required this.exercise,
+    required this.repetitions,
+    this.weight,
+  });
 }
 
 class _EmptyState extends StatelessWidget {

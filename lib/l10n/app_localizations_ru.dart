@@ -68,12 +68,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get sessionDayEmpty => 'В этот день сессий не было';
 
   @override
-  String get noTechniqueDescription => 'Описание техники отсутствует';
-
-  @override
-  String get noNotes => 'Заметок нет';
-
-  @override
   String startedLabel(String date) {
     return 'Начало $date';
   }
@@ -162,9 +156,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get noPlannedSets => 'У этой тренировки нет планов';
-
-  @override
-  String get noLinksAttached => 'Ссылок нет';
 
   @override
   String get errorUnableToOpenLink => 'Не удалось открыть ссылку';

@@ -901,6 +901,11 @@ class _ExerciseDetailsSheet extends StatelessWidget {
         .map((id) => categoriesById[id])
         .whereType<Category>()
         .toList();
+    final techniqueText = exercise.technique?.trim() ?? '';
+    final notesText = exercise.notes?.trim() ?? '';
+    final hasTechnique = techniqueText.isNotEmpty;
+    final hasNotes = notesText.isNotEmpty;
+    final hasLinks = exercise.links.isNotEmpty;
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.only(
@@ -944,14 +949,12 @@ class _ExerciseDetailsSheet extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              Text(
-                l10n.exerciseFormCategoriesLabel,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 4),
-              if (selectedCategories.isEmpty)
-                Text(l10n.exerciseFormNoCategories)
-              else
+              if (selectedCategories.isNotEmpty) ...[
+                Text(
+                  l10n.exerciseFormCategoriesLabel,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 4),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
@@ -968,37 +971,32 @@ class _ExerciseDetailsSheet extends StatelessWidget {
                     );
                   }).toList(),
                 ),
-              const SizedBox(height: 16),
-              Text(
-                l10n.sectionTechnique,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                (exercise.technique ?? '').isEmpty
-                    ? l10n.noTechniqueDescription
-                    : exercise.technique!,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                l10n.sectionNotes,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                (exercise.notes ?? '').isEmpty
-                    ? l10n.noNotes
-                    : exercise.notes!,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                l10n.sectionLinks,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              if (exercise.links.isEmpty)
-                Text(l10n.noLinksAttached)
-              else
+              ],
+              if (hasTechnique) ...[
+                const SizedBox(height: 16),
+                Text(
+                  l10n.sectionTechnique,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 4),
+                Text(techniqueText),
+              ],
+              if (hasNotes) ...[
+                const SizedBox(height: 16),
+                Text(
+                  l10n.sectionNotes,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 4),
+                Text(notesText),
+              ],
+              if (hasLinks) ...[
+                const SizedBox(height: 16),
+                Text(
+                  l10n.sectionLinks,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
                 ...exercise.links.map(
                   (link) => Padding(
                     padding: const EdgeInsets.only(bottom: 12),
@@ -1008,6 +1006,7 @@ class _ExerciseDetailsSheet extends StatelessWidget {
                     ),
                   ),
                 ),
+              ],
               const SizedBox(height: 16),
               Row(
                 children: [

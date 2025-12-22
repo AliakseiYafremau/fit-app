@@ -26,8 +26,6 @@
     }
   },
   "sessionDayEmpty": "В этот день сессий не было",
-  "noTechniqueDescription": "Описание техники отсутствует",
-  "noNotes": "Заметок нет",
   "startedLabel": "Начало {date}",
   "@startedLabel": {
     "placeholders": {
@@ -83,7 +81,6 @@
   "buttonFinishSession": "Завершить сессию",
   "buttonCancelSession": "Отменить сессию",
   "noPlannedSets": "У этой тренировки нет планов",
-  "noLinksAttached": "Ссылок нет",
   "errorUnableToOpenLink": "Не удалось открыть ссылку",
   "errorUnableToLoadPhoto": "Не удалось загрузить фото",
   "sessionSummaryEmpty": "В этой сессии не отслеживались подходы",

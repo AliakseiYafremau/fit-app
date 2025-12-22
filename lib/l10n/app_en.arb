@@ -26,8 +26,6 @@
     }
   },
   "sessionDayEmpty": "No sessions on this day",
-  "noTechniqueDescription": "No technique description",
-  "noNotes": "No notes",
   "startedLabel": "Started {date}",
   "@startedLabel": {
     "placeholders": {
@@ -83,7 +81,6 @@
   "buttonFinishSession": "Finish session",
   "buttonCancelSession": "Cancel session",
   "noPlannedSets": "No planned sets for this training",
-  "noLinksAttached": "No links attached",
   "errorUnableToOpenLink": "Unable to open link",
   "errorUnableToLoadPhoto": "Unable to load photo",
   "sessionSummaryEmpty": "No sets were tracked in this session",

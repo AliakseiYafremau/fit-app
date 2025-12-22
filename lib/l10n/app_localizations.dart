@@ -212,18 +212,6 @@ abstract class AppLocalizations {
   /// **'No sessions on this day'**
   String get sessionDayEmpty;
 
-  /// No description provided for @noTechniqueDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'No technique description'**
-  String get noTechniqueDescription;
-
-  /// No description provided for @noNotes.
-  ///
-  /// In en, this message translates to:
-  /// **'No notes'**
-  String get noNotes;
-
   /// No description provided for @startedLabel.
   ///
   /// In en, this message translates to:
@@ -385,12 +373,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No planned sets for this training'**
   String get noPlannedSets;
-
-  /// No description provided for @noLinksAttached.
-  ///
-  /// In en, this message translates to:
-  /// **'No links attached'**
-  String get noLinksAttached;
 
   /// No description provided for @errorUnableToOpenLink.
   ///

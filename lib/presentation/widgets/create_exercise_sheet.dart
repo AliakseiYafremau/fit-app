@@ -28,7 +28,7 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
   final List<TextEditingController> _linkControllers = [];
   final Set<String> _selectedCategoryIds = <String>{};
   List<Category> _availableCategories = const [];
-  bool _usesWeights = true;
+  bool _usesWeights = false;
   Uint8List? _photoPreviewBytes;
   Uint8List? _pendingPhotoBytes;
   bool _removePhoto = false;

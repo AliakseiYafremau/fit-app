@@ -143,6 +143,29 @@
   "sectionTechnique": "Technique",
   "sectionNotes": "Notes",
   "sectionLinks": "Links",
+  "exerciseFormCreateTitle": "Create Exercise",
+  "exerciseFormEditTitle": "Edit Exercise",
+  "exerciseFormNameLabel": "Exercise name",
+  "errorExerciseNameRequired": "Enter exercise name",
+  "exerciseFormNoPhoto": "No photo selected",
+  "exerciseFormAddPhoto": "Add photo",
+  "exerciseFormChangePhoto": "Change photo",
+  "exerciseFormRemovePhoto": "Remove photo",
+  "exerciseFormTechniqueLabel": "Technique description",
+  "exerciseFormNotesLabel": "Notes",
+  "exerciseFormCategoriesLabel": "Categories",
+  "exerciseFormNoCategories": "No categories yet",
+  "exerciseFormLinkLabel": "Link {index}",
+  "@exerciseFormLinkLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "exerciseFormAddLink": "Add link",
+  "exerciseFormAddExercise": "Add exercise",
+  "exerciseFormSaveChanges": "Save changes",
   "exerciseUsesWeights": "Uses weights",
   "exerciseBodyweight": "Bodyweight / no weights",
   "plannedSetsCount": "{count, plural, one{{count} planned set} other{{count} planned sets}}",

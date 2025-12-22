@@ -143,6 +143,29 @@
   "sectionTechnique": "Техника",
   "sectionNotes": "Заметки",
   "sectionLinks": "Ссылки",
+  "exerciseFormCreateTitle": "Создать упражнение",
+  "exerciseFormEditTitle": "Изменить упражнение",
+  "exerciseFormNameLabel": "Название упражнения",
+  "errorExerciseNameRequired": "Введите название упражнения",
+  "exerciseFormNoPhoto": "Фото не выбрано",
+  "exerciseFormAddPhoto": "Добавить фото",
+  "exerciseFormChangePhoto": "Сменить фото",
+  "exerciseFormRemovePhoto": "Удалить фото",
+  "exerciseFormTechniqueLabel": "Описание техники",
+  "exerciseFormNotesLabel": "Заметки",
+  "exerciseFormCategoriesLabel": "Категории",
+  "exerciseFormNoCategories": "Категорий пока нет",
+  "exerciseFormLinkLabel": "Ссылка {index}",
+  "@exerciseFormLinkLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "exerciseFormAddLink": "Добавить ссылку",
+  "exerciseFormAddExercise": "Добавить упражнение",
+  "exerciseFormSaveChanges": "Сохранить изменения",
   "exerciseUsesWeights": "С весами",
   "exerciseBodyweight": "Без веса / собственный вес",
   "plannedSetsCount": "{count, plural, one{{count} запланированный подход} few{{count} запланированных подхода} many{{count} запланированных подходов} other{{count} запланированных подходов}}",

@@ -297,6 +297,56 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sectionLinks => 'Links';
 
   @override
+  String get exerciseFormCreateTitle => 'Create Exercise';
+
+  @override
+  String get exerciseFormEditTitle => 'Edit Exercise';
+
+  @override
+  String get exerciseFormNameLabel => 'Exercise name';
+
+  @override
+  String get errorExerciseNameRequired => 'Enter exercise name';
+
+  @override
+  String get exerciseFormNoPhoto => 'No photo selected';
+
+  @override
+  String get exerciseFormAddPhoto => 'Add photo';
+
+  @override
+  String get exerciseFormChangePhoto => 'Change photo';
+
+  @override
+  String get exerciseFormRemovePhoto => 'Remove photo';
+
+  @override
+  String get exerciseFormTechniqueLabel => 'Technique description';
+
+  @override
+  String get exerciseFormNotesLabel => 'Notes';
+
+  @override
+  String get exerciseFormCategoriesLabel => 'Categories';
+
+  @override
+  String get exerciseFormNoCategories => 'No categories yet';
+
+  @override
+  String exerciseFormLinkLabel(int index) {
+    return 'Link $index';
+  }
+
+  @override
+  String get exerciseFormAddLink => 'Add link';
+
+  @override
+  String get exerciseFormAddExercise => 'Add exercise';
+
+  @override
+  String get exerciseFormSaveChanges => 'Save changes';
+
+  @override
   String get exerciseUsesWeights => 'Uses weights';
 
   @override

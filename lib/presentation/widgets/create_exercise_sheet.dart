@@ -7,6 +7,7 @@ import 'package:fit_app/application/interfaces/file_manager.dart';
 import 'package:fit_app/application/interfaces/repo/category.dart';
 import 'package:fit_app/domain/entities/category.dart';
 import 'package:fit_app/domain/entities/exercise.dart';
+import 'package:fit_app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -149,8 +150,9 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
     final name = _nameController.text.trim();
     final technique = _techniqueController.text.trim();
     final notes = _notesController.text.trim();
+    final l10n = AppLocalizations.of(context)!;
     if (name.isEmpty) {
-      _showMessage('Enter exercise name');
+      _showMessage(l10n.errorExerciseNameRequired);
       return;
     }
     final techniqueValue = technique.isEmpty ? null : technique;
@@ -198,6 +200,7 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
     return SafeArea(
       child: Padding(
@@ -213,20 +216,22 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                _isEditing ? 'Edit Exercise' : 'Create Exercise',
+                _isEditing
+                    ? l10n.exerciseFormEditTitle
+                    : l10n.exerciseFormCreateTitle,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Exercise name',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.exerciseFormNameLabel,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 12),
               Text(
-                'Photo',
+                l10n.sectionPhoto,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
@@ -254,7 +259,7 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
                             border: Border.all(color: Colors.white24),
                           ),
                           alignment: Alignment.center,
-                          child: const Text('No photo selected'),
+                          child: Text(l10n.exerciseFormNoPhoto),
                         ),
               const SizedBox(height: 8),
               Row(
@@ -263,8 +268,8 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
                     onPressed: _pickPhoto,
                     icon: const Icon(Icons.photo_library_outlined),
                     label: Text(_photoPreviewBytes == null
-                        ? 'Add photo'
-                        : 'Change photo'),
+                        ? l10n.exerciseFormAddPhoto
+                        : l10n.exerciseFormChangePhoto),
                   ),
                   const SizedBox(width: 12),
                   if (_photoPreviewBytes != null ||
@@ -272,38 +277,38 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
                     TextButton.icon(
                       onPressed: _removePhotoSelection,
                       icon: const Icon(Icons.delete_outline),
-                      label: const Text('Remove'),
+                      label: Text(l10n.exerciseFormRemovePhoto),
                     ),
                 ],
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: _techniqueController,
-                decoration: const InputDecoration(
-                  labelText: 'Technique description',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.exerciseFormTechniqueLabel,
+                  border: const OutlineInputBorder(),
                 ),
                 maxLines: 2,
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: _notesController,
-                decoration: const InputDecoration(
-                  labelText: 'Notes',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.exerciseFormNotesLabel,
+                  border: const OutlineInputBorder(),
                 ),
                 maxLines: 2,
               ),
               const SizedBox(height: 12),
               Text(
-                'Categories',
+                l10n.exerciseFormCategoriesLabel,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
               if (_availableCategories.isEmpty)
-                const Text(
-                  'No categories yet',
-                  style: TextStyle(color: Colors.white70),
+                Text(
+                  l10n.exerciseFormNoCategories,
+                  style: const TextStyle(color: Colors.white70),
                 )
               else
                 Wrap(
@@ -330,14 +335,14 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
               const SizedBox(height: 12),
               SwitchListTile(
                 value: _usesWeights,
-                title: const Text('Uses weights'),
+                title: Text(l10n.exerciseUsesWeights),
                 onChanged: _isEditing
                     ? null
                     : (value) => setState(() => _usesWeights = value),
               ),
               const SizedBox(height: 12),
               Text(
-                'Links',
+                l10n.sectionLinks,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
@@ -350,7 +355,7 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
                         child: TextField(
                           controller: _linkControllers[index],
                           decoration: InputDecoration(
-                            labelText: 'Link ${index + 1}',
+                            labelText: l10n.exerciseFormLinkLabel(index + 1),
                             border: const OutlineInputBorder(),
                           ),
                         ),
@@ -368,7 +373,7 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
                 child: TextButton.icon(
                   onPressed: _addLinkField,
                   icon: const Icon(Icons.add),
-                  label: const Text('Add link'),
+                  label: Text(l10n.exerciseFormAddLink),
                 ),
               ),
               const SizedBox(height: 16),
@@ -376,7 +381,9 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _submit,
-                  child: Text(_isEditing ? 'Save changes' : 'Add exercise'),
+                  child: Text(_isEditing
+                      ? l10n.exerciseFormSaveChanges
+                      : l10n.exerciseFormAddExercise),
                 ),
               ),
             ],

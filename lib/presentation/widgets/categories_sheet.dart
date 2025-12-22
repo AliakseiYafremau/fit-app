@@ -257,6 +257,7 @@ class _CategoriesSheetState extends State<CategoriesSheet> {
   Future<void> _editCategory(Category category) async {
     final result = await _showEditCategoryDialog(category);
     if (result == null) return;
+    if (!mounted) return;
     final l10n = AppLocalizations.of(context)!;
     try {
       widget.updateCategory.execute(

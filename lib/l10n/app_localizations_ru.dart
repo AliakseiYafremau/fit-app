@@ -298,6 +298,56 @@ class AppLocalizationsRu extends AppLocalizations {
   String get sectionLinks => 'Ссылки';
 
   @override
+  String get exerciseFormCreateTitle => 'Создать упражнение';
+
+  @override
+  String get exerciseFormEditTitle => 'Изменить упражнение';
+
+  @override
+  String get exerciseFormNameLabel => 'Название упражнения';
+
+  @override
+  String get errorExerciseNameRequired => 'Введите название упражнения';
+
+  @override
+  String get exerciseFormNoPhoto => 'Фото не выбрано';
+
+  @override
+  String get exerciseFormAddPhoto => 'Добавить фото';
+
+  @override
+  String get exerciseFormChangePhoto => 'Сменить фото';
+
+  @override
+  String get exerciseFormRemovePhoto => 'Удалить фото';
+
+  @override
+  String get exerciseFormTechniqueLabel => 'Описание техники';
+
+  @override
+  String get exerciseFormNotesLabel => 'Заметки';
+
+  @override
+  String get exerciseFormCategoriesLabel => 'Категории';
+
+  @override
+  String get exerciseFormNoCategories => 'Категорий пока нет';
+
+  @override
+  String exerciseFormLinkLabel(int index) {
+    return 'Ссылка $index';
+  }
+
+  @override
+  String get exerciseFormAddLink => 'Добавить ссылку';
+
+  @override
+  String get exerciseFormAddExercise => 'Добавить упражнение';
+
+  @override
+  String get exerciseFormSaveChanges => 'Сохранить изменения';
+
+  @override
   String get exerciseUsesWeights => 'С весами';
 
   @override

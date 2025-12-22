@@ -72,21 +72,22 @@ class IsarExerciseRepository implements ExerciseRepository {
     });
   }
   Exercise _attachPhoto(Exercise exercise) {
-    final photoId = '${exercise.id}_photo';
-    final hasPhoto = _fileManager.exists(photoId);
+    final candidatePhotoId = exercise.photoId ?? '${exercise.id}_photo';
+    final hasPhoto = _fileManager.exists(candidatePhotoId);
     if (hasPhoto == (exercise.photoId != null)) {
-      if (!hasPhoto || exercise.photoId == photoId) {
+      if (!hasPhoto || exercise.photoId == candidatePhotoId) {
         return exercise;
       }
     }
     return Exercise(
       id: exercise.id,
       name: exercise.name,
-      photoId: hasPhoto ? photoId : null,
+      photoId: hasPhoto ? candidatePhotoId : null,
       technique: exercise.technique,
       notes: exercise.notes,
       usesWeights: exercise.usesWeights,
       links: exercise.links,
+      categoriesId: exercise.categoriesId,
     );
   }
 }

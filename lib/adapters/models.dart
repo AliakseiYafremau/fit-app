@@ -10,10 +10,12 @@ class ExerciseModel {
   late String entityId;
 
   late String name;
+  String? photoId;
   String technique = '';
   String notes = '';
   late bool usesWeights;
   List<String> links = [];
+  List<String> categoryIds = [];
 }
 
 @collection

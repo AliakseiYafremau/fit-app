@@ -15,6 +15,7 @@ import 'package:fit_app/application/interfaces/repo/category.dart';
 import 'package:fit_app/application/interfaces/repo/exercise.dart';
 import 'package:fit_app/application/interfaces/repo/session.dart';
 import 'package:fit_app/application/interfaces/repo/training.dart';
+import 'package:fit_app/domain/entities/category.dart';
 import 'package:fit_app/domain/entities/exercise.dart';
 import 'package:fit_app/domain/entities/session.dart';
 import 'package:fit_app/domain/entities/training.dart';
@@ -250,11 +251,13 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _showExerciseDetails(Exercise exercise) async {
     final latest = _exerciseRepository.getById(exercise.id) ?? exercise;
+    final categories = _categoryRepository.getAll();
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       builder: (context) => _ExerciseDetailsSheet(
         exercise: latest,
+        categories: categories,
         onEdit: _onEditExercise,
         onDelete: _onDeleteExercise,
       ),
@@ -723,13 +726,6 @@ class _ExercisesList extends StatelessWidget {
         return Card(
           child: ListTile(
             title: Text(exercise.name),
-            subtitle: Text(
-              (exercise.technique ?? '').isEmpty
-                  ? l10n.noTechniqueDescription
-                  : exercise.technique!,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
             onTap: () => onView(exercise),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
@@ -884,11 +880,13 @@ class _TrainingDetailsSheet extends StatelessWidget {
 class _ExerciseDetailsSheet extends StatelessWidget {
   const _ExerciseDetailsSheet({
     required this.exercise,
+    required this.categories,
     required this.onEdit,
     required this.onDelete,
   });
 
   final Exercise exercise;
+  final List<Category> categories;
   final ValueChanged<Exercise> onEdit;
   final ValueChanged<Exercise> onDelete;
 
@@ -896,6 +894,13 @@ class _ExerciseDetailsSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
     final l10n = AppLocalizations.of(context)!;
+    final categoriesById = {
+      for (final category in categories) category.id: category,
+    };
+    final selectedCategories = exercise.categoriesId
+        .map((id) => categoriesById[id])
+        .whereType<Category>()
+        .toList();
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.only(
@@ -938,6 +943,31 @@ class _ExerciseDetailsSheet extends StatelessWidget {
                   ),
                 ],
               ),
+              const SizedBox(height: 16),
+              Text(
+                l10n.exerciseFormCategoriesLabel,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 4),
+              if (selectedCategories.isEmpty)
+                Text(l10n.exerciseFormNoCategories)
+              else
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: selectedCategories.map((category) {
+                    final color = _colorFromHex(category.color);
+                    return Chip(
+                      backgroundColor: color.withValues(alpha: 0.15),
+                      label: Text(category.name),
+                      avatar: CircleAvatar(
+                        backgroundColor: color,
+                        radius: 14,
+                        child: const SizedBox.shrink(),
+                      ),
+                    );
+                  }).toList(),
+                ),
               const SizedBox(height: 16),
               Text(
                 l10n.sectionTechnique,
@@ -1034,6 +1064,16 @@ class _ExerciseDetailsSheet extends StatelessWidget {
       if (!context.mounted) return;
       _showTopSnackBar(context, l10n.errorUnableToOpenLink);
     }
+  }
+
+  Color _colorFromHex(String value) {
+    if (value.length == 7 && value.startsWith('#')) {
+      final parsed = int.tryParse(value.substring(1), radix: 16);
+      if (parsed != null) {
+        return Color(0xFF000000 | parsed);
+      }
+    }
+    return Colors.grey;
   }
 }
 

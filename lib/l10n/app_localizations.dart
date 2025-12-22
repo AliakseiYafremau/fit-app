@@ -644,6 +644,102 @@ abstract class AppLocalizations {
   /// **'Links'**
   String get sectionLinks;
 
+  /// No description provided for @exerciseFormCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Exercise'**
+  String get exerciseFormCreateTitle;
+
+  /// No description provided for @exerciseFormEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Exercise'**
+  String get exerciseFormEditTitle;
+
+  /// No description provided for @exerciseFormNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise name'**
+  String get exerciseFormNameLabel;
+
+  /// No description provided for @errorExerciseNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter exercise name'**
+  String get errorExerciseNameRequired;
+
+  /// No description provided for @exerciseFormNoPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'No photo selected'**
+  String get exerciseFormNoPhoto;
+
+  /// No description provided for @exerciseFormAddPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photo'**
+  String get exerciseFormAddPhoto;
+
+  /// No description provided for @exerciseFormChangePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Change photo'**
+  String get exerciseFormChangePhoto;
+
+  /// No description provided for @exerciseFormRemovePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove photo'**
+  String get exerciseFormRemovePhoto;
+
+  /// No description provided for @exerciseFormTechniqueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Technique description'**
+  String get exerciseFormTechniqueLabel;
+
+  /// No description provided for @exerciseFormNotesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get exerciseFormNotesLabel;
+
+  /// No description provided for @exerciseFormCategoriesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get exerciseFormCategoriesLabel;
+
+  /// No description provided for @exerciseFormNoCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'No categories yet'**
+  String get exerciseFormNoCategories;
+
+  /// No description provided for @exerciseFormLinkLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Link {index}'**
+  String exerciseFormLinkLabel(int index);
+
+  /// No description provided for @exerciseFormAddLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Add link'**
+  String get exerciseFormAddLink;
+
+  /// No description provided for @exerciseFormAddExercise.
+  ///
+  /// In en, this message translates to:
+  /// **'Add exercise'**
+  String get exerciseFormAddExercise;
+
+  /// No description provided for @exerciseFormSaveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get exerciseFormSaveChanges;
+
   /// No description provided for @exerciseUsesWeights.
   ///
   /// In en, this message translates to:

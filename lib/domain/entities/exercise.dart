@@ -11,6 +11,7 @@ class Exercise {
   final String? notes;
   final bool usesWeights;
   final List<String> links;
+  final List<String> categoriesId;
 
   Exercise({
     required this.id,
@@ -20,6 +21,7 @@ class Exercise {
     this.notes,
     required this.usesWeights,
     this.links = const [],
+    this.categoriesId = const [],
   }) {
     if (name.trim().isEmpty) {
       throw ArgumentError('Exercise name cannot be empty');

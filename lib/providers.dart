@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:fit_app/adapters/file/local_file_manager.dart';
+import 'package:fit_app/adapters/repo/isar/isar_category_repository.dart';
 import 'package:fit_app/adapters/repo/isar/isar_exercise_repository.dart';
 import 'package:fit_app/adapters/repo/isar/isar_planned_set_repository.dart';
 import 'package:fit_app/adapters/repo/isar/isar_session_repository.dart';
@@ -9,17 +10,21 @@ import 'package:fit_app/adapters/repo/isar/isar_training_repository.dart';
 import 'package:fit_app/adapters/uuid_generator.dart';
 import 'package:fit_app/application/interactors/cancel_session.dart';
 import 'package:fit_app/application/interactors/complete_set.dart';
+import 'package:fit_app/application/interactors/create_category.dart';
+import 'package:fit_app/application/interactors/delete_category.dart';
 import 'package:fit_app/application/interactors/create_exercise.dart';
 import 'package:fit_app/application/interactors/create_training.dart';
 import 'package:fit_app/application/interactors/delete_exercise.dart';
 import 'package:fit_app/application/interactors/delete_training.dart';
 import 'package:fit_app/application/interactors/start_session.dart';
 import 'package:fit_app/application/interactors/finish_session.dart';
+import 'package:fit_app/application/interactors/update_category.dart';
 import 'package:fit_app/application/interactors/update_exercise.dart';
 import 'package:fit_app/application/interactors/update_training.dart';
 import 'package:fit_app/application/interactors/undo_complete_set.dart';
 import 'package:fit_app/application/interfaces/file_manager.dart';
 import 'package:fit_app/application/interfaces/id_generator.dart';
+import 'package:fit_app/application/interfaces/repo/category.dart';
 import 'package:fit_app/application/interfaces/repo/exercise.dart';
 import 'package:fit_app/application/interfaces/repo/session.dart';
 import 'package:fit_app/application/interfaces/repo/training.dart';
@@ -36,6 +41,9 @@ List<SingleChildWidget> buildAppProviders(Isar isar, Directory appDirectory) => 
       Provider<FileManager>(
         create: (_) => LocalFileManager(rootDirectory: appDirectory),
       ),
+      Provider<CategoryRepository>(
+        create: (_) => IsarCategoryRepository(isar),
+      ),
       ProxyProvider<FileManager, ExerciseRepository>(
         update: (_, fileManager, previous) =>
             IsarExerciseRepository(isar, fileManager: fileManager),
@@ -51,6 +59,24 @@ List<SingleChildWidget> buildAppProviders(Isar isar, Directory appDirectory) => 
       ),
       Provider<SessionRepository>(
         create: (_) => IsarSessionRepository(isar),
+      ),
+      ProxyProvider2<CategoryRepository, IdGenerator, CreateCategory>(
+        update: (_, categoryRepository, idGenerator, previous) => CreateCategory(
+          categoryRepository: categoryRepository,
+          idGenerator: idGenerator,
+        ),
+      ),
+      ProxyProvider<CategoryRepository, UpdateCategory>(
+        update: (_, categoryRepository, previous) => UpdateCategory(
+          categoryRepository: categoryRepository,
+        ),
+      ),
+      ProxyProvider2<CategoryRepository, ExerciseRepository, DeleteCategory>(
+        update: (_, categoryRepository, exerciseRepository, previous) =>
+            DeleteCategory(
+          categoryRepository: categoryRepository,
+          exerciseRepository: exerciseRepository,
+        ),
       ),
       ProxyProvider3<ExerciseRepository, IdGenerator, FileManager, CreateExercise>(
         update: (_, exerciseRepository, idGenerator, fileManager, previous) =>

@@ -27,6 +27,7 @@ Future<void> main() async {
   final isar = await Isar.open(
     [
       ExerciseModelSchema,
+      CategoryModelSchema,
       SessionModelSchema,
       TrainingModelSchema,
       WorkoutSetModelSchema,

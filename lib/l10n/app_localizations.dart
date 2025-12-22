@@ -134,6 +134,24 @@ abstract class AppLocalizations {
   /// **'Calendar'**
   String get calendarButton;
 
+  /// No description provided for @dashboardTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Open dashboard'**
+  String get dashboardTooltip;
+
+  /// No description provided for @dashboardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dashboard'**
+  String get dashboardTitle;
+
+  /// No description provided for @dashboardCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get dashboardCategories;
+
   /// No description provided for @historyViewList.
   ///
   /// In en, this message translates to:
@@ -487,6 +505,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Deleted training'**
   String get deletedTrainingName;
+
+  /// No description provided for @categoriesSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get categoriesSheetTitle;
+
+  /// No description provided for @categoriesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No categories yet'**
+  String get categoriesEmpty;
+
+  /// No description provided for @categoryFormTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create category'**
+  String get categoryFormTitle;
+
+  /// No description provided for @categoryNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Category name'**
+  String get categoryNameLabel;
+
+  /// No description provided for @categoryColorLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get categoryColorLabel;
+
+  /// No description provided for @categoryCreateButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create category'**
+  String get categoryCreateButton;
+
+  /// No description provided for @categoryPickColorButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose color'**
+  String get categoryPickColorButton;
+
+  /// No description provided for @categoryColorPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a color'**
+  String get categoryColorPickerTitle;
+
+  /// No description provided for @messageCategoryCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Category created'**
+  String get messageCategoryCreated;
+
+  /// No description provided for @categoryEditDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit category'**
+  String get categoryEditDialogTitle;
+
+  /// No description provided for @categoryActionEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get categoryActionEdit;
+
+  /// No description provided for @categoryDeleteDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete category'**
+  String get categoryDeleteDialogTitle;
+
+  /// No description provided for @categoryDeleteConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\"? This action cannot be undone.'**
+  String categoryDeleteConfirmation(String name);
+
+  /// No description provided for @messageCategoryUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Category updated'**
+  String get messageCategoryUpdated;
+
+  /// No description provided for @messageCategoryDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Category deleted'**
+  String get messageCategoryDeleted;
+
+  /// No description provided for @errorCategoryNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter category name'**
+  String get errorCategoryNameRequired;
+
+  /// No description provided for @errorCreateCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to create category'**
+  String get errorCreateCategory;
+
+  /// No description provided for @errorUpdateCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to update category'**
+  String get errorUpdateCategory;
+
+  /// No description provided for @errorDeleteCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to delete category'**
+  String get errorDeleteCategory;
 
   /// No description provided for @sectionPhoto.
   ///

@@ -2,12 +2,16 @@ import 'dart:typed_data';
 
 import 'package:fit_app/application/interactors/cancel_session.dart';
 import 'package:fit_app/application/interactors/complete_set.dart';
-import 'package:fit_app/application/interactors/undo_complete_set.dart';
+import 'package:fit_app/application/interactors/create_category.dart';
+import 'package:fit_app/application/interactors/delete_category.dart';
 import 'package:fit_app/application/interfaces/file_manager.dart';
 import 'package:fit_app/application/interactors/delete_exercise.dart';
 import 'package:fit_app/application/interactors/delete_training.dart';
 import 'package:fit_app/application/interactors/finish_session.dart';
+import 'package:fit_app/application/interactors/update_category.dart';
 import 'package:fit_app/application/interactors/start_session.dart';
+import 'package:fit_app/application/interactors/undo_complete_set.dart';
+import 'package:fit_app/application/interfaces/repo/category.dart';
 import 'package:fit_app/application/interfaces/repo/exercise.dart';
 import 'package:fit_app/application/interfaces/repo/session.dart';
 import 'package:fit_app/application/interfaces/repo/training.dart';
@@ -22,6 +26,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../widgets/categories_sheet.dart';
 import '../widgets/create_exercise_sheet.dart';
 import '../widgets/create_training_sheet.dart';
 import '../widgets/primary_nav_bar.dart';
@@ -44,6 +49,7 @@ class _HomePageState extends State<HomePage> {
   late final TrainingRepository _trainingRepository;
   late final ExerciseRepository _exerciseRepository;
   late final SessionRepository _sessionRepository;
+  late final CategoryRepository _categoryRepository;
   late final DeleteExercise _deleteExercise;
   late final DeleteTraining _deleteTraining;
   late final StartSession _startSession;
@@ -51,6 +57,9 @@ class _HomePageState extends State<HomePage> {
   late final CancelSession _cancelSession;
   late final CompleteSet _completeSet;
   late final UndoCompleteSet _undoCompleteSet;
+  late final CreateCategory _createCategory;
+  late final UpdateCategory _updateCategory;
+  late final DeleteCategory _deleteCategory;
 
   List<Training> _trainings = const [];
   List<Exercise> _exercises = const [];
@@ -63,6 +72,7 @@ class _HomePageState extends State<HomePage> {
     _trainingRepository = context.read<TrainingRepository>();
     _exerciseRepository = context.read<ExerciseRepository>();
     _sessionRepository = context.read<SessionRepository>();
+    _categoryRepository = context.read<CategoryRepository>();
     _deleteExercise = context.read<DeleteExercise>();
     _deleteTraining = context.read<DeleteTraining>();
     _startSession = context.read<StartSession>();
@@ -70,6 +80,9 @@ class _HomePageState extends State<HomePage> {
     _cancelSession = context.read<CancelSession>();
     _completeSet = context.read<CompleteSet>();
     _undoCompleteSet = context.read<UndoCompleteSet>();
+    _createCategory = context.read<CreateCategory>();
+    _updateCategory = context.read<UpdateCategory>();
+    _deleteCategory = context.read<DeleteCategory>();
     _trainings = _trainingRepository.getAll();
     _exercises = _exerciseRepository.getAll();
     _activeSession = _sessionRepository.getActive();
@@ -384,6 +397,50 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Future<void> _openCategoriesSheet() async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => CategoriesSheet(
+        categoryRepository: _categoryRepository,
+        createCategory: _createCategory,
+        updateCategory: _updateCategory,
+        deleteCategory: _deleteCategory,
+      ),
+    );
+  }
+
+  void _openDashboard() {
+    final l10n = AppLocalizations.of(context)!;
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+              child: Text(
+                l10n.dashboardTitle,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.category),
+              title: Text(l10n.dashboardCategories),
+              onTap: () {
+                Navigator.of(context).pop();
+                _openCategoriesSheet();
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -391,6 +448,11 @@ class _HomePageState extends State<HomePage> {
     final currentLocaleCode = localeController.locale?.languageCode;
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: _openDashboard,
+          icon: const Icon(Icons.menu),
+          tooltip: l10n.dashboardTooltip,
+        ),
         title: Text(l10n.appTitle),
         centerTitle: true,
         actions: [

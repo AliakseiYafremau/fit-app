@@ -17,6 +17,17 @@ class ExerciseModel {
 }
 
 @collection
+class CategoryModel {
+  Id? isarId;
+
+  @Index(unique: true)
+  late String entityId;
+
+  late String name;
+  late String color;
+}
+
+@collection
 class SessionModel {
   Id? isarId;
 

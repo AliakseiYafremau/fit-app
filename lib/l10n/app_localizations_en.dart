@@ -27,6 +27,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get calendarButton => 'Calendar';
 
   @override
+  String get dashboardTooltip => 'Open dashboard';
+
+  @override
+  String get dashboardTitle => 'Dashboard';
+
+  @override
+  String get dashboardCategories => 'Categories';
+
+  @override
   String get historyViewList => 'List';
 
   @override
@@ -215,6 +224,65 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deletedTrainingName => 'Deleted training';
+
+  @override
+  String get categoriesSheetTitle => 'Categories';
+
+  @override
+  String get categoriesEmpty => 'No categories yet';
+
+  @override
+  String get categoryFormTitle => 'Create category';
+
+  @override
+  String get categoryNameLabel => 'Category name';
+
+  @override
+  String get categoryColorLabel => 'Color';
+
+  @override
+  String get categoryCreateButton => 'Create category';
+
+  @override
+  String get categoryPickColorButton => 'Choose color';
+
+  @override
+  String get categoryColorPickerTitle => 'Pick a color';
+
+  @override
+  String get messageCategoryCreated => 'Category created';
+
+  @override
+  String get categoryEditDialogTitle => 'Edit category';
+
+  @override
+  String get categoryActionEdit => 'Edit';
+
+  @override
+  String get categoryDeleteDialogTitle => 'Delete category';
+
+  @override
+  String categoryDeleteConfirmation(String name) {
+    return 'Delete \"$name\"? This action cannot be undone.';
+  }
+
+  @override
+  String get messageCategoryUpdated => 'Category updated';
+
+  @override
+  String get messageCategoryDeleted => 'Category deleted';
+
+  @override
+  String get errorCategoryNameRequired => 'Enter category name';
+
+  @override
+  String get errorCreateCategory => 'Unable to create category';
+
+  @override
+  String get errorUpdateCategory => 'Unable to update category';
+
+  @override
+  String get errorDeleteCategory => 'Unable to delete category';
 
   @override
   String get sectionPhoto => 'Photo';

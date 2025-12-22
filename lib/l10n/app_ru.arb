@@ -6,6 +6,9 @@
   "searchHint": "Поиск",
   "historyButton": "История",
   "calendarButton": "Календарь",
+  "dashboardTooltip": "Открыть дашборд",
+  "dashboardTitle": "Дашборд",
+  "dashboardCategories": "Категории",
   "historyViewList": "Список",
   "historyViewCalendar": "Календарь",
   "noWorkouts": "Тренировок пока нет",
@@ -110,6 +113,32 @@
   "@deletedTrainingName": {
     "description": "Показывается, если исходная тренировка была удалена"
   },
+  "categoriesSheetTitle": "Категории",
+  "categoriesEmpty": "Категорий пока нет",
+  "categoryFormTitle": "Создать категорию",
+  "categoryNameLabel": "Название категории",
+  "categoryColorLabel": "Цвет",
+  "categoryCreateButton": "Создать",
+  "categoryPickColorButton": "Выбрать цвет",
+  "categoryColorPickerTitle": "Выберите цвет",
+  "messageCategoryCreated": "Категория создана",
+  "categoryEditDialogTitle": "Изменить категорию",
+  "categoryActionEdit": "Изменить",
+  "categoryDeleteDialogTitle": "Удалить категорию",
+  "categoryDeleteConfirmation": "Удалить «{name}»? Это действие нельзя отменить.",
+  "@categoryDeleteConfirmation": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "messageCategoryUpdated": "Категория обновлена",
+  "messageCategoryDeleted": "Категория удалена",
+  "errorCategoryNameRequired": "Введите название категории",
+  "errorCreateCategory": "Не удалось создать категорию",
+  "errorUpdateCategory": "Не удалось обновить категорию",
+  "errorDeleteCategory": "Не удалось удалить категорию",
   "sectionPhoto": "Фото",
   "sectionTechnique": "Техника",
   "sectionNotes": "Заметки",

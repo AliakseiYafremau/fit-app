@@ -27,6 +27,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get calendarButton => 'Календарь';
 
   @override
+  String get dashboardTooltip => 'Открыть дашборд';
+
+  @override
+  String get dashboardTitle => 'Дашборд';
+
+  @override
+  String get dashboardCategories => 'Категории';
+
+  @override
   String get historyViewList => 'Список';
 
   @override
@@ -216,6 +225,65 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get deletedTrainingName => 'Удаленная тренировка';
+
+  @override
+  String get categoriesSheetTitle => 'Категории';
+
+  @override
+  String get categoriesEmpty => 'Категорий пока нет';
+
+  @override
+  String get categoryFormTitle => 'Создать категорию';
+
+  @override
+  String get categoryNameLabel => 'Название категории';
+
+  @override
+  String get categoryColorLabel => 'Цвет';
+
+  @override
+  String get categoryCreateButton => 'Создать';
+
+  @override
+  String get categoryPickColorButton => 'Выбрать цвет';
+
+  @override
+  String get categoryColorPickerTitle => 'Выберите цвет';
+
+  @override
+  String get messageCategoryCreated => 'Категория создана';
+
+  @override
+  String get categoryEditDialogTitle => 'Изменить категорию';
+
+  @override
+  String get categoryActionEdit => 'Изменить';
+
+  @override
+  String get categoryDeleteDialogTitle => 'Удалить категорию';
+
+  @override
+  String categoryDeleteConfirmation(String name) {
+    return 'Удалить «$name»? Это действие нельзя отменить.';
+  }
+
+  @override
+  String get messageCategoryUpdated => 'Категория обновлена';
+
+  @override
+  String get messageCategoryDeleted => 'Категория удалена';
+
+  @override
+  String get errorCategoryNameRequired => 'Введите название категории';
+
+  @override
+  String get errorCreateCategory => 'Не удалось создать категорию';
+
+  @override
+  String get errorUpdateCategory => 'Не удалось обновить категорию';
+
+  @override
+  String get errorDeleteCategory => 'Не удалось удалить категорию';
 
   @override
   String get sectionPhoto => 'Фото';

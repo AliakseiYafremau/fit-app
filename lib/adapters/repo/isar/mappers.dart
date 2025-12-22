@@ -1,8 +1,28 @@
 import 'package:fit_app/adapters/models.dart';
+import 'package:fit_app/domain/entities/category.dart';
 import 'package:fit_app/domain/entities/exercise.dart';
 import 'package:fit_app/domain/entities/session.dart';
 import 'package:fit_app/domain/entities/training.dart';
 import 'package:fit_app/domain/entities/workout_set.dart';
+
+CategoryModel mapCategoryToModel(
+  Category category, {
+  CategoryModel? existing,
+}) {
+  final model = existing ?? CategoryModel();
+  model.entityId = category.id;
+  model.name = category.name;
+  model.color = category.color;
+  return model;
+}
+
+Category mapCategoryFromModel(CategoryModel model) {
+  return Category(
+    id: model.entityId,
+    name: model.name,
+    color: model.color,
+  );
+}
 
 ExerciseModel mapExerciseToModel(
   Exercise exercise, {

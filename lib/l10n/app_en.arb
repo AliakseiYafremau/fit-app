@@ -6,6 +6,9 @@
   "searchHint": "Search",
   "historyButton": "History",
   "calendarButton": "Calendar",
+  "dashboardTooltip": "Open dashboard",
+  "dashboardTitle": "Dashboard",
+  "dashboardCategories": "Categories",
   "historyViewList": "List",
   "historyViewCalendar": "Calendar",
   "noWorkouts": "No workouts yet",
@@ -110,6 +113,32 @@
   "@deletedTrainingName": {
     "description": "Shown when a session's original training has been removed"
   },
+  "categoriesSheetTitle": "Categories",
+  "categoriesEmpty": "No categories yet",
+  "categoryFormTitle": "Create category",
+  "categoryNameLabel": "Category name",
+  "categoryColorLabel": "Color",
+  "categoryCreateButton": "Create category",
+  "categoryPickColorButton": "Choose color",
+  "categoryColorPickerTitle": "Pick a color",
+  "messageCategoryCreated": "Category created",
+  "categoryEditDialogTitle": "Edit category",
+  "categoryActionEdit": "Edit",
+  "categoryDeleteDialogTitle": "Delete category",
+  "categoryDeleteConfirmation": "Delete \"{name}\"? This action cannot be undone.",
+  "@categoryDeleteConfirmation": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "messageCategoryUpdated": "Category updated",
+  "messageCategoryDeleted": "Category deleted",
+  "errorCategoryNameRequired": "Enter category name",
+  "errorCreateCategory": "Unable to create category",
+  "errorUpdateCategory": "Unable to update category",
+  "errorDeleteCategory": "Unable to delete category",
   "sectionPhoto": "Photo",
   "sectionTechnique": "Technique",
   "sectionNotes": "Notes",

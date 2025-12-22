@@ -49,6 +49,7 @@ class UpdateExercise {
       usesWeights: existing.usesWeights,
       notes: data.notes,
       links: data.links,
+      categoriesId: data.categoryIds,
     );
 
     exerciseRepository.update(updated);

@@ -4,6 +4,8 @@ import 'package:fit_app/application/dto/exercise.dart';
 import 'package:fit_app/application/interactors/create_exercise.dart';
 import 'package:fit_app/application/interactors/update_exercise.dart';
 import 'package:fit_app/application/interfaces/file_manager.dart';
+import 'package:fit_app/application/interfaces/repo/category.dart';
+import 'package:fit_app/domain/entities/category.dart';
 import 'package:fit_app/domain/entities/exercise.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -23,6 +25,8 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
   final _techniqueController = TextEditingController();
   final _notesController = TextEditingController();
   final List<TextEditingController> _linkControllers = [];
+  final Set<String> _selectedCategoryIds = <String>{};
+  List<Category> _availableCategories = const [];
   bool _usesWeights = true;
   Uint8List? _photoPreviewBytes;
   Uint8List? _pendingPhotoBytes;
@@ -33,6 +37,7 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
   late final CreateExercise _createExercise;
   late final UpdateExercise _updateExercise;
   late final FileManager _fileManager;
+  late final CategoryRepository _categoryRepository;
   bool _dependenciesReady = false;
   bool get _isEditing => widget.exercise != null;
 
@@ -45,6 +50,7 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
       _techniqueController.text = exercise.technique ?? '';
       _notesController.text = exercise.notes ?? '';
       _usesWeights = exercise.usesWeights;
+      _selectedCategoryIds.addAll(exercise.categoriesId);
       if (exercise.links.isEmpty) {
         _linkControllers.add(TextEditingController());
       } else {
@@ -64,6 +70,8 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
     _createExercise = context.read<CreateExercise>();
     _updateExercise = context.read<UpdateExercise>();
     _fileManager = context.read<FileManager>();
+    _categoryRepository = context.read<CategoryRepository>();
+    _availableCategories = _categoryRepository.getAll();
     _dependenciesReady = true;
     final exercise = widget.exercise;
     if (exercise?.photoId != null) {
@@ -152,6 +160,7 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
         .map((controller) => controller.text.trim())
         .where((link) => link.isNotEmpty)
         .toList();
+    final categoryIds = _selectedCategoryIds.toList();
 
     if (_isEditing) {
       final dto = UpdateExerciseDTO(
@@ -162,6 +171,7 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
         links: links,
         photoBytes: _pendingPhotoBytes,
         removePhoto: _removePhoto,
+        categoryIds: categoryIds,
       );
       _updateExercise.execute(dto);
     } else {
@@ -172,6 +182,7 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
         usesWeights: _usesWeights,
         links: links,
         photoBytes: _pendingPhotoBytes,
+        categoryIds: categoryIds,
       );
 
       _createExercise.execute(dto);
@@ -283,6 +294,39 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
                 ),
                 maxLines: 2,
               ),
+              const SizedBox(height: 12),
+              Text(
+                'Categories',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              if (_availableCategories.isEmpty)
+                const Text(
+                  'No categories yet',
+                  style: TextStyle(color: Colors.white70),
+                )
+              else
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _availableCategories.map((category) {
+                    final selected =
+                        _selectedCategoryIds.contains(category.id);
+                    return FilterChip(
+                      label: Text(category.name),
+                      selected: selected,
+                      onSelected: (value) {
+                        setState(() {
+                          if (value) {
+                            _selectedCategoryIds.add(category.id);
+                          } else {
+                            _selectedCategoryIds.remove(category.id);
+                          }
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
               const SizedBox(height: 12),
               SwitchListTile(
                 value: _usesWeights,

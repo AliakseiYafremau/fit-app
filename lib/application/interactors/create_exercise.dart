@@ -36,6 +36,7 @@ class CreateExercise {
       usesWeights: data.usesWeights,
       notes: data.notes,
       links: data.links,
+      categoriesId: data.categoryIds,
     );
     exerciseRepository.add(exercise);
   }

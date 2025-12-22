@@ -41,7 +41,6 @@ class StartSession {
 
     final session = Session(
       id: idGenerator.generate(),
-      training: training,
       workoutSets: workoutSets,
       active: true,
       startedAt: DateTime.now(),

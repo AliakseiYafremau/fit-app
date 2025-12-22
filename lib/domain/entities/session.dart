@@ -1,14 +1,11 @@
 import 'package:fit_app/domain/entities/workout_set.dart';
 import 'package:fit_app/domain/entities/id.dart';
-import 'package:fit_app/domain/entities/training.dart';
-
 
 /// Training session entity.
 ///
-/// Uses a base training plan and stores completed exercises for that session.
+/// Stores the workout sets that compose the session run.
 class Session {
   final Id id;
-  final Training? training;
   final List<WorkoutSet> workoutSets;
   final bool active;
   final DateTime startedAt;
@@ -16,7 +13,6 @@ class Session {
 
   Session({
     required this.id,
-    this.training,
     List<WorkoutSet>? workoutSets,
     this.active = true,
     required this.startedAt,

@@ -218,12 +218,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bodyweightOnly => 'This exercise is bodyweight only';
 
   @override
-  String sessionSheetTitle(String name) {
-    return 'Session: $name';
-  }
-
-  @override
-  String get deletedTrainingName => 'Deleted training';
+  String get sessionSheetTitle => 'Session';
 
   @override
   String get categoriesSheetTitle => 'Categories';

@@ -101,18 +101,7 @@
   "labelWeight": "Weight",
   "helperWeightedExercise": "Required for weighted exercises",
   "bodyweightOnly": "This exercise is bodyweight only",
-  "sessionSheetTitle": "Session: {name}",
-  "@sessionSheetTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "deletedTrainingName": "Deleted training",
-  "@deletedTrainingName": {
-    "description": "Shown when a session's original training has been removed"
-  },
+  "sessionSheetTitle": "Session",
   "categoriesSheetTitle": "Categories",
   "categoriesEmpty": "No categories yet",
   "categoryFormTitle": "Create category",

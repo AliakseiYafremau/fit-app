@@ -1,18 +1,14 @@
-import 'package:fit_app/application/interfaces/repo/session.dart';
 import 'package:fit_app/application/interfaces/repo/training.dart';
 import 'package:fit_app/application/interfaces/repo/workout_set.dart';
 import 'package:fit_app/domain/entities/id.dart';
-import 'package:fit_app/domain/entities/session.dart';
 
 class DeleteTraining {
   final TrainingRepository trainingRepository;
   final PlannedSetRepository plannedSetRepository;
-  final SessionRepository sessionRepository;
 
   DeleteTraining({
     required this.trainingRepository,
     required this.plannedSetRepository,
-    required this.sessionRepository,
   });
 
   void execute(Id trainingId) {
@@ -23,19 +19,6 @@ class DeleteTraining {
 
     for (var plannedSet in training.plannedSets) {
       plannedSetRepository.delete(plannedSet.id);
-    }
-
-    final sessions = sessionRepository.getByTrainingId(trainingId);
-    for (final session in sessions) {
-      final updatedSession = Session(
-        id: session.id,
-        training: null,
-        workoutSets: session.workoutSets,
-        active: session.active,
-        startedAt: session.startedAt,
-        finishedAt: session.finishedAt,
-      );
-      sessionRepository.update(updatedSession);
     }
 
     trainingRepository.delete(trainingId);

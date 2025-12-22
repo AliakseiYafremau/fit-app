@@ -36,7 +36,6 @@ class SessionModel {
   @Index(unique: true)
   late String entityId;
 
-  late String trainingId;
   List<String> workoutSetIds = [];
   bool active = true;
   DateTime startedAt = DateTime.now();

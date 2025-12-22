@@ -101,18 +101,7 @@
   "labelWeight": "Вес",
   "helperWeightedExercise": "Нужно для упражнений с весом",
   "bodyweightOnly": "Это упражнение только с собственным весом",
-  "sessionSheetTitle": "Сессия: {name}",
-  "@sessionSheetTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
-  "deletedTrainingName": "Удаленная тренировка",
-  "@deletedTrainingName": {
-    "description": "Показывается, если исходная тренировка была удалена"
-  },
+  "sessionSheetTitle": "Сессия",
   "categoriesSheetTitle": "Категории",
   "categoriesEmpty": "Категорий пока нет",
   "categoryFormTitle": "Создать категорию",

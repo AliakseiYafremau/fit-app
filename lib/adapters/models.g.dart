@@ -2866,13 +2866,8 @@ const SessionModelSchema = CollectionSchema(
       name: r'startedAt',
       type: IsarType.dateTime,
     ),
-    r'trainingId': PropertySchema(
-      id: 4,
-      name: r'trainingId',
-      type: IsarType.string,
-    ),
     r'workoutSetIds': PropertySchema(
-      id: 5,
+      id: 4,
       name: r'workoutSetIds',
       type: IsarType.stringList,
     )
@@ -2912,7 +2907,6 @@ int _sessionModelEstimateSize(
 ) {
   var bytesCount = offsets.last;
   bytesCount += 3 + object.entityId.length * 3;
-  bytesCount += 3 + object.trainingId.length * 3;
   bytesCount += 3 + object.workoutSetIds.length * 3;
   {
     for (var i = 0; i < object.workoutSetIds.length; i++) {
@@ -2933,8 +2927,7 @@ void _sessionModelSerialize(
   writer.writeString(offsets[1], object.entityId);
   writer.writeDateTime(offsets[2], object.finishedAt);
   writer.writeDateTime(offsets[3], object.startedAt);
-  writer.writeString(offsets[4], object.trainingId);
-  writer.writeStringList(offsets[5], object.workoutSetIds);
+  writer.writeStringList(offsets[4], object.workoutSetIds);
 }
 
 SessionModel _sessionModelDeserialize(
@@ -2949,8 +2942,7 @@ SessionModel _sessionModelDeserialize(
   object.finishedAt = reader.readDateTimeOrNull(offsets[2]);
   object.isarId = id;
   object.startedAt = reader.readDateTime(offsets[3]);
-  object.trainingId = reader.readString(offsets[4]);
-  object.workoutSetIds = reader.readStringList(offsets[5]) ?? [];
+  object.workoutSetIds = reader.readStringList(offsets[4]) ?? [];
   return object;
 }
 
@@ -2970,8 +2962,6 @@ P _sessionModelDeserializeProp<P>(
     case 3:
       return (reader.readDateTime(offset)) as P;
     case 4:
-      return (reader.readString(offset)) as P;
-    case 5:
       return (reader.readStringList(offset) ?? []) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -3524,142 +3514,6 @@ extension SessionModelQueryFilter
   }
 
   QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
-      trainingIdEqualTo(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'trainingId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
-      trainingIdGreaterThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'trainingId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
-      trainingIdLessThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'trainingId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
-      trainingIdBetween(
-    String lower,
-    String upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'trainingId',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
-      trainingIdStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'trainingId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
-      trainingIdEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'trainingId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
-      trainingIdContains(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'trainingId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
-      trainingIdMatches(String pattern, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'trainingId',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
-      trainingIdIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'trainingId',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
-      trainingIdIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'trainingId',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<SessionModel, SessionModel, QAfterFilterCondition>
       workoutSetIdsElementEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -3941,19 +3795,6 @@ extension SessionModelQuerySortBy
       return query.addSortBy(r'startedAt', Sort.desc);
     });
   }
-
-  QueryBuilder<SessionModel, SessionModel, QAfterSortBy> sortByTrainingId() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'trainingId', Sort.asc);
-    });
-  }
-
-  QueryBuilder<SessionModel, SessionModel, QAfterSortBy>
-      sortByTrainingIdDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'trainingId', Sort.desc);
-    });
-  }
 }
 
 extension SessionModelQuerySortThenBy
@@ -4018,19 +3859,6 @@ extension SessionModelQuerySortThenBy
       return query.addSortBy(r'startedAt', Sort.desc);
     });
   }
-
-  QueryBuilder<SessionModel, SessionModel, QAfterSortBy> thenByTrainingId() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'trainingId', Sort.asc);
-    });
-  }
-
-  QueryBuilder<SessionModel, SessionModel, QAfterSortBy>
-      thenByTrainingIdDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'trainingId', Sort.desc);
-    });
-  }
 }
 
 extension SessionModelQueryWhereDistinct
@@ -4057,13 +3885,6 @@ extension SessionModelQueryWhereDistinct
   QueryBuilder<SessionModel, SessionModel, QDistinct> distinctByStartedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'startedAt');
-    });
-  }
-
-  QueryBuilder<SessionModel, SessionModel, QDistinct> distinctByTrainingId(
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'trainingId', caseSensitive: caseSensitive);
     });
   }
 
@@ -4104,12 +3925,6 @@ extension SessionModelQueryProperty
   QueryBuilder<SessionModel, DateTime, QQueryOperations> startedAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'startedAt');
-    });
-  }
-
-  QueryBuilder<SessionModel, String, QQueryOperations> trainingIdProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'trainingId');
     });
   }
 

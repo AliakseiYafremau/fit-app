@@ -219,12 +219,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get bodyweightOnly => 'Это упражнение только с собственным весом';
 
   @override
-  String sessionSheetTitle(String name) {
-    return 'Сессия: $name';
-  }
-
-  @override
-  String get deletedTrainingName => 'Удаленная тренировка';
+  String get sessionSheetTitle => 'Сессия';
 
   @override
   String get categoriesSheetTitle => 'Категории';

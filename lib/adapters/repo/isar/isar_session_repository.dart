@@ -3,7 +3,6 @@ import 'package:fit_app/adapters/repo/isar/mappers.dart';
 import 'package:fit_app/application/interfaces/repo/session.dart';
 import 'package:fit_app/domain/entities/id.dart' as domain_id;
 import 'package:fit_app/domain/entities/session.dart';
-import 'package:fit_app/domain/entities/training.dart';
 import 'package:fit_app/domain/entities/workout_set.dart';
 import 'package:isar/isar.dart';
 
@@ -17,10 +16,6 @@ class IsarSessionRepository implements SessionRepository {
 
   IsarCollection<WorkoutSetModel> get _workoutSets =>
       _isar.collection<WorkoutSetModel>();
-  IsarCollection<TrainingModel> get _trainings =>
-      _isar.collection<TrainingModel>();
-  IsarCollection<PlannedSetModel> get _plannedSets =>
-      _isar.collection<PlannedSetModel>();
   IsarCollection<ExerciseModel> get _exercises =>
       _isar.collection<ExerciseModel>();
 
@@ -65,19 +60,6 @@ class IsarSessionRepository implements SessionRepository {
   @override
   void update(Session session) {
     add(session);
-  }
-
-  @override
-  List<Session> getByTrainingId(domain_id.Id trainingId) {
-    final models = _sessions
-        .filter()
-        .trainingIdEqualTo(trainingId)
-        .findAllSync();
-    return models
-        .map(_mapSessionFromModel)
-        .where((session) => session != null)
-        .cast<Session>()
-        .toList(growable: false);
   }
 
   @override
@@ -142,10 +124,6 @@ class IsarSessionRepository implements SessionRepository {
     if (model == null) {
       return null;
     }
-    Training? training;
-    if (model.trainingId.isNotEmpty) {
-      training = _mapTrainingById(model.trainingId);
-    }
     final workoutSets = <WorkoutSet>[];
     for (final workoutSetId in model.workoutSetIds) {
       final set = _mapWorkoutSetById(workoutSetId);
@@ -155,44 +133,7 @@ class IsarSessionRepository implements SessionRepository {
     }
     return mapSessionFromModel(
       model,
-      training,
       workoutSets,
-    );
-  }
-
-  Training? _mapTrainingById(String trainingId) {
-    final model =
-        _trainings.where().entityIdEqualTo(trainingId).findFirstSync();
-    if (model == null) {
-      return null;
-    }
-    final plannedSets = <PlannedSet>[];
-    for (final plannedSetId in model.plannedSetIds) {
-      final plannedSetModel = _plannedSets
-          .where()
-          .entityIdEqualTo(plannedSetId)
-          .findFirstSync();
-      if (plannedSetModel == null) {
-        continue;
-      }
-      final exerciseModel = _exercises
-          .where()
-          .entityIdEqualTo(plannedSetModel.exerciseId)
-          .findFirstSync();
-      if (exerciseModel == null) {
-        continue;
-      }
-      plannedSets.add(
-        mapPlannedSetFromModel(
-          plannedSetModel,
-          mapExerciseFromModel(exerciseModel),
-        ),
-      );
-    }
-    return Training(
-      id: model.entityId,
-      name: model.name,
-      plannedSets: plannedSets,
     );
   }
 

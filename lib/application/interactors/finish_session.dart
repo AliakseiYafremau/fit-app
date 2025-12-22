@@ -17,7 +17,6 @@ class FinishSession {
     }
     final updated = Session(
       id: session.id,
-      training: session.training,
       workoutSets: session.workoutSets,
       active: false,
       startedAt: session.startedAt,

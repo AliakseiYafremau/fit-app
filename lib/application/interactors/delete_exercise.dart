@@ -42,11 +42,6 @@ class DeleteExercise {
     }
 
     final sessionsById = <Id, Session>{};
-    for (final training in trainingsById.values) {
-      for (final session in sessionRepository.getByTrainingId(training.id)) {
-        sessionsById[session.id] = session;
-      }
-    }
     for (final workoutSet in workoutSets) {
       final session = sessionRepository.getByWorkoutId(workoutSet.id);
       sessionsById[session.id] = session;
@@ -75,12 +70,8 @@ class DeleteExercise {
       if (filteredWorkoutSets.length == session.workoutSets.length) {
         continue;
       }
-      final training = session.training;
-      final sessionTraining =
-          training == null ? null : (trainingsById[training.id] ?? training);
       final updatedSession = Session(
         id: session.id,
-        training: sessionTraining,
         workoutSets: filteredWorkoutSets,
         active: session.active,
         startedAt: session.startedAt,

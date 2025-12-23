@@ -27,10 +27,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get calendarButton => 'Календарь';
 
   @override
-  String get dashboardTooltip => 'Открыть дашборд';
+  String get dashboardTooltip => '';
 
   @override
-  String get dashboardTitle => 'Дашборд';
+  String get dashboardTitle => '';
 
   @override
   String get dashboardCategories => 'Категории';

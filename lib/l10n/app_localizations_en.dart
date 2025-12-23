@@ -27,10 +27,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get calendarButton => 'Calendar';
 
   @override
-  String get dashboardTooltip => 'Open dashboard';
+  String get dashboardTooltip => '';
 
   @override
-  String get dashboardTitle => 'Dashboard';
+  String get dashboardTitle => '';
 
   @override
   String get dashboardCategories => 'Categories';

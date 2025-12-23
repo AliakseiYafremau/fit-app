@@ -49,6 +49,7 @@ class _HomePageState extends State<HomePage> {
       PageController(initialPage: _selectedIndex);
   String _searchTerm = '';
   bool? _usesWeightsFilter;
+  bool _dashboardOpenedFromSwipe = false;
 
   late final TrainingRepository _trainingRepository;
   late final ExerciseRepository _exerciseRepository;
@@ -577,22 +578,26 @@ class _HomePageState extends State<HomePage> {
           Expanded(
             child: Stack(
               children: [
-                PageView(
-                  controller: _pageController,
-                  onPageChanged: _onPageChanged,
-                  children: [
-                    _WorkoutsList(
-                      trainings: _trainings,
-                      searchTerm: _searchTerm,
-                      onView: _showTrainingDetails,
-                    ),
-                    _ExercisesList(
-                      exercises: _exercises,
-                      searchTerm: _searchTerm,
-                      usesWeightsFilter: _usesWeightsFilter,
-                      onView: _showExerciseDetails,
-                    ),
-                  ],
+                NotificationListener<ScrollNotification>(
+                  onNotification: _handlePageScrollNotification,
+                  child: PageView(
+                    controller: _pageController,
+                    onPageChanged: _onPageChanged,
+                    physics: const BouncingScrollPhysics(),
+                    children: [
+                      _WorkoutsList(
+                        trainings: _trainings,
+                        searchTerm: _searchTerm,
+                        onView: _showTrainingDetails,
+                      ),
+                      _ExercisesList(
+                        exercises: _exercises,
+                        searchTerm: _searchTerm,
+                        usesWeightsFilter: _usesWeightsFilter,
+                        onView: _showExerciseDetails,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -620,6 +625,26 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
+  }
+
+  bool _handlePageScrollNotification(ScrollNotification notification) {
+    if (notification.metrics.axis != Axis.horizontal) {
+      return false;
+    }
+    if (notification is ScrollStartNotification) {
+      _dashboardOpenedFromSwipe = false;
+    } else if (notification is ScrollUpdateNotification) {
+      final scrollingLeft = (notification.scrollDelta ?? 0) < 0;
+      final atFirstPage =
+          _selectedIndex == 0 && notification.metrics.pixels <= 0.01;
+      if (scrollingLeft && atFirstPage && !_dashboardOpenedFromSwipe) {
+        _dashboardOpenedFromSwipe = true;
+        _openDashboard();
+      }
+    } else if (notification is ScrollEndNotification) {
+      _dashboardOpenedFromSwipe = false;
+    }
+    return false;
   }
 }
 

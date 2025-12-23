@@ -137,13 +137,13 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardTooltip.
   ///
   /// In en, this message translates to:
-  /// **'Open dashboard'**
+  /// **''**
   String get dashboardTooltip;
 
   /// No description provided for @dashboardTitle.
   ///
   /// In en, this message translates to:
-  /// **'Dashboard'**
+  /// **''**
   String get dashboardTitle;
 
   /// No description provided for @dashboardCategories.

@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// Displays a very lightweight interactive diagram that mimics a stacked SVG
@@ -30,6 +31,13 @@ class _InteractiveSvgDiagramState extends State<InteractiveSvgDiagram> {
   }
 
   void _toggleRegion(String id) {
+    final region = _muscleRegions.firstWhere(
+      (element) => element.id == id,
+      orElse: () {
+        throw StateError('Unknown region $id');
+      },
+    );
+    if (!region.selectable) return;
     setState(() {
       if (_selected.contains(id)) {
         _selected.remove(id);
@@ -54,30 +62,43 @@ class _InteractiveSvgDiagramState extends State<InteractiveSvgDiagram> {
   Widget build(BuildContext context) {
     final baseColor = Colors.grey.shade500;
     final highlightColor = Colors.orange.shade400;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.grey.shade200, Colors.grey.shade100],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(40),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.grey.shade50, Colors.grey.shade200],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
         ),
-        borderRadius: BorderRadius.circular(32),
-      ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          for (final region in _muscleRegions)
-            for (final shape in region.shapes)
-              _RegionShapeTile(
-                regionId: region.id,
-                label: region.label,
-                shape: shape,
-                selected: _selected.contains(region.id),
-                baseColor: baseColor,
-                highlightColor: highlightColor,
-                onTap: () => _toggleRegion(region.id),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: FittedBox(
+            fit: BoxFit.contain,
+            child: SizedBox(
+              width: 320,
+              height: 520,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  for (final region in _muscleRegions)
+                    for (final shape in region.shapes)
+                      _RegionShapeTile(
+                        regionId: region.id,
+                        label: region.label,
+                        shape: shape,
+                        selected: _selected.contains(region.id),
+                        selectable: region.selectable,
+                        baseColor: baseColor,
+                        highlightColor: highlightColor,
+                        onTap: () => _toggleRegion(region.id),
+                      ),
+                ],
               ),
-        ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -89,6 +110,7 @@ class _RegionShapeTile extends StatelessWidget {
     required this.label,
     required this.shape,
     required this.selected,
+    required this.selectable,
     required this.baseColor,
     required this.highlightColor,
     required this.onTap,
@@ -98,28 +120,33 @@ class _RegionShapeTile extends StatelessWidget {
   final String label;
   final _RegionShape shape;
   final bool selected;
+  final bool selectable;
   final Color baseColor;
   final Color highlightColor;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? highlightColor : baseColor;
+    final color = selectable
+        ? (selected ? highlightColor : baseColor)
+        : baseColor.withValues(alpha: 0.4);
     final angle = shape.rotationDegrees * math.pi / 180;
     final body = _ShapeBody(color: color, shape: shape);
     return Semantics(
       label: label,
-      button: true,
-      selected: selected,
+      button: selectable,
+      selected: selectable && selected,
       child: Align(
         alignment: shape.alignment,
         child: FractionallySizedBox(
           widthFactor: shape.widthFactor,
           heightFactor: shape.heightFactor,
           child: MouseRegion(
-            cursor: SystemMouseCursors.click,
+            cursor: selectable
+                ? SystemMouseCursors.click
+                : SystemMouseCursors.basic,
             child: GestureDetector(
-              onTap: onTap,
+              onTap: selectable ? onTap : null,
               child: Transform.rotate(
                 angle: angle,
                 child: Padding(padding: const EdgeInsets.all(6), child: body),
@@ -157,29 +184,41 @@ class _ShapeBody extends StatelessWidget {
       duration: const Duration(milliseconds: 200),
       decoration: decoration,
     );
-    if (shape.type == _RegionShapeType.triangle) {
-      return ClipPath(clipper: _TriangleClipper(), child: child);
+    if (shape.type == _RegionShapeType.polygon) {
+      return ClipPath(
+        clipper: _PolygonClipper(shape.polygonPoints),
+        child: child,
+      );
     }
     return child;
   }
 }
 
-class _TriangleClipper extends CustomClipper<Path> {
+class _PolygonClipper extends CustomClipper<Path> {
+  _PolygonClipper(this.points);
+
+  final List<Offset> points;
+
   @override
   Path getClip(Size size) {
-    final path = Path()
-      ..moveTo(size.width / 2, 0)
-      ..lineTo(size.width, size.height)
-      ..lineTo(0, size.height)
-      ..close();
+    if (points.isEmpty) return Path();
+    final scaled = points
+        .map((point) => Offset(point.dx * size.width, point.dy * size.height))
+        .toList(growable: false);
+    final path = Path()..moveTo(scaled.first.dx, scaled.first.dy);
+    for (var i = 1; i < scaled.length; i++) {
+      path.lineTo(scaled[i].dx, scaled[i].dy);
+    }
+    path.close();
     return path;
   }
 
   @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+  bool shouldReclip(covariant _PolygonClipper oldClipper) =>
+      !listEquals(points, oldClipper.points);
 }
 
-enum _RegionShapeType { rectangle, triangle }
+enum _RegionShapeType { rectangle, polygon }
 
 class _RegionShape {
   const _RegionShape._({
@@ -189,6 +228,7 @@ class _RegionShape {
     required this.heightFactor,
     required this.rotationDegrees,
     required this.borderRadius,
+    required this.polygonPoints,
   });
 
   const _RegionShape.rectangle({
@@ -204,20 +244,23 @@ class _RegionShape {
          heightFactor: heightFactor,
          rotationDegrees: rotationDegrees,
          borderRadius: borderRadius,
+         polygonPoints: const <Offset>[],
        );
 
-  const _RegionShape.triangle({
+  const _RegionShape.polygon({
     required Alignment alignment,
     required double widthFactor,
     required double heightFactor,
+    required List<Offset> points,
     double rotationDegrees = 0,
   }) : this._(
-         type: _RegionShapeType.triangle,
+         type: _RegionShapeType.polygon,
          alignment: alignment,
          widthFactor: widthFactor,
          heightFactor: heightFactor,
          rotationDegrees: rotationDegrees,
          borderRadius: BorderRadius.zero,
+         polygonPoints: points,
        );
 
   final _RegionShapeType type;
@@ -226,6 +269,7 @@ class _RegionShape {
   final double heightFactor;
   final double rotationDegrees;
   final BorderRadius borderRadius;
+  final List<Offset> polygonPoints;
 }
 
 class _MuscleRegion {
@@ -233,11 +277,13 @@ class _MuscleRegion {
     required this.id,
     required this.label,
     required this.shapes,
+    this.selectable = true,
   });
 
   final String id;
   final String label;
   final List<_RegionShape> shapes;
+  final bool selectable;
 }
 
 const List<_MuscleRegion> _muscleRegions = <_MuscleRegion>[
@@ -291,23 +337,26 @@ const List<_MuscleRegion> _muscleRegions = <_MuscleRegion>[
     id: 'core',
     label: 'Core',
     shapes: [
-      _RegionShape.triangle(
+      _RegionShape.polygon(
         alignment: Alignment(-0.2, 0.05),
         widthFactor: 0.35,
         heightFactor: 0.18,
         rotationDegrees: -10,
+        points: _trianglePoints,
       ),
-      _RegionShape.triangle(
+      _RegionShape.polygon(
         alignment: Alignment(0.2, 0.05),
         widthFactor: 0.35,
         heightFactor: 0.18,
         rotationDegrees: 10,
+        points: _trianglePoints,
       ),
     ],
   ),
   _MuscleRegion(
     id: 'hips',
     label: 'Hips',
+    selectable: false,
     shapes: [
       _RegionShape.rectangle(
         alignment: Alignment(0, 0.4),
@@ -320,10 +369,11 @@ const List<_MuscleRegion> _muscleRegions = <_MuscleRegion>[
     id: 'legs',
     label: 'Legs',
     shapes: [
-      _RegionShape.triangle(
+      _RegionShape.polygon(
         alignment: Alignment(0, 0.75),
         widthFactor: 0.55,
         heightFactor: 0.32,
+        points: _trianglePoints,
       ),
       _RegionShape.rectangle(
         alignment: Alignment(0, 1),
@@ -336,4 +386,10 @@ const List<_MuscleRegion> _muscleRegions = <_MuscleRegion>[
       ),
     ],
   ),
+];
+
+const List<Offset> _trianglePoints = <Offset>[
+  Offset(0.5, 0),
+  Offset(1, 1),
+  Offset(0, 1),
 ];

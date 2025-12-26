@@ -455,10 +455,6 @@ class _HomePageState extends State<HomePage> {
                     Navigator.of(context).pop();
                     _openHistorySheet();
                   },
-                  onOpenMuscles: () {
-                    Navigator.of(context).pop();
-                    _openMusclesOverlay();
-                  },
                 ),
               ),
             ),
@@ -551,6 +547,7 @@ class _HomePageState extends State<HomePage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: TextField(
@@ -564,42 +561,56 @@ class _HomePageState extends State<HomePage> {
                 ),
                 if (_selectedIndex == 1) ...[
                   const SizedBox(width: 12),
-                  ToggleButtons(
-                    isSelected: [
-                      _usesWeightsFilter == null,
-                      _usesWeightsFilter == true,
-                      _usesWeightsFilter == false,
-                    ],
-                    borderRadius: BorderRadius.circular(8),
-                    onPressed: (index) {
-                      setState(() {
-                        if (index == 0) {
-                          _usesWeightsFilter = null;
-                        } else if (index == 1) {
-                          _usesWeightsFilter = _usesWeightsFilter == true
-                              ? null
-                              : true;
-                        } else {
-                          _usesWeightsFilter = _usesWeightsFilter == false
-                              ? null
-                              : false;
-                        }
-                      });
-                    },
-                    children: const [
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8),
-                        child: Icon(Icons.remove_circle_outline),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8),
-                        child: Icon(Icons.fitness_center),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8),
-                        child: Icon(Icons.directions_run),
-                      ),
-                    ],
+                  Flexible(
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      alignment: WrapAlignment.end,
+                      children: [
+                        OutlinedButton.icon(
+                          onPressed: _openMusclesOverlay,
+                          icon: const Icon(Icons.fitness_center),
+                          label: Text(l10n.dashboardMuscles),
+                        ),
+                        ToggleButtons(
+                          isSelected: [
+                            _usesWeightsFilter == null,
+                            _usesWeightsFilter == true,
+                            _usesWeightsFilter == false,
+                          ],
+                          borderRadius: BorderRadius.circular(8),
+                          onPressed: (index) {
+                            setState(() {
+                              if (index == 0) {
+                                _usesWeightsFilter = null;
+                              } else if (index == 1) {
+                                _usesWeightsFilter = _usesWeightsFilter == true
+                                    ? null
+                                    : true;
+                              } else {
+                                _usesWeightsFilter = _usesWeightsFilter == false
+                                    ? null
+                                    : false;
+                              }
+                            });
+                          },
+                          children: const [
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 8),
+                              child: Icon(Icons.remove_circle_outline),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 8),
+                              child: Icon(Icons.fitness_center),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 8),
+                              child: Icon(Icons.directions_run),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ],
@@ -683,13 +694,11 @@ class _DashboardSheet extends StatelessWidget {
     required this.onOpenCategories,
     required this.onOpenHistory,
     required this.onClose,
-    required this.onOpenMuscles,
   });
 
   final VoidCallback onOpenCategories;
   final VoidCallback onOpenHistory;
   final VoidCallback onClose;
-  final VoidCallback onOpenMuscles;
 
   @override
   Widget build(BuildContext context) {
@@ -720,11 +729,6 @@ class _DashboardSheet extends StatelessWidget {
           leading: const Icon(Icons.category),
           title: Text(l10n.dashboardCategories),
           onTap: onOpenCategories,
-        ),
-        ListTile(
-          leading: const Icon(Icons.fitness_center),
-          title: Text(l10n.dashboardMuscles),
-          onTap: onOpenMuscles,
         ),
         ListTile(
           leading: const Icon(Icons.history),

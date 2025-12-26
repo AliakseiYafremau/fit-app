@@ -36,6 +36,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get dashboardCategories => 'Категории';
 
   @override
+  String get dashboardMuscles => 'Мышцы';
+
+  @override
   String get historyViewList => 'Список';
 
   @override

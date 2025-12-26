@@ -36,6 +36,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardCategories => 'Categories';
 
   @override
+  String get dashboardMuscles => 'Muscles';
+
+  @override
   String get historyViewList => 'List';
 
   @override

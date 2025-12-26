@@ -152,6 +152,12 @@ abstract class AppLocalizations {
   /// **'Categories'**
   String get dashboardCategories;
 
+  /// No description provided for @dashboardMuscles.
+  ///
+  /// In en, this message translates to:
+  /// **'Muscles'**
+  String get dashboardMuscles;
+
   /// No description provided for @historyViewList.
   ///
   /// In en, this message translates to:

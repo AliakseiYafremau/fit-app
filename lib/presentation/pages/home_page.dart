@@ -33,6 +33,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../widgets/categories_sheet.dart';
 import '../widgets/create_exercise_sheet.dart';
 import '../widgets/create_training_sheet.dart';
+import '../widgets/interactive_svg_diagram.dart';
 import '../widgets/primary_nav_bar.dart';
 
 class HomePage extends StatefulWidget {
@@ -45,8 +46,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   bool _dependenciesReady = false;
-  late final PageController _pageController =
-      PageController(initialPage: _selectedIndex);
+  late final PageController _pageController = PageController(
+    initialPage: _selectedIndex,
+  );
   String _searchTerm = '';
   bool? _usesWeightsFilter;
   bool _dashboardOpenedFromSwipe = false;
@@ -269,10 +271,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _startTrainingSession(Training training) async {
-      _startSession.execute(training.id);
-      _refreshActiveSession();
-      if (!mounted) return;
-      _openActiveSessionSheet();
+    _startSession.execute(training.id);
+    _refreshActiveSession();
+    if (!mounted) return;
+    _openActiveSessionSheet();
   }
 
   Future<void> _openActiveSessionSheet() async {
@@ -399,9 +401,9 @@ class _HomePageState extends State<HomePage> {
 
   void _showError(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _openCategoriesSheet() async {
@@ -439,8 +441,9 @@ class _HomePageState extends State<HomePage> {
                 elevation: 12,
                 clipBehavior: Clip.antiAlias,
                 shape: const RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.horizontal(right: Radius.circular(24)),
+                  borderRadius: BorderRadius.horizontal(
+                    right: Radius.circular(24),
+                  ),
                 ),
                 child: _DashboardSheet(
                   onClose: () => Navigator.of(context).pop(),
@@ -452,6 +455,10 @@ class _HomePageState extends State<HomePage> {
                     Navigator.of(context).pop();
                     _openHistorySheet();
                   },
+                  onOpenMuscles: () {
+                    Navigator.of(context).pop();
+                    _openMusclesOverlay();
+                  },
                 ),
               ),
             ),
@@ -459,16 +466,37 @@ class _HomePageState extends State<HomePage> {
         );
       },
       transitionBuilder: (context, animation, secondaryAnimation, child) {
-        final offsetAnimation = Tween<Offset>(
-          begin: const Offset(-1, 0),
-          end: Offset.zero,
-        ).animate(CurvedAnimation(
+        final offsetAnimation =
+            Tween<Offset>(begin: const Offset(-1, 0), end: Offset.zero).animate(
+              CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+            );
+        return SlideTransition(position: offsetAnimation, child: child);
+      },
+    );
+  }
+
+  Future<void> _openMusclesOverlay() async {
+    final l10n = AppLocalizations.of(context)!;
+    await showGeneralDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: l10n.dashboardMuscles,
+      barrierColor: Colors.black.withValues(alpha: 0.7),
+      transitionDuration: const Duration(milliseconds: 250),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return _MusclesOverlay(onClose: () => Navigator.of(context).pop());
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        final curved = CurvedAnimation(
           parent: animation,
           curve: Curves.easeOutCubic,
-        ));
-        return SlideTransition(
-          position: offsetAnimation,
-          child: child,
+        );
+        return FadeTransition(
+          opacity: curved,
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.95, end: 1).animate(curved),
+            child: child,
+          ),
         );
       },
     );
@@ -548,11 +576,13 @@ class _HomePageState extends State<HomePage> {
                         if (index == 0) {
                           _usesWeightsFilter = null;
                         } else if (index == 1) {
-                          _usesWeightsFilter =
-                              _usesWeightsFilter == true ? null : true;
+                          _usesWeightsFilter = _usesWeightsFilter == true
+                              ? null
+                              : true;
                         } else {
-                          _usesWeightsFilter =
-                              _usesWeightsFilter == false ? null : false;
+                          _usesWeightsFilter = _usesWeightsFilter == false
+                              ? null
+                              : false;
                         }
                       });
                     },
@@ -653,11 +683,13 @@ class _DashboardSheet extends StatelessWidget {
     required this.onOpenCategories,
     required this.onOpenHistory,
     required this.onClose,
+    required this.onOpenMuscles,
   });
 
   final VoidCallback onOpenCategories;
   final VoidCallback onOpenHistory;
   final VoidCallback onClose;
+  final VoidCallback onOpenMuscles;
 
   @override
   Widget build(BuildContext context) {
@@ -690,11 +722,79 @@ class _DashboardSheet extends StatelessWidget {
           onTap: onOpenCategories,
         ),
         ListTile(
+          leading: const Icon(Icons.fitness_center),
+          title: Text(l10n.dashboardMuscles),
+          onTap: onOpenMuscles,
+        ),
+        ListTile(
           leading: const Icon(Icons.history),
           title: Text(l10n.historyButton),
           onTap: onOpenHistory,
         ),
       ],
+    );
+  }
+}
+
+class _MusclesOverlay extends StatelessWidget {
+  const _MusclesOverlay({required this.onClose});
+
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    return Material(
+      color: Colors.transparent,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: onClose,
+              child: const ColoredBox(color: Colors.transparent),
+            ),
+          ),
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: Card(
+                margin: const EdgeInsets.symmetric(horizontal: 24),
+                clipBehavior: Clip.antiAlias,
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              l10n.dashboardMuscles,
+                              style: theme.textTheme.titleLarge,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: onClose,
+                            icon: const Icon(Icons.close),
+                            tooltip: l10n.buttonClose,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      const SizedBox(
+                        height: 360,
+                        child: InteractiveSvgDiagram(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -716,9 +816,10 @@ class _WorkoutsList extends StatelessWidget {
     final filtered = searchTerm.isEmpty
         ? trainings
         : trainings
-            .where((training) =>
-                training.name.toLowerCase().contains(searchTerm))
-            .toList();
+              .where(
+                (training) => training.name.toLowerCase().contains(searchTerm),
+              )
+              .toList();
     if (filtered.isEmpty) {
       return _EmptyState(message: l10n.noWorkouts);
     }
@@ -761,9 +862,11 @@ class _ExercisesList extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     Iterable<Exercise> candidates = exercises;
     if (searchTerm.isNotEmpty) {
-      candidates = candidates.where((exercise) =>
-          exercise.name.toLowerCase().contains(searchTerm) ||
-          (exercise.technique ?? '').toLowerCase().contains(searchTerm));
+      candidates = candidates.where(
+        (exercise) =>
+            exercise.name.toLowerCase().contains(searchTerm) ||
+            (exercise.technique ?? '').toLowerCase().contains(searchTerm),
+      );
     }
     if (usesWeightsFilter != null) {
       candidates = candidates.where(
@@ -883,9 +986,9 @@ class _TrainingDetailsSheet extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                      child: OutlinedButton.icon(
-                        icon: const Icon(Icons.edit_outlined),
-                        label: Text(l10n.buttonEditWorkout),
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.edit_outlined),
+                      label: Text(l10n.buttonEditWorkout),
                       onPressed: () {
                         Navigator.of(context).pop();
                         onEdit(training);
@@ -894,9 +997,9 @@ class _TrainingDetailsSheet extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                      child: OutlinedButton.icon(
-                        icon: const Icon(Icons.delete_outline),
-                        label: Text(l10n.buttonDeleteWorkout),
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.delete_outline),
+                      label: Text(l10n.buttonDeleteWorkout),
                       onPressed: () {
                         Navigator.of(context).pop();
                         onDelete(training);
@@ -909,20 +1012,20 @@ class _TrainingDetailsSheet extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                      child: ElevatedButton(
-                        onPressed: canStartSession
+                    child: ElevatedButton(
+                      onPressed: canStartSession
                           ? () {
                               Navigator.of(context).pop();
                               onStartSession();
                             }
                           : null,
-                        child: Text(l10n.buttonStartSession),
+                      child: Text(l10n.buttonStartSession),
                     ),
                   ),
                   const SizedBox(width: 12),
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                      child: Text(l10n.buttonClose),
+                    child: Text(l10n.buttonClose),
                   ),
                 ],
               ),
@@ -1108,10 +1211,7 @@ class _ExerciseDetailsSheet extends StatelessWidget {
   Future<void> _launchLink(BuildContext context, Uri uri) async {
     final l10n = AppLocalizations.of(context)!;
     try {
-      final opened = await launchUrl(
-        uri,
-        mode: LaunchMode.externalApplication,
-      );
+      final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
       if (!context.mounted) return;
       if (!opened) {
         _showTopSnackBar(context, l10n.errorUnableToOpenLink);
@@ -1134,10 +1234,7 @@ class _ExerciseDetailsSheet extends StatelessWidget {
 }
 
 class _ExerciseLinkPreview extends StatelessWidget {
-  const _ExerciseLinkPreview({
-    required this.link,
-    required this.launcher,
-  });
+  const _ExerciseLinkPreview({required this.link, required this.launcher});
 
   final String link;
   final Future<void> Function(Uri uri) launcher;
@@ -1284,7 +1381,9 @@ String _formatTime(DateTime dateTime) {
 
 String _formatTimeRange(Session session) {
   final start = _formatTime(session.startedAt);
-  final end = session.finishedAt != null ? _formatTime(session.finishedAt!) : null;
+  final end = session.finishedAt != null
+      ? _formatTime(session.finishedAt!)
+      : null;
   return end == null ? start : '$start – $end';
 }
 
@@ -1313,10 +1412,10 @@ PopupMenuEntry<String> _buildLocaleMenuItem({
 
 void _showTopSnackBar(BuildContext context, String message) {
   final messenger =
-      rootScaffoldMessengerKey.currentState ?? ScaffoldMessenger.maybeOf(context);
+      rootScaffoldMessengerKey.currentState ??
+      ScaffoldMessenger.maybeOf(context);
   if (messenger == null) return;
-  final paddingContext =
-      rootScaffoldMessengerKey.currentContext ?? context;
+  final paddingContext = rootScaffoldMessengerKey.currentContext ?? context;
   final mediaQuery = MediaQuery.maybeOf(paddingContext);
   final topPadding = (mediaQuery?.padding.top ?? 0) + kToolbarHeight + 16;
   messenger.clearSnackBars();
@@ -1472,8 +1571,9 @@ class _HistorySheetState extends State<_HistorySheet> {
                   child: ListView.separated(
                     itemBuilder: (context, index) {
                       final session = sessions[index];
-                      final completedSets =
-                          session.workoutSets.where((set) => set.done).length;
+                      final completedSets = session.workoutSets
+                          .where((set) => set.done)
+                          .length;
                       return Card(
                         child: ListTile(
                           title: Text(
@@ -1481,8 +1581,9 @@ class _HistorySheetState extends State<_HistorySheet> {
                               _formatDateTime(session.startedAt),
                             ),
                           ),
-                          subtitle:
-                              Text(l10n.completedSetsCount(completedSets)),
+                          subtitle: Text(
+                            l10n.completedSetsCount(completedSets),
+                          ),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () => Navigator.of(context).pop(session),
                         ),
@@ -1522,9 +1623,7 @@ class _HistorySheetState extends State<_HistorySheet> {
                     (session) => ListTile(
                       contentPadding: EdgeInsets.zero,
                       title: Text(
-                        l10n.startedLabel(
-                          _formatDateTime(session.startedAt),
-                        ),
+                        l10n.startedLabel(_formatDateTime(session.startedAt)),
                       ),
                       subtitle: Text(_formatTimeRange(session)),
                       onTap: () => Navigator.of(context).pop(session),
@@ -1579,19 +1678,19 @@ class _SessionHistoryDetailsSheet extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 4),
-              Text(
-                l10n.startedLabel(_formatDateTime(session.startedAt)),
-              ),
+              Text(l10n.startedLabel(_formatDateTime(session.startedAt))),
               const SizedBox(height: 4),
               Text(
-                AppLocalizations.of(context)!
-                    .startedLabel(_formatDateTime(session.startedAt)),
+                AppLocalizations.of(
+                  context,
+                )!.startedLabel(_formatDateTime(session.startedAt)),
               ),
               if (session.finishedAt != null) ...[
                 const SizedBox(height: 2),
                 Text(
-                  AppLocalizations.of(context)!
-                      .finishedLabel(_formatDateTime(session.finishedAt!)),
+                  AppLocalizations.of(
+                    context,
+                  )!.finishedLabel(_formatDateTime(session.finishedAt!)),
                 ),
               ],
               const SizedBox(height: 8),
@@ -1652,7 +1751,7 @@ class _SessionSheet extends StatefulWidget {
 
   final Session session;
   final Future<void> Function(WorkoutSet set, int repetitions, double? weight)
-      onCompleteSet;
+  onCompleteSet;
   final Future<void> Function(WorkoutSet set) onUndoSet;
   final Future<void> Function() onFinish;
   final Future<void> Function() onCancel;
@@ -1690,8 +1789,9 @@ class _SessionSheetState extends State<_SessionSheet> {
 
   Future<void> _completeSet(WorkoutSet set) async {
     final l10n = AppLocalizations.of(context)!;
-    final repsController =
-        TextEditingController(text: set.repetitions.toString());
+    final repsController = TextEditingController(
+      text: set.repetitions.toString(),
+    );
     final usesWeights = set.exercise.usesWeights;
     final weightController = usesWeights
         ? TextEditingController(text: set.weight?.toString() ?? '')
@@ -1706,16 +1806,15 @@ class _SessionSheetState extends State<_SessionSheet> {
             TextField(
               controller: repsController,
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: l10n.labelRepetitions,
-              ),
+              decoration: InputDecoration(labelText: l10n.labelRepetitions),
             ),
             const SizedBox(height: 12),
             if (usesWeights)
               TextField(
                 controller: weightController,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 decoration: InputDecoration(
                   labelText: l10n.labelWeight,
                   helperText: l10n.helperWeightedExercise,
@@ -1746,9 +1845,11 @@ class _SessionSheetState extends State<_SessionSheet> {
     if (confirmed != true) return;
     if (!mounted) return;
 
-    final repetitions = int.tryParse(repsController.text.trim() == ''
-        ? set.repetitions.toString()
-        : repsController.text.trim());
+    final repetitions = int.tryParse(
+      repsController.text.trim() == ''
+          ? set.repetitions.toString()
+          : repsController.text.trim(),
+    );
     if (repetitions == null || repetitions <= 0) {
       _showTopSnackBar(context, l10n.errorEnterValidRepetitions);
       return;
@@ -1871,8 +1972,9 @@ class _SessionSheetState extends State<_SessionSheet> {
                 if (selectedExercise.usesWeights)
                   TextField(
                     controller: weightController,
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     decoration: InputDecoration(
                       labelText: l10n.labelWeight,
                       helperText: l10n.helperWeightedExercise,
@@ -1894,8 +1996,7 @@ class _SessionSheetState extends State<_SessionSheet> {
             ),
             FilledButton(
               onPressed: () {
-                final repetitions =
-                    int.tryParse(repsController.text.trim());
+                final repetitions = int.tryParse(repsController.text.trim());
                 if (repetitions == null || repetitions <= 0) {
                   setStateDialog(
                     () => repsError = l10n.errorEnterValidRepetitions,
@@ -2021,8 +2122,9 @@ class _SessionSheetState extends State<_SessionSheet> {
               ),
               const SizedBox(height: 4),
               Text(
-                AppLocalizations.of(context)!
-                    .startedLabel(_formatDateTime(_session.startedAt)),
+                AppLocalizations.of(
+                  context,
+                )!.startedLabel(_formatDateTime(_session.startedAt)),
               ),
               const SizedBox(height: 16),
               if (sets.isEmpty)
@@ -2073,8 +2175,9 @@ class _SessionSheetState extends State<_SessionSheet> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: TextButton.icon(
-                  onPressed:
-                      _availableExercises.isEmpty ? null : _addWorkoutSet,
+                  onPressed: _availableExercises.isEmpty
+                      ? null
+                      : _addWorkoutSet,
                   icon: const Icon(Icons.add),
                   label: Text(l10n.sessionAddSetButton),
                 ),
@@ -2133,10 +2236,7 @@ class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text(
-        message,
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
+      child: Text(message, style: Theme.of(context).textTheme.titleMedium),
     );
   }
 }

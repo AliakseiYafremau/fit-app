@@ -32,10 +32,7 @@ class _CategoryEditResult {
   final String name;
   final Color color;
 
-  const _CategoryEditResult({
-    required this.name,
-    required this.color,
-  });
+  const _CategoryEditResult({required this.name, required this.color});
 }
 
 class _CategoriesSheetState extends State<CategoriesSheet> {
@@ -89,9 +86,9 @@ class _CategoriesSheetState extends State<CategoriesSheet> {
   }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Color _colorFromHex(String value) {
@@ -155,7 +152,9 @@ class _CategoriesSheetState extends State<CategoriesSheet> {
     }
   }
 
-  Future<_CategoryEditResult?> _showEditCategoryDialog(Category category) async {
+  Future<_CategoryEditResult?> _showEditCategoryDialog(
+    Category category,
+  ) async {
     final l10n = AppLocalizations.of(context)!;
     final controller = TextEditingController(text: category.name);
     Color tempColor = _colorFromHex(category.color);
@@ -175,8 +174,9 @@ class _CategoriesSheetState extends State<CategoriesSheet> {
                   autofocus: true,
                   decoration: InputDecoration(
                     labelText: l10n.categoryNameLabel,
-                    errorText:
-                        showNameError ? l10n.errorCategoryNameRequired : null,
+                    errorText: showNameError
+                        ? l10n.errorCategoryNameRequired
+                        : null,
                   ),
                   onChanged: (_) {
                     if (showNameError) {
@@ -202,26 +202,15 @@ class _CategoriesSheetState extends State<CategoriesSheet> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _colorToHex(tempColor),
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        const SizedBox(height: 4),
-                        OutlinedButton.icon(
-                          onPressed: () async {
-                            final chosen =
-                                await _showColorPickerDialog(tempColor);
-                            if (chosen != null) {
-                              setStateDialog(() => tempColor = chosen);
-                            }
-                          },
-                          icon: const Icon(Icons.color_lens_outlined),
-                          label: Text(l10n.categoryPickColorButton),
-                        ),
-                      ],
+                    OutlinedButton.icon(
+                      onPressed: () async {
+                        final chosen = await _showColorPickerDialog(tempColor);
+                        if (chosen != null) {
+                          setStateDialog(() => tempColor = chosen);
+                        }
+                      },
+                      icon: const Icon(Icons.color_lens_outlined),
+                      label: Text(l10n.categoryPickColorButton),
                     ),
                   ],
                 ),
@@ -240,9 +229,9 @@ class _CategoriesSheetState extends State<CategoriesSheet> {
                   setStateDialog(() => showNameError = true);
                   return;
                 }
-                Navigator.of(context).pop(
-                  _CategoryEditResult(name: trimmed, color: tempColor),
-                );
+                Navigator.of(
+                  context,
+                ).pop(_CategoryEditResult(name: trimmed, color: tempColor));
               },
               child: Text(l10n.buttonUpdate),
             ),
@@ -416,20 +405,10 @@ class _CategoriesSheetState extends State<CategoriesSheet> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _colorToHex(_selectedColor),
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                      const SizedBox(height: 4),
-                      OutlinedButton.icon(
-                        onPressed: _pickColor,
-                        icon: const Icon(Icons.color_lens_outlined),
-                        label: Text(l10n.categoryPickColorButton),
-                      ),
-                    ],
+                  OutlinedButton.icon(
+                    onPressed: _pickColor,
+                    icon: const Icon(Icons.color_lens_outlined),
+                    label: Text(l10n.categoryPickColorButton),
                   ),
                 ],
               ),

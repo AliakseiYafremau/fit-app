@@ -546,71 +546,67 @@ class _HomePageState extends State<HomePage> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.search),
-                      hintText: l10n.searchHint,
-                      border: const OutlineInputBorder(),
-                    ),
-                    onChanged: _onSearchChanged,
+                TextField(
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.search),
+                    hintText: l10n.searchHint,
+                    border: const OutlineInputBorder(),
                   ),
+                  onChanged: _onSearchChanged,
                 ),
                 if (_selectedIndex == 1) ...[
-                  const SizedBox(width: 12),
-                  Flexible(
-                    child: Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      alignment: WrapAlignment.end,
-                      children: [
-                        OutlinedButton.icon(
-                          onPressed: _openMusclesOverlay,
-                          icon: const Icon(Icons.fitness_center),
-                          label: Text(l10n.dashboardMuscles),
-                        ),
-                        ToggleButtons(
-                          isSelected: [
-                            _usesWeightsFilter == null,
-                            _usesWeightsFilter == true,
-                            _usesWeightsFilter == false,
-                          ],
-                          borderRadius: BorderRadius.circular(8),
-                          onPressed: (index) {
-                            setState(() {
-                              if (index == 0) {
-                                _usesWeightsFilter = null;
-                              } else if (index == 1) {
-                                _usesWeightsFilter = _usesWeightsFilter == true
-                                    ? null
-                                    : true;
-                              } else {
-                                _usesWeightsFilter = _usesWeightsFilter == false
-                                    ? null
-                                    : false;
-                              }
-                            });
-                          },
-                          children: const [
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 8),
-                              child: Icon(Icons.remove_circle_outline),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 8),
-                              child: Icon(Icons.fitness_center),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 8),
-                              child: Icon(Icons.directions_run),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: _openMusclesOverlay,
+                        icon: const Icon(Icons.fitness_center),
+                        label: Text(l10n.dashboardMuscles),
+                      ),
+                      ToggleButtons(
+                        isSelected: [
+                          _usesWeightsFilter == null,
+                          _usesWeightsFilter == true,
+                          _usesWeightsFilter == false,
+                        ],
+                        borderRadius: BorderRadius.circular(8),
+                        onPressed: (index) {
+                          setState(() {
+                            if (index == 0) {
+                              _usesWeightsFilter = null;
+                            } else if (index == 1) {
+                              _usesWeightsFilter = _usesWeightsFilter == true
+                                  ? null
+                                  : true;
+                            } else {
+                              _usesWeightsFilter = _usesWeightsFilter == false
+                                  ? null
+                                  : false;
+                            }
+                          });
+                        },
+                        children: const [
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                            child: Icon(Icons.remove_circle_outline),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                            child: Icon(Icons.fitness_center),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                            child: Icon(Icons.directions_run),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
               ],

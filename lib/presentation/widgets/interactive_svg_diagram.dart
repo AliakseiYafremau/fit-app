@@ -167,30 +167,23 @@ class _ShapeBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final decoration = BoxDecoration(
-      color: color,
-      borderRadius: shape.type == _RegionShapeType.rectangle
-          ? shape.borderRadius
-          : null,
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.12),
-          blurRadius: 8,
-          offset: const Offset(0, 4),
-        ),
-      ],
-    );
     final child = AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      decoration: decoration,
+      decoration: BoxDecoration(
+        color: color,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
     );
-    if (shape.type == _RegionShapeType.polygon) {
-      return ClipPath(
-        clipper: _PolygonClipper(shape.polygonPoints),
-        child: child,
-      );
-    }
-    return child;
+    return ClipPath(
+      clipper: _PolygonClipper(shape.normalizedPoints),
+      child: child,
+    );
   }
 }
 
@@ -218,58 +211,58 @@ class _PolygonClipper extends CustomClipper<Path> {
       !listEquals(points, oldClipper.points);
 }
 
-enum _RegionShapeType { rectangle, polygon }
-
 class _RegionShape {
-  const _RegionShape._({
-    required this.type,
-    required this.alignment,
-    required this.widthFactor,
-    required this.heightFactor,
-    required this.rotationDegrees,
-    required this.borderRadius,
-    required this.polygonPoints,
+  const _RegionShape({
+    this.alignment = Alignment.center,
+    this.rotationDegrees = 0,
+    required this.points,
   });
 
-  const _RegionShape.rectangle({
-    required Alignment alignment,
-    required double widthFactor,
-    required double heightFactor,
-    BorderRadius borderRadius = const BorderRadius.all(Radius.circular(24)),
-    double rotationDegrees = 0,
-  }) : this._(
-         type: _RegionShapeType.rectangle,
-         alignment: alignment,
-         widthFactor: widthFactor,
-         heightFactor: heightFactor,
-         rotationDegrees: rotationDegrees,
-         borderRadius: borderRadius,
-         polygonPoints: const <Offset>[],
-       );
-
-  const _RegionShape.polygon({
-    required Alignment alignment,
-    required double widthFactor,
-    required double heightFactor,
-    required List<Offset> points,
-    double rotationDegrees = 0,
-  }) : this._(
-         type: _RegionShapeType.polygon,
-         alignment: alignment,
-         widthFactor: widthFactor,
-         heightFactor: heightFactor,
-         rotationDegrees: rotationDegrees,
-         borderRadius: BorderRadius.zero,
-         polygonPoints: points,
-       );
-
-  final _RegionShapeType type;
   final Alignment alignment;
-  final double widthFactor;
-  final double heightFactor;
   final double rotationDegrees;
-  final BorderRadius borderRadius;
-  final List<Offset> polygonPoints;
+  final List<Offset> points;
+
+  static const double _minFactor = 0.0001;
+
+  Rect get _bounds {
+    if (points.isEmpty) return Rect.zero;
+    var minDx = points.first.dx;
+    var maxDx = points.first.dx;
+    var minDy = points.first.dy;
+    var maxDy = points.first.dy;
+    for (final point in points.skip(1)) {
+      if (point.dx < minDx) minDx = point.dx;
+      if (point.dx > maxDx) maxDx = point.dx;
+      if (point.dy < minDy) minDy = point.dy;
+      if (point.dy > maxDy) maxDy = point.dy;
+    }
+    return Rect.fromLTRB(minDx, minDy, maxDx, maxDy);
+  }
+
+  double get widthFactor {
+    final width = _bounds.width;
+    return width > 0 ? width : _minFactor;
+  }
+
+  double get heightFactor {
+    final height = _bounds.height;
+    return height > 0 ? height : _minFactor;
+  }
+
+  List<Offset> get normalizedPoints {
+    if (points.isEmpty) return const <Offset>[];
+    final bounds = _bounds;
+    final width = bounds.width == 0 ? 1 : bounds.width;
+    final height = bounds.height == 0 ? 1 : bounds.height;
+    return points
+        .map(
+          (point) => Offset(
+            (point.dx - bounds.left) / width,
+            (point.dy - bounds.top) / height,
+          ),
+        )
+        .toList(growable: false);
+  }
 }
 
 class _MuscleRegion {
@@ -287,109 +280,95 @@ class _MuscleRegion {
 }
 
 const List<_MuscleRegion> _muscleRegions = <_MuscleRegion>[
+  _MuscleRegion(id: "abd", label: "Abd", shapes: <_RegionShape>[
+    _RegionShape(
+      alignment: Alignment(0, -0.04),
+      rotationDegrees: 0,
+      points: <Offset>[
+        Offset(-0.18, 0),
+        Offset(0.18, 0),
+        Offset(0.13, 0.13),
+        Offset(-0.13, 0.13),
+      ],
+    ),
+  ]),
   _MuscleRegion(
-    id: 'shoulders',
-    label: 'Shoulders',
-    shapes: [
-      _RegionShape.rectangle(
-        alignment: Alignment(0, -0.9),
-        widthFactor: 0.55,
-        heightFactor: 0.18,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(48),
-          topRight: Radius.circular(48),
-        ),
+    id: 'upper_legs',
+    label: 'Upper Legs',
+    shapes: <_RegionShape>[
+      _RegionShape(
+        alignment: Alignment(-0.21, 0.24),
+        rotationDegrees: 0,
+        points: <Offset>[
+          Offset(0, 0),
+          Offset(0.12, 0),
+          Offset(0.05, 0.14),
+          Offset(-0.04, 0.14),
+        ],
+      ),
+      _RegionShape(
+        alignment: Alignment(0.21, 0.24),
+        rotationDegrees: 0,
+        points: <Offset>[
+          Offset(0, 0),
+          Offset(-0.12, 0),
+          Offset(-0.05, 0.14),
+          Offset(0.04, 0.14),
+        ],
       ),
     ],
   ),
   _MuscleRegion(
-    id: 'chest',
-    label: 'Chest',
-    shapes: [
-      _RegionShape.rectangle(
-        alignment: Alignment(0, -0.5),
-        widthFactor: 0.6,
-        heightFactor: 0.22,
+    id: 'low_legs',
+    label: 'Low Legs',
+    shapes: <_RegionShape>[
+      _RegionShape(
+        alignment: Alignment(-0.24, 0.58),
+        rotationDegrees: 0,
+        points: <Offset>[
+          Offset(0, 0),
+          Offset(0.1, 0),
+          Offset(0.12, 0.17),
+          Offset(0.04, 0.17),
+        ],
+      ),
+      _RegionShape(
+        alignment: Alignment(0.24, 0.58),
+        rotationDegrees: 0,
+        points: <Offset>[
+          Offset(0, 0),
+          Offset(-0.1, 0),
+          Offset(-0.12, 0.17),
+          Offset(-0.04, 0.17),
+        ],
       ),
     ],
   ),
   _MuscleRegion(
-    id: 'arms',
-    label: 'Arms',
-    shapes: [
-      _RegionShape.rectangle(
-        alignment: Alignment(-0.45, -0.2),
-        widthFactor: 0.45,
-        heightFactor: 0.16,
-        rotationDegrees: -12,
-        borderRadius: BorderRadius.all(Radius.circular(32)),
-      ),
-      _RegionShape.rectangle(
-        alignment: Alignment(0.45, -0.2),
-        widthFactor: 0.45,
-        heightFactor: 0.16,
-        rotationDegrees: 12,
-        borderRadius: BorderRadius.all(Radius.circular(32)),
-      ),
-    ],
-  ),
-  _MuscleRegion(
-    id: 'core',
-    label: 'Core',
-    shapes: [
-      _RegionShape.polygon(
-        alignment: Alignment(-0.2, 0.05),
-        widthFactor: 0.35,
-        heightFactor: 0.18,
-        rotationDegrees: -10,
-        points: _trianglePoints,
-      ),
-      _RegionShape.polygon(
-        alignment: Alignment(0.2, 0.05),
-        widthFactor: 0.35,
-        heightFactor: 0.18,
-        rotationDegrees: 10,
-        points: _trianglePoints,
-      ),
-    ],
-  ),
-  _MuscleRegion(
-    id: 'hips',
-    label: 'Hips',
+    id: 'feet',
+    label: 'Feet',
     selectable: false,
-    shapes: [
-      _RegionShape.rectangle(
-        alignment: Alignment(0, 0.4),
-        widthFactor: 0.5,
-        heightFactor: 0.18,
+    shapes: <_RegionShape>[
+      _RegionShape(
+        alignment: Alignment(-0.35, 0.7),
+        rotationDegrees: 0,
+        points: <Offset>[
+          Offset(0, 0),
+          Offset(0.1, 0),
+          Offset(0.12, 0.05),
+          Offset(-0.1, 0.05),
+        ],
+      ),
+      _RegionShape(
+        alignment: Alignment(0.35, 0.7),
+        rotationDegrees: 0,
+        points: <Offset>[
+          Offset(0, 0),
+          Offset(-0.1, 0),
+          Offset(-0.12, 0.05),
+          Offset(0.1, 0.05),
+        ],
       ),
     ],
   ),
-  _MuscleRegion(
-    id: 'legs',
-    label: 'Legs',
-    shapes: [
-      _RegionShape.polygon(
-        alignment: Alignment(0, 0.75),
-        widthFactor: 0.55,
-        heightFactor: 0.32,
-        points: _trianglePoints,
-      ),
-      _RegionShape.rectangle(
-        alignment: Alignment(0, 1),
-        widthFactor: 0.25,
-        heightFactor: 0.25,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(48),
-          bottomRight: Radius.circular(48),
-        ),
-      ),
-    ],
-  ),
-];
-
-const List<Offset> _trianglePoints = <Offset>[
-  Offset(0.5, 0),
-  Offset(1, 1),
-  Offset(0, 1),
 ];

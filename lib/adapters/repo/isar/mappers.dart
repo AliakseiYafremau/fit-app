@@ -37,6 +37,7 @@ ExerciseModel mapExerciseToModel(
   model.usesWeights = exercise.usesWeights;
   model.links = List<String>.from(exercise.links);
   model.categoryIds = List<String>.from(exercise.categoriesId);
+  model.musclesIds = List<String>.from(exercise.musclesId);
   return model;
 }
 
@@ -50,6 +51,7 @@ Exercise mapExerciseFromModel(ExerciseModel model) {
     usesWeights: model.usesWeights,
     links: List<String>.from(model.links),
     categoriesId: List<String>.from(model.categoryIds),
+    musclesId: List<String>.from(model.musclesIds),
   );
 }
 

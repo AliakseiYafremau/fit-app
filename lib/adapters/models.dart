@@ -16,6 +16,7 @@ class ExerciseModel {
   late bool usesWeights;
   List<String> links = [];
   List<String> categoryIds = [];
+  List<String> musclesIds = [];
 }
 
 @collection

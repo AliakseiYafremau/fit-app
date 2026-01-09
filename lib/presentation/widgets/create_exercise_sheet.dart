@@ -8,6 +8,7 @@ import 'package:fit_app/application/interfaces/repo/category.dart';
 import 'package:fit_app/domain/entities/category.dart';
 import 'package:fit_app/domain/entities/exercise.dart';
 import 'package:fit_app/l10n/app_localizations.dart';
+import 'package:fit_app/presentation/widgets/interactive_svg_diagram.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +28,7 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
   final _notesController = TextEditingController();
   final List<TextEditingController> _linkControllers = [];
   final Set<String> _selectedCategoryIds = <String>{};
+  final Set<String> _selectedMuscleIds = <String>{};
   List<Category> _availableCategories = const [];
   bool _usesWeights = false;
   Uint8List? _photoPreviewBytes;
@@ -52,6 +54,7 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
       _notesController.text = exercise.notes ?? '';
       _usesWeights = exercise.usesWeights;
       _selectedCategoryIds.addAll(exercise.categoriesId);
+      _selectedMuscleIds.addAll(exercise.musclesId);
       if (exercise.links.isEmpty) {
         _linkControllers.add(TextEditingController());
       } else {
@@ -163,6 +166,7 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
         .where((link) => link.isNotEmpty)
         .toList();
     final categoryIds = _selectedCategoryIds.toList();
+    final muscleIds = _selectedMuscleIds.toList();
 
     if (_isEditing) {
       final dto = UpdateExerciseDTO(
@@ -174,6 +178,7 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
         photoBytes: _pendingPhotoBytes,
         removePhoto: _removePhoto,
         categoryIds: categoryIds,
+        musclesIds: muscleIds,
       );
       _updateExercise.execute(dto);
     } else {
@@ -185,6 +190,7 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
         links: links,
         photoBytes: _pendingPhotoBytes,
         categoryIds: categoryIds,
+        musclesIds: muscleIds,
       );
 
       _createExercise.execute(dto);
@@ -332,6 +338,25 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
                     );
                   }).toList(),
                 ),
+              const SizedBox(height: 12),
+              Text(
+                l10n.dashboardMuscles,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 320,
+                child: InteractiveSvgDiagram(
+                  initialSelection: _selectedMuscleIds,
+                  onSelectionChanged: (selection) {
+                    setState(() {
+                      _selectedMuscleIds
+                        ..clear()
+                        ..addAll(selection);
+                    });
+                  },
+                ),
+              ),
               const SizedBox(height: 12),
               SwitchListTile(
                 value: _usesWeights,

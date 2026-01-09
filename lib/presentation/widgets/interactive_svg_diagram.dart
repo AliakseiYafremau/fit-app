@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:fit_app/domain/entities/id.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -50,12 +51,7 @@ class _InteractiveSvgDiagramState extends State<InteractiveSvgDiagram> {
 
   void _notifySelection() {
     if (widget.onSelectionChanged == null) return;
-    final labels = _selected
-        .map(
-          (id) => _muscleRegions.firstWhere((region) => region.id == id).label,
-        )
-        .toSet();
-    widget.onSelectionChanged!(labels);
+    widget.onSelectionChanged!(Set<String>.from(_selected));
   }
 
   @override
@@ -282,22 +278,145 @@ class _MuscleRegion {
 const List<_MuscleRegion> _muscleRegions = <_MuscleRegion>[
   _MuscleRegion(id: "abd", label: "Abd", shapes: <_RegionShape>[
     _RegionShape(
-      alignment: Alignment(0, -0.04),
+      alignment: Alignment(0, -0.06),
       rotationDegrees: 0,
       points: <Offset>[
-        Offset(-0.18, 0),
-        Offset(0.18, 0),
-        Offset(0.13, 0.13),
-        Offset(-0.13, 0.13),
+        Offset(-0.15, 0),
+        Offset(0.15, 0),
+        Offset(0.11, 0.15),
+        Offset(-0.11, 0.15),
       ],
     ),
   ]),
+  _MuscleRegion(
+    id: 'chest',
+    label: 'Chest',
+    shapes: <_RegionShape>[
+      _RegionShape(
+        alignment: Alignment(-0.18, -0.3),
+        rotationDegrees: 0,
+        points: <Offset>[
+          Offset(0, 0),
+          Offset(0.075, 0),
+          Offset(0.095, 0.02),
+          Offset(0.095, 0.08),
+          Offset(0.075, 0.1),
+          Offset(-0.055, 0.1),
+          Offset(-0.075, 0.08),
+          Offset(-0.075, 0.035),
+        ],
+      ),
+      _RegionShape(
+        alignment: Alignment(0.18, -0.3),
+        rotationDegrees: 0,
+        points: <Offset>[
+          Offset(0, 0),
+          Offset(-0.075, 0),
+          Offset(-0.095, 0.02),
+          Offset(-0.095, 0.08),
+          Offset(-0.075, 0.1),
+          Offset(0.055, 0.1),
+          Offset(0.075, 0.08),
+          Offset(0.075, 0.035),
+        ],
+      ),
+    ],
+  ),
+  _MuscleRegion(
+    id: 'shoulders', 
+    label: 'Shoulders',
+    shapes: <_RegionShape>[
+      _RegionShape(alignment: Alignment(-0.22, -0.4), rotationDegrees: 0,
+      points: <Offset>[
+        Offset(0, 0),
+        Offset(-0.1, 0.045),
+        Offset(-0.1, 0),
+      ])
+    ]),
+  // _MuscleRegion(
+  //   id: 'arms',
+  //   label: 'Arms',
+  //   shapes: <_RegionShape>[
+  //     _RegionShape(
+  //       alignment: Alignment(-0.36, -0.18),
+  //       rotationDegrees: -10,
+  //       points: <Offset>[
+  //         Offset(0, 0),
+  //         Offset(0.1, 0),
+  //         Offset(0.14, 0.18),
+  //         Offset(0.02, 0.18),
+  //       ],
+  //     ),
+  //     _RegionShape(
+  //       alignment: Alignment(0.36, -0.18),
+  //       rotationDegrees: 10,
+  //       points: <Offset>[
+  //         Offset(0, 0),
+  //         Offset(-0.1, 0),
+  //         Offset(-0.14, 0.18),
+  //         Offset(-0.02, 0.18),
+  //       ],
+  //     ),
+  //   ],
+  // ),
+  // _MuscleRegion(
+  //   id: 'forearms',
+  //   label: 'Forearms',
+  //   shapes: <_RegionShape>[
+  //     _RegionShape(
+  //       alignment: Alignment(-0.42, 0.02),
+  //       rotationDegrees: -8,
+  //       points: <Offset>[
+  //         Offset(0, 0),
+  //         Offset(0.08, 0),
+  //         Offset(0.12, 0.18),
+  //         Offset(0.02, 0.18),
+  //       ],
+  //     ),
+  //     _RegionShape(
+  //       alignment: Alignment(0.42, 0.02),
+  //       rotationDegrees: 8,
+  //       points: <Offset>[
+  //         Offset(0, 0),
+  //         Offset(-0.08, 0),
+  //         Offset(-0.12, 0.18),
+  //         Offset(-0.02, 0.18),
+  //       ],
+  //     ),
+  //   ],
+  // ),
+  // _MuscleRegion(
+  //   id: 'neck_head',
+  //   label: 'Neck & Head',
+  //   shapes: <_RegionShape>[
+  //     _RegionShape(
+  //       alignment: Alignment(0, -0.42),
+  //       rotationDegrees: 0,
+  //       points: <Offset>[
+  //         Offset(-0.08, 0),
+  //         Offset(0.08, 0),
+  //         Offset(0.1, 0.12),
+  //         Offset(-0.1, 0.12),
+  //       ],
+  //     ),
+  //     _RegionShape(
+  //       alignment: Alignment(0, -0.54),
+  //       rotationDegrees: 0,
+  //       points: <Offset>[
+  //         Offset(-0.1, 0),
+  //         Offset(0.1, 0),
+  //         Offset(0.12, 0.14),
+  //         Offset(-0.12, 0.14),
+  //       ],
+  //     ),
+  //   ],
+  // ),
   _MuscleRegion(
     id: 'upper_legs',
     label: 'Upper Legs',
     shapes: <_RegionShape>[
       _RegionShape(
-        alignment: Alignment(-0.21, 0.24),
+        alignment: Alignment(-0.16, 0.24),
         rotationDegrees: 0,
         points: <Offset>[
           Offset(0, 0),
@@ -307,7 +426,7 @@ const List<_MuscleRegion> _muscleRegions = <_MuscleRegion>[
         ],
       ),
       _RegionShape(
-        alignment: Alignment(0.21, 0.24),
+        alignment: Alignment(0.16, 0.24),
         rotationDegrees: 0,
         points: <Offset>[
           Offset(0, 0),
@@ -323,7 +442,7 @@ const List<_MuscleRegion> _muscleRegions = <_MuscleRegion>[
     label: 'Low Legs',
     shapes: <_RegionShape>[
       _RegionShape(
-        alignment: Alignment(-0.24, 0.58),
+        alignment: Alignment(-0.19, 0.58),
         rotationDegrees: 0,
         points: <Offset>[
           Offset(0, 0),
@@ -333,7 +452,7 @@ const List<_MuscleRegion> _muscleRegions = <_MuscleRegion>[
         ],
       ),
       _RegionShape(
-        alignment: Alignment(0.24, 0.58),
+        alignment: Alignment(0.19, 0.58),
         rotationDegrees: 0,
         points: <Offset>[
           Offset(0, 0),
@@ -350,7 +469,7 @@ const List<_MuscleRegion> _muscleRegions = <_MuscleRegion>[
     selectable: false,
     shapes: <_RegionShape>[
       _RegionShape(
-        alignment: Alignment(-0.35, 0.7),
+        alignment: Alignment(-0.30, 0.7),
         rotationDegrees: 0,
         points: <Offset>[
           Offset(0, 0),
@@ -360,7 +479,7 @@ const List<_MuscleRegion> _muscleRegions = <_MuscleRegion>[
         ],
       ),
       _RegionShape(
-        alignment: Alignment(0.35, 0.7),
+        alignment: Alignment(0.30, 0.7),
         rotationDegrees: 0,
         points: <Offset>[
           Offset(0, 0),

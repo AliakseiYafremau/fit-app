@@ -32,28 +32,33 @@ const ExerciseModelSchema = CollectionSchema(
       name: r'links',
       type: IsarType.stringList,
     ),
-    r'name': PropertySchema(
+    r'musclesIds': PropertySchema(
       id: 3,
+      name: r'musclesIds',
+      type: IsarType.stringList,
+    ),
+    r'name': PropertySchema(
+      id: 4,
       name: r'name',
       type: IsarType.string,
     ),
     r'notes': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'notes',
       type: IsarType.string,
     ),
     r'photoId': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'photoId',
       type: IsarType.string,
     ),
     r'technique': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'technique',
       type: IsarType.string,
     ),
     r'usesWeights': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'usesWeights',
       type: IsarType.bool,
     )
@@ -107,6 +112,13 @@ int _exerciseModelEstimateSize(
       bytesCount += value.length * 3;
     }
   }
+  bytesCount += 3 + object.musclesIds.length * 3;
+  {
+    for (var i = 0; i < object.musclesIds.length; i++) {
+      final value = object.musclesIds[i];
+      bytesCount += value.length * 3;
+    }
+  }
   bytesCount += 3 + object.name.length * 3;
   bytesCount += 3 + object.notes.length * 3;
   {
@@ -128,11 +140,12 @@ void _exerciseModelSerialize(
   writer.writeStringList(offsets[0], object.categoryIds);
   writer.writeString(offsets[1], object.entityId);
   writer.writeStringList(offsets[2], object.links);
-  writer.writeString(offsets[3], object.name);
-  writer.writeString(offsets[4], object.notes);
-  writer.writeString(offsets[5], object.photoId);
-  writer.writeString(offsets[6], object.technique);
-  writer.writeBool(offsets[7], object.usesWeights);
+  writer.writeStringList(offsets[3], object.musclesIds);
+  writer.writeString(offsets[4], object.name);
+  writer.writeString(offsets[5], object.notes);
+  writer.writeString(offsets[6], object.photoId);
+  writer.writeString(offsets[7], object.technique);
+  writer.writeBool(offsets[8], object.usesWeights);
 }
 
 ExerciseModel _exerciseModelDeserialize(
@@ -146,11 +159,12 @@ ExerciseModel _exerciseModelDeserialize(
   object.entityId = reader.readString(offsets[1]);
   object.isarId = id;
   object.links = reader.readStringList(offsets[2]) ?? [];
-  object.name = reader.readString(offsets[3]);
-  object.notes = reader.readString(offsets[4]);
-  object.photoId = reader.readStringOrNull(offsets[5]);
-  object.technique = reader.readString(offsets[6]);
-  object.usesWeights = reader.readBool(offsets[7]);
+  object.musclesIds = reader.readStringList(offsets[3]) ?? [];
+  object.name = reader.readString(offsets[4]);
+  object.notes = reader.readString(offsets[5]);
+  object.photoId = reader.readStringOrNull(offsets[6]);
+  object.technique = reader.readString(offsets[7]);
+  object.usesWeights = reader.readBool(offsets[8]);
   return object;
 }
 
@@ -168,14 +182,16 @@ P _exerciseModelDeserializeProp<P>(
     case 2:
       return (reader.readStringList(offset) ?? []) as P;
     case 3:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringList(offset) ?? []) as P;
     case 4:
       return (reader.readString(offset)) as P;
     case 5:
-      return (reader.readStringOrNull(offset)) as P;
-    case 6:
       return (reader.readString(offset)) as P;
+    case 6:
+      return (reader.readStringOrNull(offset)) as P;
     case 7:
+      return (reader.readString(offset)) as P;
+    case 8:
       return (reader.readBool(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1037,6 +1053,231 @@ extension ExerciseModelQueryFilter
     });
   }
 
+  QueryBuilder<ExerciseModel, ExerciseModel, QAfterFilterCondition>
+      musclesIdsElementEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'musclesIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ExerciseModel, ExerciseModel, QAfterFilterCondition>
+      musclesIdsElementGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'musclesIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ExerciseModel, ExerciseModel, QAfterFilterCondition>
+      musclesIdsElementLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'musclesIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ExerciseModel, ExerciseModel, QAfterFilterCondition>
+      musclesIdsElementBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'musclesIds',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ExerciseModel, ExerciseModel, QAfterFilterCondition>
+      musclesIdsElementStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'musclesIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ExerciseModel, ExerciseModel, QAfterFilterCondition>
+      musclesIdsElementEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'musclesIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ExerciseModel, ExerciseModel, QAfterFilterCondition>
+      musclesIdsElementContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'musclesIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ExerciseModel, ExerciseModel, QAfterFilterCondition>
+      musclesIdsElementMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'musclesIds',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ExerciseModel, ExerciseModel, QAfterFilterCondition>
+      musclesIdsElementIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'musclesIds',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<ExerciseModel, ExerciseModel, QAfterFilterCondition>
+      musclesIdsElementIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'musclesIds',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<ExerciseModel, ExerciseModel, QAfterFilterCondition>
+      musclesIdsLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'musclesIds',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<ExerciseModel, ExerciseModel, QAfterFilterCondition>
+      musclesIdsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'musclesIds',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<ExerciseModel, ExerciseModel, QAfterFilterCondition>
+      musclesIdsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'musclesIds',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<ExerciseModel, ExerciseModel, QAfterFilterCondition>
+      musclesIdsLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'musclesIds',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<ExerciseModel, ExerciseModel, QAfterFilterCondition>
+      musclesIdsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'musclesIds',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<ExerciseModel, ExerciseModel, QAfterFilterCondition>
+      musclesIdsLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'musclesIds',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
+
   QueryBuilder<ExerciseModel, ExerciseModel, QAfterFilterCondition> nameEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -1805,6 +2046,12 @@ extension ExerciseModelQueryWhereDistinct
     });
   }
 
+  QueryBuilder<ExerciseModel, ExerciseModel, QDistinct> distinctByMusclesIds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'musclesIds');
+    });
+  }
+
   QueryBuilder<ExerciseModel, ExerciseModel, QDistinct> distinctByName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1865,6 +2112,13 @@ extension ExerciseModelQueryProperty
   QueryBuilder<ExerciseModel, List<String>, QQueryOperations> linksProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'links');
+    });
+  }
+
+  QueryBuilder<ExerciseModel, List<String>, QQueryOperations>
+      musclesIdsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'musclesIds');
     });
   }
 

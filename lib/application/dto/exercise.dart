@@ -8,6 +8,7 @@ class NewExerciseDTO {
   final List<String> links;
   final Uint8List? photoBytes;
   final List<String> categoryIds;
+  final List<String> musclesIds;
 
   NewExerciseDTO({
     required this.name,
@@ -17,6 +18,7 @@ class NewExerciseDTO {
     this.links = const [],
     this.photoBytes,
     this.categoryIds = const [],
+    this.musclesIds = const [],
   });
 }
 
@@ -29,6 +31,7 @@ class UpdateExerciseDTO {
   final Uint8List? photoBytes;
   final bool removePhoto;
   final List<String> categoryIds;
+  final List<String> musclesIds;
 
   UpdateExerciseDTO({
     required this.exerciseId,
@@ -39,5 +42,6 @@ class UpdateExerciseDTO {
     this.photoBytes,
     this.removePhoto = false,
     this.categoryIds = const [],
+    this.musclesIds = const [],
   });
 }

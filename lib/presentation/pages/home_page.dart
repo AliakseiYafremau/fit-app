@@ -51,6 +51,7 @@ class _HomePageState extends State<HomePage> {
   );
   String _searchTerm = '';
   bool? _usesWeightsFilter;
+  final Set<String> _selectedMuscleIds = <String>{};
   bool _dashboardOpenedFromSwipe = false;
 
   late final TrainingRepository _trainingRepository;
@@ -480,7 +481,17 @@ class _HomePageState extends State<HomePage> {
       barrierColor: Colors.black.withValues(alpha: 0.7),
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, animation, secondaryAnimation) {
-        return _MusclesOverlay(onClose: () => Navigator.of(context).pop());
+        return _MusclesOverlay(
+          onClose: () => Navigator.of(context).pop(),
+          initialSelection: _selectedMuscleIds,
+          onSelectionChanged: (selection) {
+            setState(() {
+              _selectedMuscleIds
+                ..clear()
+                ..addAll(selection);
+            });
+          },
+        );
       },
       transitionBuilder: (context, animation, secondaryAnimation, child) {
         final curved = CurvedAnimation(
@@ -567,7 +578,11 @@ class _HomePageState extends State<HomePage> {
                       OutlinedButton.icon(
                         onPressed: _openMusclesOverlay,
                         icon: const Icon(Icons.fitness_center),
-                        label: Text(l10n.dashboardMuscles),
+                        label: Text(
+                          _selectedMuscleIds.isEmpty
+                              ? l10n.dashboardMuscles
+                              : '${l10n.dashboardMuscles} (${_selectedMuscleIds.length})',
+                        ),
                       ),
                       ToggleButtons(
                         isSelected: [
@@ -631,6 +646,7 @@ class _HomePageState extends State<HomePage> {
                         exercises: _exercises,
                         searchTerm: _searchTerm,
                         usesWeightsFilter: _usesWeightsFilter,
+                        musclesFilter: _selectedMuscleIds,
                         onView: _showExerciseDetails,
                       ),
                     ],
@@ -737,9 +753,15 @@ class _DashboardSheet extends StatelessWidget {
 }
 
 class _MusclesOverlay extends StatelessWidget {
-  const _MusclesOverlay({required this.onClose});
+  const _MusclesOverlay({
+    required this.onClose,
+    required this.initialSelection,
+    required this.onSelectionChanged,
+  });
 
   final VoidCallback onClose;
+  final Set<String> initialSelection;
+  final ValueChanged<Set<String>> onSelectionChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -783,9 +805,12 @@ class _MusclesOverlay extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      const SizedBox(
+                      SizedBox(
                         height: 360,
-                        child: InteractiveSvgDiagram(),
+                        child: InteractiveSvgDiagram(
+                          initialSelection: initialSelection,
+                          onSelectionChanged: onSelectionChanged,
+                        ),
                       ),
                     ],
                   ),
@@ -849,12 +874,14 @@ class _ExercisesList extends StatelessWidget {
     required this.exercises,
     required this.searchTerm,
     required this.usesWeightsFilter,
+    required this.musclesFilter,
     required this.onView,
   });
 
   final List<Exercise> exercises;
   final String searchTerm;
   final bool? usesWeightsFilter;
+  final Set<String> musclesFilter;
   final ValueChanged<Exercise> onView;
 
   @override
@@ -871,6 +898,11 @@ class _ExercisesList extends StatelessWidget {
     if (usesWeightsFilter != null) {
       candidates = candidates.where(
         (exercise) => exercise.usesWeights == usesWeightsFilter,
+      );
+    }
+    if (musclesFilter.isNotEmpty) {
+      candidates = candidates.where(
+        (exercise) => exercise.musclesId.any(musclesFilter.contains),
       );
     }
     final filtered = candidates.toList();

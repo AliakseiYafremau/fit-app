@@ -88,6 +88,7 @@ class IsarExerciseRepository implements ExerciseRepository {
       usesWeights: exercise.usesWeights,
       links: exercise.links,
       categoriesId: exercise.categoriesId,
+      musclesId: exercise.musclesId,
     );
   }
 }

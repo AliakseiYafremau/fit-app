@@ -37,6 +37,7 @@ class CreateExercise {
       notes: data.notes,
       links: data.links,
       categoriesId: data.categoryIds,
+      musclesId: data.musclesIds,
     );
     exerciseRepository.add(exercise);
   }

@@ -50,6 +50,7 @@ class UpdateExercise {
       notes: data.notes,
       links: data.links,
       categoriesId: data.categoryIds,
+      musclesId: data.musclesIds,
     );
 
     exerciseRepository.update(updated);

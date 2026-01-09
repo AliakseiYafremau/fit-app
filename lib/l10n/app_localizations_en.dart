@@ -90,6 +90,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageRussian => 'Russian';
 
   @override
+  String get languageSpanish => 'Spanish';
+
+  @override
   String get fabActiveSessionTooltip => 'View active session';
 
   @override

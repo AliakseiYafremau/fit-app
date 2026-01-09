@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 
-import 'package:fit_app/domain/entities/id.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -333,84 +332,6 @@ const List<_MuscleRegion> _muscleRegions = <_MuscleRegion>[
         Offset(-0.1, 0),
       ])
     ]),
-  // _MuscleRegion(
-  //   id: 'arms',
-  //   label: 'Arms',
-  //   shapes: <_RegionShape>[
-  //     _RegionShape(
-  //       alignment: Alignment(-0.36, -0.18),
-  //       rotationDegrees: -10,
-  //       points: <Offset>[
-  //         Offset(0, 0),
-  //         Offset(0.1, 0),
-  //         Offset(0.14, 0.18),
-  //         Offset(0.02, 0.18),
-  //       ],
-  //     ),
-  //     _RegionShape(
-  //       alignment: Alignment(0.36, -0.18),
-  //       rotationDegrees: 10,
-  //       points: <Offset>[
-  //         Offset(0, 0),
-  //         Offset(-0.1, 0),
-  //         Offset(-0.14, 0.18),
-  //         Offset(-0.02, 0.18),
-  //       ],
-  //     ),
-  //   ],
-  // ),
-  // _MuscleRegion(
-  //   id: 'forearms',
-  //   label: 'Forearms',
-  //   shapes: <_RegionShape>[
-  //     _RegionShape(
-  //       alignment: Alignment(-0.42, 0.02),
-  //       rotationDegrees: -8,
-  //       points: <Offset>[
-  //         Offset(0, 0),
-  //         Offset(0.08, 0),
-  //         Offset(0.12, 0.18),
-  //         Offset(0.02, 0.18),
-  //       ],
-  //     ),
-  //     _RegionShape(
-  //       alignment: Alignment(0.42, 0.02),
-  //       rotationDegrees: 8,
-  //       points: <Offset>[
-  //         Offset(0, 0),
-  //         Offset(-0.08, 0),
-  //         Offset(-0.12, 0.18),
-  //         Offset(-0.02, 0.18),
-  //       ],
-  //     ),
-  //   ],
-  // ),
-  // _MuscleRegion(
-  //   id: 'neck_head',
-  //   label: 'Neck & Head',
-  //   shapes: <_RegionShape>[
-  //     _RegionShape(
-  //       alignment: Alignment(0, -0.42),
-  //       rotationDegrees: 0,
-  //       points: <Offset>[
-  //         Offset(-0.08, 0),
-  //         Offset(0.08, 0),
-  //         Offset(0.1, 0.12),
-  //         Offset(-0.1, 0.12),
-  //       ],
-  //     ),
-  //     _RegionShape(
-  //       alignment: Alignment(0, -0.54),
-  //       rotationDegrees: 0,
-  //       points: <Offset>[
-  //         Offset(-0.1, 0),
-  //         Offset(0.1, 0),
-  //         Offset(0.12, 0.14),
-  //         Offset(-0.12, 0.14),
-  //       ],
-  //     ),
-  //   ],
-  // ),
   _MuscleRegion(
     id: 'upper_legs',
     label: 'Upper Legs',

@@ -90,6 +90,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get languageRussian => 'Русский';
 
   @override
+  String get languageSpanish => 'Испанский';
+
+  @override
   String get fabActiveSessionTooltip => 'Активная сессия';
 
   @override

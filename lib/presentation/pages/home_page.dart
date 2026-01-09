@@ -541,6 +541,11 @@ class _HomePageState extends State<HomePage> {
                 value: 'ru',
                 currentCode: currentLocaleCode,
               ),
+              _buildLocaleMenuItem(
+                label: l10n.languageSpanish,
+                value: 'es',
+                currentCode: currentLocaleCode,
+              ),
             ],
           ),
         ],
@@ -685,8 +690,13 @@ class _HomePageState extends State<HomePage> {
       return false;
     }
     if (notification is ScrollStartNotification) {
-      _dashboardOpenedFromSwipe = false;
+      if (notification.dragDetails != null) {
+        _dashboardOpenedFromSwipe = false;
+      }
     } else if (notification is ScrollUpdateNotification) {
+      if (notification.dragDetails == null) {
+        return false;
+      }
       final scrollingLeft = (notification.scrollDelta ?? 0) < 0;
       final atFirstPage =
           _selectedIndex == 0 && notification.metrics.pixels <= 0.01;
@@ -695,7 +705,9 @@ class _HomePageState extends State<HomePage> {
         _openDashboard();
       }
     } else if (notification is ScrollEndNotification) {
-      _dashboardOpenedFromSwipe = false;
+      if (notification.dragDetails != null) {
+        _dashboardOpenedFromSwipe = false;
+      }
     }
     return false;
   }

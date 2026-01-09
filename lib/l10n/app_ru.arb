@@ -46,6 +46,7 @@
   "languageSelectorTooltip": "Язык",
   "languageEnglish": "Английский",
   "languageRussian": "Русский",
+  "languageSpanish": "Испанский",
   "fabActiveSessionTooltip": "Активная сессия",
   "deleteExerciseTitle": "Удалить упражнение",
   "deleteExerciseMessage": "Удалить упражнение «{name}»?",

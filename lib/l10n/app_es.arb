@@ -1,0 +1,216 @@
+{
+  "@@locale": "es",
+  "appTitle": "Fit App",
+  "tabWorkouts": "Entrenamientos",
+  "tabExercises": "Ejercicios",
+  "searchHint": "Buscar",
+  "historyButton": "Historial",
+  "calendarButton": "Calendario",
+  "dashboardTooltip": "",
+  "dashboardTitle": "",
+  "dashboardCategories": "Categorías",
+  "dashboardMuscles": "Músculos",
+  "historyViewList": "Lista",
+  "historyViewCalendar": "Calendario",
+  "noWorkouts": "Aún no hay entrenamientos",
+  "noExercises": "Aún no hay ejercicios",
+  "sessionHistoryTitle": "Historial de sesiones",
+  "sessionHistoryEmpty": "Aún no hay sesiones completadas",
+  "sessionCalendarTitle": "Calendario de sesiones",
+  "sessionCalendarEmpty": "Aún no hay sesiones completadas",
+  "sessionsOnDay": "Sesiones en {date}",
+  "@sessionsOnDay": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionDayEmpty": "No hay sesiones este día",
+  "startedLabel": "Iniciado el {date}",
+  "@startedLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "finishedLabel": "Finalizado el {date}",
+  "@finishedLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "languageSelectorTooltip": "Idioma",
+  "languageEnglish": "Inglés",
+  "languageRussian": "Ruso",
+  "languageSpanish": "Español",
+  "fabActiveSessionTooltip": "Ver sesión activa",
+  "deleteExerciseTitle": "Eliminar ejercicio",
+  "deleteExerciseMessage": "¿Seguro que quieres eliminar \"{name}\"?",
+  "@deleteExerciseMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteWorkoutTitle": "Eliminar entrenamiento",
+  "deleteWorkoutMessage": "¿Eliminar el entrenamiento \"{name}\"?",
+  "@deleteWorkoutMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cancelSessionTitle": "Cancelar sesión",
+  "cancelSessionMessage": "¿Seguro que quieres cancelar esta sesión? Se perderá el progreso.",
+  "cancelSessionKeep": "Mantener sesión",
+  "cancelSessionConfirm": "Cancelar sesión",
+  "buttonCancel": "Cancelar",
+  "buttonDelete": "Eliminar",
+  "buttonSave": "Guardar",
+  "buttonClose": "Cerrar",
+  "buttonStartSession": "Iniciar sesión",
+  "buttonEditWorkout": "Editar entrenamiento",
+  "buttonDeleteWorkout": "Eliminar entrenamiento",
+  "buttonEditExercise": "Editar ejercicio",
+  "buttonDeleteExercise": "Eliminar ejercicio",
+  "buttonUndo": "Deshacer",
+  "buttonFinishSession": "Finalizar sesión",
+  "buttonCancelSession": "Cancelar sesión",
+  "noPlannedSets": "No hay series planificadas para este entrenamiento",
+  "errorUnableToOpenLink": "No se puede abrir el enlace",
+  "errorUnableToLoadPhoto": "No se puede cargar la foto",
+  "sessionSummaryEmpty": "No se registraron series en esta sesión",
+  "sessionSummaryTitle": "Resumen de sesión completada",
+  "completeSetTitle": "Completar serie",
+  "errorEnterValidRepetitions": "Ingresa repeticiones válidas",
+  "errorEnterValidWeight": "Ingresa un peso válido",
+  "errorWeightRequired": "Se requiere peso para este ejercicio",
+  "emptySessionSets": "No hay series en esta sesión",
+  "errorFinishSession": "No se puede finalizar la sesión",
+  "errorCancelSession": "No se puede cancelar la sesión",
+  "errorCompleteSet": "No se puede completar la serie",
+  "errorUndoSet": "No se puede deshacer la serie",
+  "labelRepetitions": "Repeticiones",
+  "labelWeight": "Peso",
+  "helperWeightedExercise": "Requerido para ejercicios con peso",
+  "bodyweightOnly": "Este ejercicio es solo con el peso corporal",
+  "sessionSheetTitle": "Sesión",
+  "sessionAddSetButton": "Agregar serie",
+  "sessionAddSetTitle": "Agregar serie de entrenamiento",
+  "sessionAddSetExerciseLabel": "Ejercicio",
+  "sessionAddSetNoExercises": "No hay ejercicios disponibles",
+  "sessionDeleteSetTitle": "Eliminar serie de entrenamiento",
+  "sessionDeleteSetMessage": "¿Quitar {exercise} de esta sesión?",
+  "categoriesSheetTitle": "Categorías",
+  "categoriesEmpty": "Aún no hay categorías",
+  "categoryFormTitle": "Crear categoría",
+  "categoryNameLabel": "Nombre de la categoría",
+  "categoryColorLabel": "Color",
+  "categoryCreateButton": "Crear categoría",
+  "categoryPickColorButton": "Elegir color",
+  "categoryColorPickerTitle": "Elegir un color",
+  "messageCategoryCreated": "Categoría creada",
+  "categoryEditDialogTitle": "Editar categoría",
+  "categoryActionEdit": "Editar",
+  "categoryDeleteDialogTitle": "Eliminar categoría",
+  "categoryDeleteConfirmation": "¿Eliminar \"{name}\"? Esta acción no se puede deshacer.",
+  "@categoryDeleteConfirmation": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "messageCategoryUpdated": "Categoría actualizada",
+  "messageCategoryDeleted": "Categoría eliminada",
+  "errorCategoryNameRequired": "Ingresa el nombre de la categoría",
+  "errorCreateCategory": "No se puede crear la categoría",
+  "errorUpdateCategory": "No se puede actualizar la categoría",
+  "errorDeleteCategory": "No se puede eliminar la categoría",
+  "sectionPhoto": "Foto",
+  "sectionTechnique": "Técnica",
+  "sectionNotes": "Notas",
+  "sectionLinks": "Enlaces",
+  "exerciseFormCreateTitle": "Crear ejercicio",
+  "exerciseFormEditTitle": "Editar ejercicio",
+  "exerciseFormNameLabel": "Nombre del ejercicio",
+  "errorExerciseNameRequired": "Ingresa el nombre del ejercicio",
+  "exerciseFormNoPhoto": "No se seleccionó ninguna foto",
+  "exerciseFormAddPhoto": "Agregar foto",
+  "exerciseFormChangePhoto": "Cambiar foto",
+  "exerciseFormRemovePhoto": "Eliminar foto",
+  "exerciseFormTechniqueLabel": "Descripción de la técnica",
+  "exerciseFormNotesLabel": "Notas",
+  "exerciseFormCategoriesLabel": "Categorías",
+  "exerciseFormNoCategories": "Aún no hay categorías",
+  "exerciseFormLinkLabel": "Enlace {index}",
+  "@exerciseFormLinkLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "exerciseFormAddLink": "Agregar enlace",
+  "exerciseFormAddExercise": "Agregar ejercicio",
+  "exerciseFormSaveChanges": "Guardar cambios",
+  "exerciseUsesWeights": "Usa peso",
+  "exerciseBodyweight": "Peso corporal / sin peso",
+  "plannedSetsCount": "{count, plural, one{{count} serie planificada} other{{count} series planificadas}}",
+  "@plannedSetsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "completedSetsCount": "{count, plural, one{{count} serie completada} other{{count} series completadas}}",
+  "@completedSetsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "buttonUpdate": "Actualizar",
+  "buttonComplete": "Completar",
+  "repetitionsWithUnit": "{count} repeticiones",
+  "@repetitionsWithUnit": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "weightDisplay": "@ {weight}",
+  "@weightDisplay": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "errorEnterTrainingName": "Ingresa el nombre del entrenamiento",
+  "errorFillSets": "Completa todas las series nuevas con ejercicios y repeticiones válidos",
+  "errorTrainingNeedsSet": "El entrenamiento debe tener al menos una serie planificada",
+  "errorAddAtLeastOneSet": "Agrega al menos una serie",
+  "editTrainingTitle": "Editar entrenamiento",
+  "createTrainingTitle": "Crear entrenamiento",
+  "labelTrainingName": "Nombre del entrenamiento",
+  "existingSetsLabel": "Series existentes",
+  "newSetsLabel": "Series nuevas",
+  "setsLabel": "Series",
+  "labelExercise": "Ejercicio",
+  "actionKeep": "Mantener",
+  "actionRemove": "Eliminar",
+  "buttonAddSet": "Agregar serie",
+  "buttonAddNewSet": "Agregar nueva serie",
+  "buttonSaveChanges": "Guardar cambios",
+  "buttonAddTraining": "Agregar"
+}

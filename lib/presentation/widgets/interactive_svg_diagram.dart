@@ -415,6 +415,45 @@ const List<_MuscleRegion> _muscleRegions = <_MuscleRegion>[
     ),
   ]),
   _MuscleRegion(
+    id: 'hands',
+    label: 'Hands',
+    selectable: false,
+    shapes: <_RegionShape>[
+      _RegionShape(
+        alignment: Alignment(-0.4, 0.2),
+        rotationDegrees: 0,
+        points: <Offset>[
+          Offset(0, 0),
+          Offset(0.07, 0),
+          Offset(0.08, 0.02),
+          Offset(0.08, 0.05),
+          Offset(0.07, 0.05),
+          Offset(0.05, 0.02),
+          Offset(0.04, 0.05),
+          Offset(0.04, 0.08),
+          Offset(0.03, 0.08),
+          Offset(-0.01, 0.04),
+        ],
+      ),
+      _RegionShape(
+        alignment: Alignment(0.4, 0.2),
+        rotationDegrees: 0,
+        points: <Offset>[
+          Offset(0, 0),
+          Offset(-0.07, 0),
+          Offset(-0.08, 0.02),
+          Offset(-0.08, 0.05),
+          Offset(-0.07, 0.05),
+          Offset(-0.05, 0.02),
+          Offset(-0.04, 0.05),
+          Offset(-0.04, 0.08),
+          Offset(-0.03, 0.08),
+          Offset(0.01, 0.04),
+        ],
+      ),
+    ],
+  ),
+  _MuscleRegion(
     id: 'upper_legs',
     label: 'Upper Legs',
     shapes: <_RegionShape>[

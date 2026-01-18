@@ -325,12 +325,24 @@ const List<_MuscleRegion> _muscleRegions = <_MuscleRegion>[
     id: 'shoulders', 
     label: 'Shoulders',
     shapes: <_RegionShape>[
-      _RegionShape(alignment: Alignment(-0.22, -0.4), rotationDegrees: 0,
+      _RegionShape(alignment: Alignment(-0.36, -0.365), rotationDegrees: 0,
       points: <Offset>[
         Offset(0, 0),
-        Offset(-0.1, 0.045),
-        Offset(-0.1, 0),
-      ])
+        Offset(0.07, 0),
+        Offset(0.1, 0.025),
+        Offset(0.03, 0.06),
+        Offset(-0.07, 0.06),
+        Offset(-0.07, 0.025),
+      ]),
+      _RegionShape(alignment: Alignment(0.36, -0.365), rotationDegrees: 0,
+      points: <Offset>[
+        Offset(0, 0),
+        Offset(-0.07, 0),
+        Offset(-0.1, 0.025),
+        Offset(-0.03, 0.06),
+        Offset(0.07, 0.06),
+        Offset(0.07, 0.025),
+      ]),
     ]),
   _MuscleRegion(
     id: 'upper_legs',

@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   static ThemeData get darkTheme {
-    const buttonColor = Color(0xFF352029);
+    const buttonColor = Color(0xFFFE5D33);
     final colorScheme = ColorScheme.fromSeed(
       seedColor: buttonColor,
       brightness: Brightness.dark,
+    ).copyWith(
+      primary: buttonColor,
+      onPrimary: Colors.white,
     );
     return ThemeData(
       colorScheme: colorScheme,

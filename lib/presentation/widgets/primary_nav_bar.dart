@@ -19,13 +19,11 @@ class PrimaryNavBar extends StatelessWidget {
       child: Row(
         children: List.generate(tabs.length, (index) {
           final isActive = selectedIndex == index;
-          final colorScheme = Theme.of(context).colorScheme;
-          final background = isActive
-              ? colorScheme.primaryContainer
-              : colorScheme.surfaceContainerHighest;
-          final foreground = isActive
-              ? colorScheme.onPrimaryContainer
-              : colorScheme.onSurface;
+          const baseBackground = Color(0xFF352029);
+          const activeBackground = Color(0xFFACB8A0);
+          final background = isActive ? activeBackground : baseBackground;
+          final foreground =
+              isActive ? Colors.black : Colors.white.withValues(alpha: 0.8);
 
           return Expanded(
             child: GestureDetector(
@@ -36,9 +34,7 @@ class PrimaryNavBar extends StatelessWidget {
                   color: background,
                   border: Border(
                     bottom: BorderSide(
-                      color: isActive
-                          ? Theme.of(context).colorScheme.primary
-                          : Colors.transparent,
+                      color: isActive ? Colors.black : Colors.transparent,
                       width: 3,
                     ),
                   ),

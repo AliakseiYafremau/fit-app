@@ -407,10 +407,6 @@ class _CategoriesSheetState extends State<CategoriesSheet> {
                   const SizedBox(width: 12),
                   OutlinedButton.icon(
                     onPressed: _pickColor,
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFFFE5D33),
-                      side: const BorderSide(color: Color(0xFFFE5D33)),
-                    ),
                     icon: const Icon(Icons.color_lens_outlined),
                     label: Text(l10n.categoryPickColorButton),
                   ),
@@ -421,10 +417,6 @@ class _CategoriesSheetState extends State<CategoriesSheet> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _creating ? null : _createCategory,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFE5D33),
-                    foregroundColor: Colors.white,
-                  ),
                   child: _creating
                       ? const SizedBox(
                           height: 20,

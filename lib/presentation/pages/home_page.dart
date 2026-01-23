@@ -623,7 +623,15 @@ class _HomePageState extends State<HomePage> {
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.search),
                     hintText: l10n.searchHint,
+                    filled: true,
+                    fillColor: const Color(0xFF352029),
                     border: const OutlineInputBorder(),
+                    enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFF352029)),
+                    ),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFF352029)),
+                    ),
                   ),
                   onChanged: _onSearchChanged,
                 ),
@@ -636,6 +644,10 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       OutlinedButton.icon(
                         onPressed: _openMusclesOverlay,
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF352029),
+                          side: const BorderSide(color: Color(0xFF352029)),
+                        ),
                         icon: const Icon(Icons.fitness_center),
                         label: Text(
                           _selectedMuscleIds.isEmpty
@@ -650,6 +662,11 @@ class _HomePageState extends State<HomePage> {
                           _usesWeightsFilter == false,
                         ],
                         borderRadius: BorderRadius.circular(8),
+                        color: const Color(0xFF352029),
+                        selectedColor: Colors.white,
+                        fillColor: const Color(0xFF352029),
+                        borderColor: const Color(0xFF352029),
+                        selectedBorderColor: const Color(0xFF352029),
                         onPressed: (index) {
                           setState(() {
                             if (index == 0) {
@@ -731,8 +748,6 @@ class _HomePageState extends State<HomePage> {
           FloatingActionButton(
             heroTag: 'main_fab',
             onPressed: _onFabPressed,
-            backgroundColor: const Color(0xFFFE5D33),
-            foregroundColor: Colors.white,
             child: const Icon(Icons.add),
           ),
         ],
@@ -1089,10 +1104,6 @@ class _TrainingDetailsSheet extends StatelessWidget {
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFFFE5D33),
-                        side: const BorderSide(color: Color(0xFFFE5D33)),
-                      ),
                       icon: const Icon(Icons.edit_outlined),
                       label: Text(l10n.buttonEditWorkout),
                       onPressed: () {
@@ -1104,10 +1115,6 @@ class _TrainingDetailsSheet extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFFFE5D33),
-                        side: const BorderSide(color: Color(0xFFFE5D33)),
-                      ),
                       icon: const Icon(Icons.delete_outline),
                       label: Text(l10n.buttonDeleteWorkout),
                       onPressed: () {
@@ -1286,10 +1293,6 @@ class _ExerciseDetailsSheet extends StatelessWidget {
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFFFE5D33),
-                        side: const BorderSide(color: Color(0xFFFE5D33)),
-                      ),
                       icon: const Icon(Icons.edit_outlined),
                       label: Text(l10n.buttonEditExercise),
                       onPressed: () {
@@ -1301,10 +1304,6 @@ class _ExerciseDetailsSheet extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFFFE5D33),
-                        side: const BorderSide(color: Color(0xFFFE5D33)),
-                      ),
                       icon: const Icon(Icons.delete_outline),
                       label: Text(l10n.buttonDeleteExercise),
                       onPressed: () {

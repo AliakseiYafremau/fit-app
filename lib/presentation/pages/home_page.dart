@@ -972,6 +972,9 @@ class _WorkoutsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDarkTheme = context.watch<ThemeController>().isDark;
+    final outlineColor =
+        isDarkTheme ? Colors.white : const Color(0xFF352029);
     final filtered = searchTerm.isEmpty
         ? trainings
         : trainings
@@ -989,6 +992,10 @@ class _WorkoutsList extends StatelessWidget {
         final setsCount = training.plannedSets.length;
         final subtitle = l10n.plannedSetsCount(setsCount);
         return Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: outlineColor),
+          ),
           child: ListTile(
             title: Text(training.name),
             subtitle: Text(subtitle),
@@ -1021,6 +1028,9 @@ class _ExercisesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDarkTheme = context.watch<ThemeController>().isDark;
+    final outlineColor =
+        isDarkTheme ? Colors.white : const Color(0xFF352029);
     Iterable<Exercise> candidates = exercises;
     if (searchTerm.isNotEmpty) {
       candidates = candidates.where(
@@ -1050,6 +1060,10 @@ class _ExercisesList extends StatelessWidget {
         final exercise = filtered[index];
         final photoId = exercise.photoId;
         return Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: outlineColor),
+          ),
           child: ListTile(
             title: Text(exercise.name),
             onTap: () => onView(exercise),

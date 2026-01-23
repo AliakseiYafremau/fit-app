@@ -15,7 +15,7 @@ class AppTheme {
       scaffoldBackgroundColor: const Color(0xFFD8EFFD),
       appBarTheme: const AppBarTheme(
         backgroundColor: Color(0xFFACB8A0),
-        foregroundColor: Colors.white,
+        foregroundColor: Color(0xFF352029),
       ),
       cardColor: const Color(0xFF2A2A2A),
       elevatedButtonTheme: ElevatedButtonThemeData(

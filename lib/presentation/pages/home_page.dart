@@ -592,7 +592,9 @@ class _HomePageState extends State<HomePage> {
     final currentLocaleCode = localeController.locale?.languageCode;
     final theme = Theme.of(context);
     final filterColor =
-        isDarkTheme ? theme.colorScheme.surface : const Color(0xFF352029);
+        isDarkTheme ? Colors.black : const Color(0xFF352029);
+    final filterBorderColor =
+        isDarkTheme ? Colors.white : const Color(0xFF352029);
     final filterTextColor =
         isDarkTheme ? theme.colorScheme.onSurface : theme.scaffoldBackgroundColor;
     return Scaffold(
@@ -656,13 +658,13 @@ class _HomePageState extends State<HomePage> {
                     filled: true,
                     fillColor: filterColor,
                     border: OutlineInputBorder(
-                      borderSide: BorderSide(color: filterColor),
+                      borderSide: BorderSide(color: filterBorderColor),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: filterColor),
+                      borderSide: BorderSide(color: filterBorderColor),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: filterColor, width: 2),
+                      borderSide: BorderSide(color: filterBorderColor, width: 2),
                     ),
                   ),
                   onChanged: _onSearchChanged,
@@ -679,7 +681,7 @@ class _HomePageState extends State<HomePage> {
                         style: OutlinedButton.styleFrom(
                           foregroundColor: filterTextColor,
                           backgroundColor: filterColor,
-                          side: BorderSide(color: filterColor),
+                          side: BorderSide(color: filterBorderColor),
                         ),
                         icon: const Icon(Icons.fitness_center),
                         label: Text(
@@ -698,8 +700,8 @@ class _HomePageState extends State<HomePage> {
                         color: const Color(0xFF352029),
                         selectedColor: filterTextColor,
                         fillColor: filterColor,
-                        borderColor: filterColor,
-                        selectedBorderColor: filterColor,
+                        borderColor: filterBorderColor,
+                        selectedBorderColor: filterBorderColor,
                         onPressed: (index) {
                           setState(() {
                             if (index == 0) {

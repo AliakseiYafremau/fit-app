@@ -7,7 +7,7 @@ class AppTheme {
         seedColor: const Color(0xFF4A4A4A),
         brightness: Brightness.dark,
       ),
-      scaffoldBackgroundColor: const Color(0xFF1B1B1B),
+      scaffoldBackgroundColor: const Color(0xFFACB8A0),
       appBarTheme: const AppBarTheme(
         backgroundColor: Color(0xFF2C2C2C),
         foregroundColor: Colors.white,

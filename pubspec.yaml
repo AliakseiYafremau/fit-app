@@ -55,6 +55,7 @@ dev_dependencies:
 
   build_runner: ^2.4.6
   isar_generator: ^3.1.0+1
+  flutter_launcher_icons: ^0.14.1
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -77,6 +78,18 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   generate: true
+  # Icon generation config (run: flutter pub run flutter_launcher_icons)
+
+flutter_launcher_icons:
+  image_path: "assets/app_icon.png"
+  android: true
+  ios: true
+  web:
+    generate: true
+  windows:
+    generate: true
+  macos:
+    generate: true
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -102,8 +102,8 @@ class _HomePageState extends State<HomePage> {
     setState(() => _selectedIndex = index);
     _pageController.animateToPage(
       index,
-      duration: const Duration(milliseconds: 250),
-      curve: Curves.easeInOut,
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeInOutCubicEmphasized,
     );
   }
 
@@ -118,6 +118,23 @@ class _HomePageState extends State<HomePage> {
     setState(() => _selectedIndex = index);
   }
 
+  ThemeData _withDarkSurface(BuildContext context) {
+    const surfaceColor = Color(0xFF352029);
+    final base = Theme.of(context);
+    return base.copyWith(
+      colorScheme: base.colorScheme.copyWith(
+        surface: surfaceColor,
+        onSurface: Colors.white,
+      ),
+      scaffoldBackgroundColor: surfaceColor,
+      dialogBackgroundColor: surfaceColor,
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: surfaceColor,
+      ),
+      cardColor: surfaceColor,
+    );
+  }
+
   @override
   void dispose() {
     _pageController.dispose();
@@ -128,7 +145,11 @@ class _HomePageState extends State<HomePage> {
     final created = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => const CreateTrainingSheet(),
+      backgroundColor: const Color(0xFF352029),
+      builder: (context) => Theme(
+        data: _withDarkSurface(context),
+        child: const CreateTrainingSheet(),
+      ),
     );
     if (!mounted || created != true) return;
     _refreshTrainings();
@@ -138,7 +159,11 @@ class _HomePageState extends State<HomePage> {
     final created = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => const CreateExerciseSheet(),
+      backgroundColor: const Color(0xFF352029),
+      builder: (context) => Theme(
+        data: _withDarkSurface(context),
+        child: const CreateExerciseSheet(),
+      ),
     );
     if (!mounted || created != true) return;
     _refreshExercises();
@@ -175,7 +200,11 @@ class _HomePageState extends State<HomePage> {
     final updated = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => CreateExerciseSheet(exercise: latest),
+      backgroundColor: const Color(0xFF352029),
+      builder: (context) => Theme(
+        data: _withDarkSurface(context),
+        child: CreateExerciseSheet(exercise: latest),
+      ),
     );
     if (!mounted || updated != true) return;
     _refreshExercises();
@@ -186,7 +215,11 @@ class _HomePageState extends State<HomePage> {
     final updated = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => CreateTrainingSheet(training: latest),
+      backgroundColor: const Color(0xFF352029),
+      builder: (context) => Theme(
+        data: _withDarkSurface(context),
+        child: CreateTrainingSheet(training: latest),
+      ),
     );
     if (!mounted || updated != true) return;
     _refreshTrainings();
@@ -245,13 +278,17 @@ class _HomePageState extends State<HomePage> {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => _TrainingDetailsSheet(
-        training: latest,
-        canStartSession: _activeSession == null,
-        onStartSession: () => _startTrainingSession(latest),
-        onViewExercise: _showExerciseDetails,
-        onEdit: _onEditTraining,
-        onDelete: _onDeleteTraining,
+      backgroundColor: const Color(0xFF352029),
+      builder: (context) => Theme(
+        data: _withDarkSurface(context),
+        child: _TrainingDetailsSheet(
+          training: latest,
+          canStartSession: _activeSession == null,
+          onStartSession: () => _startTrainingSession(latest),
+          onViewExercise: _showExerciseDetails,
+          onEdit: _onEditTraining,
+          onDelete: _onDeleteTraining,
+        ),
       ),
     );
   }
@@ -262,11 +299,15 @@ class _HomePageState extends State<HomePage> {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => _ExerciseDetailsSheet(
-        exercise: latest,
-        categories: categories,
-        onEdit: _onEditExercise,
-        onDelete: _onDeleteExercise,
+      backgroundColor: const Color(0xFF352029),
+      builder: (context) => Theme(
+        data: _withDarkSurface(context),
+        child: _ExerciseDetailsSheet(
+          exercise: latest,
+          categories: categories,
+          onEdit: _onEditExercise,
+          onDelete: _onDeleteExercise,
+        ),
       ),
     );
   }
@@ -304,7 +345,11 @@ class _HomePageState extends State<HomePage> {
     final selectedSession = await showModalBottomSheet<Session>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => _HistorySheet(sessions: completedSessions),
+      backgroundColor: const Color(0xFF352029),
+      builder: (context) => Theme(
+        data: _withDarkSurface(context),
+        child: _HistorySheet(sessions: completedSessions),
+      ),
     );
     if (!mounted || selectedSession == null) return;
     _showSessionHistoryDetails(selectedSession);
@@ -411,11 +456,15 @@ class _HomePageState extends State<HomePage> {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => CategoriesSheet(
-        categoryRepository: _categoryRepository,
-        createCategory: _createCategory,
-        updateCategory: _updateCategory,
-        deleteCategory: _deleteCategory,
+      backgroundColor: const Color(0xFF352029),
+      builder: (context) => Theme(
+        data: _withDarkSurface(context),
+        child: CategoriesSheet(
+          categoryRepository: _categoryRepository,
+          createCategory: _createCategory,
+          updateCategory: _updateCategory,
+          deleteCategory: _deleteCategory,
+        ),
       ),
     );
   }
@@ -424,11 +473,12 @@ class _HomePageState extends State<HomePage> {
     final l10n = AppLocalizations.of(context)!;
     final size = MediaQuery.of(context).size;
     final panelWidth = size.width < 480 ? size.width * 0.85 : 360.0;
+    final colorScheme = Theme.of(context).colorScheme;
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
       barrierLabel: l10n.dashboardTitle,
-      barrierColor: Colors.black54,
+      barrierColor: colorScheme.scrim.withValues(alpha: 0.54),
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, animation, secondaryAnimation) {
         return Align(
@@ -438,7 +488,7 @@ class _HomePageState extends State<HomePage> {
               width: panelWidth,
               height: double.infinity,
               child: Material(
-                color: Theme.of(context).colorScheme.surface,
+                color: const Color(0xFF352029),
                 elevation: 12,
                 clipBehavior: Clip.antiAlias,
                 shape: const RoundedRectangleBorder(
@@ -446,16 +496,19 @@ class _HomePageState extends State<HomePage> {
                     right: Radius.circular(24),
                   ),
                 ),
-                child: _DashboardSheet(
-                  onClose: () => Navigator.of(context).pop(),
-                  onOpenCategories: () {
-                    Navigator.of(context).pop();
-                    _openCategoriesSheet();
-                  },
-                  onOpenHistory: () {
-                    Navigator.of(context).pop();
-                    _openHistorySheet();
-                  },
+                child: Theme(
+                  data: _withDarkSurface(context),
+                  child: _DashboardSheet(
+                    onClose: () => Navigator.of(context).pop(),
+                    onOpenCategories: () {
+                      Navigator.of(context).pop();
+                      _openCategoriesSheet();
+                    },
+                    onOpenHistory: () {
+                      Navigator.of(context).pop();
+                      _openHistorySheet();
+                    },
+                  ),
                 ),
               ),
             ),
@@ -474,11 +527,12 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _openMusclesOverlay() async {
     final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
     await showGeneralDialog<void>(
       context: context,
       barrierDismissible: true,
       barrierLabel: l10n.dashboardMuscles,
-      barrierColor: Colors.black.withValues(alpha: 0.7),
+      barrierColor: colorScheme.scrim.withValues(alpha: 0.7),
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, animation, secondaryAnimation) {
         return _MusclesOverlay(
@@ -553,7 +607,7 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         children: [
           SizedBox(
-            height: 56,
+            height: 48,
             child: PrimaryNavBar(
               tabs: [l10n.tabWorkouts, l10n.tabExercises],
               selectedIndex: _selectedIndex,
@@ -569,7 +623,15 @@ class _HomePageState extends State<HomePage> {
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.search),
                     hintText: l10n.searchHint,
+                    filled: true,
+                    fillColor: const Color(0xFF352029),
                     border: const OutlineInputBorder(),
+                    enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFF352029)),
+                    ),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xFF352029)),
+                    ),
                   ),
                   onChanged: _onSearchChanged,
                 ),
@@ -582,6 +644,10 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       OutlinedButton.icon(
                         onPressed: _openMusclesOverlay,
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF352029),
+                          side: const BorderSide(color: Color(0xFF352029)),
+                        ),
                         icon: const Icon(Icons.fitness_center),
                         label: Text(
                           _selectedMuscleIds.isEmpty
@@ -596,6 +662,11 @@ class _HomePageState extends State<HomePage> {
                           _usesWeightsFilter == false,
                         ],
                         borderRadius: BorderRadius.circular(8),
+                        color: const Color(0xFF352029),
+                        selectedColor: Colors.white,
+                        fillColor: const Color(0xFF352029),
+                        borderColor: const Color(0xFF352029),
+                        selectedBorderColor: const Color(0xFF352029),
                         onPressed: (index) {
                           setState(() {
                             if (index == 0) {
@@ -780,13 +851,15 @@ class _MusclesOverlay extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     return Material(
-      color: Colors.transparent,
+      color: theme.colorScheme.surface.withValues(alpha: 0),
       child: Stack(
         children: [
           Positioned.fill(
             child: GestureDetector(
               onTap: onClose,
-              child: const ColoredBox(color: Colors.transparent),
+              child: ColoredBox(
+                color: theme.colorScheme.surface.withValues(alpha: 0),
+              ),
             ),
           ),
           Center(
@@ -1163,7 +1236,11 @@ class _ExerciseDetailsSheet extends StatelessWidget {
                   spacing: 8,
                   runSpacing: 8,
                   children: selectedCategories.map((category) {
-                    final color = _colorFromHex(category.color);
+                    final theme = Theme.of(context);
+                    final color = _colorFromHex(
+                      category.color,
+                      theme.colorScheme.outline,
+                    );
                     return Chip(
                       backgroundColor: color.withValues(alpha: 0.15),
                       label: Text(category.name),
@@ -1266,14 +1343,14 @@ class _ExerciseDetailsSheet extends StatelessWidget {
     }
   }
 
-  Color _colorFromHex(String value) {
+  Color _colorFromHex(String value, Color fallback) {
     if (value.length == 7 && value.startsWith('#')) {
       final parsed = int.tryParse(value.substring(1), radix: 16);
       if (parsed != null) {
         return Color(0xFF000000 | parsed);
       }
     }
-    return Colors.grey;
+    return fallback;
   }
 }
 
@@ -1285,6 +1362,7 @@ class _ExerciseLinkPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final uri = _normalizeLinkUri(link);
     if (uri == null) {
       return Text(link);
@@ -1308,17 +1386,17 @@ class _ExerciseLinkPreview extends StatelessWidget {
                       'https://img.youtube.com/vi/$videoId/0.jpg',
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) => Container(
-                        color: Colors.black12,
+                        color: colorScheme.surfaceContainerHighest,
                         alignment: Alignment.center,
                         child: const Icon(Icons.play_circle_outline),
                       ),
                     ),
                     Container(
-                      color: Colors.black26,
-                      child: const Center(
+                      color: colorScheme.scrim.withValues(alpha: 0.4),
+                      child: Center(
                         child: Icon(
                           Icons.play_circle_fill,
-                          color: Colors.white,
+                          color: colorScheme.onSurface,
                           size: 48,
                         ),
                       ),
@@ -1483,6 +1561,7 @@ class _ExercisePhotoViewer extends StatelessWidget {
   Widget build(BuildContext context) {
     final fileManager = context.read<FileManager>();
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return FutureBuilder<Uint8List>(
       future: Future<Uint8List>(() => fileManager.read(photoId)),
       builder: (context, snapshot) {
@@ -1497,9 +1576,9 @@ class _ExercisePhotoViewer extends StatelessWidget {
             height: 180,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: Colors.black12,
+              color: theme.colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white24),
+              border: Border.all(color: theme.colorScheme.outlineVariant),
             ),
             alignment: Alignment.center,
             child: Text(l10n.errorUnableToLoadPhoto),

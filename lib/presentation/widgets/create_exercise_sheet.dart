@@ -272,6 +272,10 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
                 children: [
                   ElevatedButton.icon(
                     onPressed: _pickPhoto,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFE5D33),
+                      foregroundColor: Colors.white,
+                    ),
                     icon: const Icon(Icons.photo_library_outlined),
                     label: Text(_photoPreviewBytes == null
                         ? l10n.exerciseFormAddPhoto
@@ -397,6 +401,9 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
                 alignment: Alignment.centerLeft,
                 child: TextButton.icon(
                   onPressed: _addLinkField,
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFFFE5D33),
+                  ),
                   icon: const Icon(Icons.add),
                   label: Text(l10n.exerciseFormAddLink),
                 ),
@@ -406,6 +413,10 @@ class _CreateExerciseSheetState extends State<CreateExerciseSheet> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _submit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFE5D33),
+                    foregroundColor: Colors.white,
+                  ),
                   child: Text(_isEditing
                       ? l10n.exerciseFormSaveChanges
                       : l10n.exerciseFormAddExercise),

@@ -268,6 +268,10 @@ class _CreateTrainingSheetState extends State<CreateTrainingSheet> {
               OutlinedButton.icon(
                 onPressed:
                     _availableExercises.isEmpty ? null : _addSet,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFFFE5D33),
+                  side: const BorderSide(color: Color(0xFFFE5D33)),
+                ),
                 icon: const Icon(Icons.add),
                 label: Text(
                   _isEditing ? l10n.buttonAddNewSet : l10n.buttonAddSet,
@@ -278,6 +282,10 @@ class _CreateTrainingSheetState extends State<CreateTrainingSheet> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _submit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFE5D33),
+                    foregroundColor: Colors.white,
+                  ),
                   child: Text(
                     _isEditing
                         ? l10n.buttonSaveChanges

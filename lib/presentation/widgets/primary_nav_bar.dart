@@ -31,7 +31,7 @@ class PrimaryNavBar extends StatelessWidget {
             child: GestureDetector(
               onTap: () => onTabSelected(index),
               child: Container(
-                height: 48,
+                height: double.infinity,
                 decoration: BoxDecoration(
                   color: background,
                   border: Border(

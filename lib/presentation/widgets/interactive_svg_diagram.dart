@@ -71,25 +71,31 @@ class _InteractiveSvgDiagramState extends State<InteractiveSvgDiagram> {
           padding: const EdgeInsets.all(24),
           child: FittedBox(
             fit: BoxFit.contain,
-            child: SizedBox(
-              width: 320,
-              height: 520,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  for (final region in _muscleRegions)
-                    for (final shape in region.shapes)
-                      _RegionShapeTile(
-                        regionId: region.id,
-                        label: region.label,
-                        shape: shape,
-                        selected: _selected.contains(region.id),
-                        selectable: region.selectable,
-                        baseColor: baseColor,
-                        highlightColor: highlightColor,
-                        onTap: () => _toggleRegion(region.id),
-                      ),
-                ],
+            child: ClipRect(
+              child: Transform.scale(
+                scale: 1.5,
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: 320,
+                  height: 520,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      for (final region in _muscleRegions)
+                        for (final shape in region.shapes)
+                          _RegionShapeTile(
+                            regionId: region.id,
+                            label: region.label,
+                            shape: shape,
+                            selected: _selected.contains(region.id),
+                            selectable: region.selectable,
+                            baseColor: baseColor,
+                            highlightColor: highlightColor,
+                            onTap: () => _toggleRegion(region.id),
+                          ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),

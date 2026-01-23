@@ -2359,7 +2359,12 @@ class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text(message, style: Theme.of(context).textTheme.titleMedium),
+      child: Text(
+        message,
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: const Color(0xFF352029),
+            ),
+      ),
     );
   }
 }

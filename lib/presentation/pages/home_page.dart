@@ -25,6 +25,7 @@ import 'package:fit_app/domain/entities/training.dart';
 import 'package:fit_app/domain/entities/workout_set.dart';
 import 'package:fit_app/l10n/app_localizations.dart';
 import 'package:fit_app/presentation/providers/locale_controller.dart';
+import 'package:fit_app/presentation/providers/theme_controller.dart';
 import 'package:fit_app/presentation/scaffold_messenger_key.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -119,20 +120,26 @@ class _HomePageState extends State<HomePage> {
   }
 
   ThemeData _withDarkSurface(BuildContext context) {
-    const surfaceColor = Color(0xFF352029);
     final base = Theme.of(context);
+    final surfaceColor = base.colorScheme.surface;
     return base.copyWith(
       colorScheme: base.colorScheme.copyWith(
         surface: surfaceColor,
-        onSurface: Colors.white,
+        onSurface: base.colorScheme.onSurface,
       ),
       scaffoldBackgroundColor: surfaceColor,
-      dialogBackgroundColor: surfaceColor,
-      bottomSheetTheme: const BottomSheetThemeData(
+      dialogTheme: DialogThemeData(
+        backgroundColor: surfaceColor,
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: surfaceColor,
       ),
       cardColor: surfaceColor,
     );
+  }
+
+  Color _surfaceColor(BuildContext context) {
+    return Theme.of(context).colorScheme.surface;
   }
 
   @override
@@ -145,7 +152,7 @@ class _HomePageState extends State<HomePage> {
     final created = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF352029),
+      backgroundColor: _surfaceColor(context),
       builder: (context) => Theme(
         data: _withDarkSurface(context),
         child: const CreateTrainingSheet(),
@@ -159,7 +166,7 @@ class _HomePageState extends State<HomePage> {
     final created = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF352029),
+      backgroundColor: _surfaceColor(context),
       builder: (context) => Theme(
         data: _withDarkSurface(context),
         child: const CreateExerciseSheet(),
@@ -200,7 +207,7 @@ class _HomePageState extends State<HomePage> {
     final updated = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF352029),
+      backgroundColor: _surfaceColor(context),
       builder: (context) => Theme(
         data: _withDarkSurface(context),
         child: CreateExerciseSheet(exercise: latest),
@@ -215,7 +222,7 @@ class _HomePageState extends State<HomePage> {
     final updated = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF352029),
+      backgroundColor: _surfaceColor(context),
       builder: (context) => Theme(
         data: _withDarkSurface(context),
         child: CreateTrainingSheet(training: latest),
@@ -278,7 +285,7 @@ class _HomePageState extends State<HomePage> {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF352029),
+      backgroundColor: _surfaceColor(context),
       builder: (context) => Theme(
         data: _withDarkSurface(context),
         child: _TrainingDetailsSheet(
@@ -299,7 +306,7 @@ class _HomePageState extends State<HomePage> {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF352029),
+      backgroundColor: _surfaceColor(context),
       builder: (context) => Theme(
         data: _withDarkSurface(context),
         child: _ExerciseDetailsSheet(
@@ -345,7 +352,7 @@ class _HomePageState extends State<HomePage> {
     final selectedSession = await showModalBottomSheet<Session>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF352029),
+      backgroundColor: _surfaceColor(context),
       builder: (context) => Theme(
         data: _withDarkSurface(context),
         child: _HistorySheet(sessions: completedSessions),
@@ -456,7 +463,7 @@ class _HomePageState extends State<HomePage> {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF352029),
+      backgroundColor: _surfaceColor(context),
       builder: (context) => Theme(
         data: _withDarkSurface(context),
         child: CategoriesSheet(
@@ -473,7 +480,18 @@ class _HomePageState extends State<HomePage> {
     final l10n = AppLocalizations.of(context)!;
     final size = MediaQuery.of(context).size;
     final panelWidth = size.width < 480 ? size.width * 0.85 : 360.0;
-    final colorScheme = Theme.of(context).colorScheme;
+    final themeController = context.read<ThemeController>();
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = themeController.isDark;
+    final panelShape = RoundedRectangleBorder(
+      borderRadius: const BorderRadius.horizontal(
+        right: Radius.circular(24),
+      ),
+      side: isDark
+          ? const BorderSide(color: Colors.white, width: 2)
+          : BorderSide.none,
+    );
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -488,14 +506,10 @@ class _HomePageState extends State<HomePage> {
               width: panelWidth,
               height: double.infinity,
               child: Material(
-                color: const Color(0xFF352029),
+                color: colorScheme.surface,
                 elevation: 12,
                 clipBehavior: Clip.antiAlias,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.horizontal(
-                    right: Radius.circular(24),
-                  ),
-                ),
+                shape: panelShape,
                 child: Theme(
                   data: _withDarkSurface(context),
                   child: _DashboardSheet(
@@ -508,6 +522,7 @@ class _HomePageState extends State<HomePage> {
                       Navigator.of(context).pop();
                       _openHistorySheet();
                     },
+                    onToggleTheme: themeController.toggleTheme,
                   ),
                 ),
               ),
@@ -567,6 +582,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final localeController = context.watch<LocaleController>();
+    final isDarkTheme = context.watch<ThemeController>().isDark;
     final currentLocaleCode = localeController.locale?.languageCode;
     return Scaffold(
       appBar: AppBar(
@@ -612,6 +628,7 @@ class _HomePageState extends State<HomePage> {
               tabs: [l10n.tabWorkouts, l10n.tabExercises],
               selectedIndex: _selectedIndex,
               onTabSelected: _onNavTap,
+              isDark: isDarkTheme,
             ),
           ),
           Padding(
@@ -623,15 +640,6 @@ class _HomePageState extends State<HomePage> {
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.search),
                     hintText: l10n.searchHint,
-                    filled: true,
-                    fillColor: const Color(0xFF352029),
-                    border: const OutlineInputBorder(),
-                    enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xFF352029)),
-                    ),
-                    focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xFF352029)),
-                    ),
                   ),
                   onChanged: _onSearchChanged,
                 ),
@@ -644,10 +652,6 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       OutlinedButton.icon(
                         onPressed: _openMusclesOverlay,
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF352029),
-                          side: const BorderSide(color: Color(0xFF352029)),
-                        ),
                         icon: const Icon(Icons.fitness_center),
                         label: Text(
                           _selectedMuscleIds.isEmpty
@@ -662,11 +666,6 @@ class _HomePageState extends State<HomePage> {
                           _usesWeightsFilter == false,
                         ],
                         borderRadius: BorderRadius.circular(8),
-                        color: const Color(0xFF352029),
-                        selectedColor: Colors.white,
-                        fillColor: const Color(0xFF352029),
-                        borderColor: const Color(0xFF352029),
-                        selectedBorderColor: const Color(0xFF352029),
                         onPressed: (index) {
                           setState(() {
                             if (index == 0) {
@@ -789,11 +788,13 @@ class _DashboardSheet extends StatelessWidget {
     required this.onOpenCategories,
     required this.onOpenHistory,
     required this.onClose,
+    required this.onToggleTheme,
   });
 
   final VoidCallback onOpenCategories;
   final VoidCallback onOpenHistory;
   final VoidCallback onClose;
+  final VoidCallback onToggleTheme;
 
   @override
   Widget build(BuildContext context) {
@@ -829,6 +830,18 @@ class _DashboardSheet extends StatelessWidget {
           leading: const Icon(Icons.history),
           title: Text(l10n.historyButton),
           onTap: onOpenHistory,
+        ),
+        const Spacer(),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+          child: SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: onToggleTheme,
+              icon: const Icon(Icons.brightness_6),
+              label: Text(l10n.dashboardThemeToggle),
+            ),
+          ),
         ),
       ],
     );
@@ -2361,9 +2374,7 @@ class _EmptyState extends StatelessWidget {
     return Center(
       child: Text(
         message,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: const Color(0xFF352029),
-            ),
+        style: Theme.of(context).textTheme.titleMedium,
       ),
     );
   }

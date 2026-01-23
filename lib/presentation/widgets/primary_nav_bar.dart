@@ -4,18 +4,26 @@ class PrimaryNavBar extends StatelessWidget {
   final List<String> tabs;
   final int selectedIndex;
   final ValueChanged<int> onTabSelected;
+  final bool isDark;
 
   const PrimaryNavBar({
     super.key,
     required this.tabs,
     required this.selectedIndex,
     required this.onTabSelected,
+    required this.isDark,
   }) : assert(tabs.length >= 2, 'Navigation bar requires at least two tabs');
 
   @override
   Widget build(BuildContext context) {
-    const baseBackground = Color(0xFF352029);
-    const activeBackground = Color(0xFFACB8A0);
+    final baseBackground =
+        isDark ? Colors.black : const Color(0xFF352029);
+    final activeBackground =
+        isDark ? Colors.black : const Color(0xFFACB8A0);
+    final activeBorder = BorderSide(
+      color: isDark ? Colors.white : Colors.black,
+      width: isDark ? 2 : 3,
+    );
     return SizedBox(
       width: double.infinity,
       child: LayoutBuilder(
@@ -25,7 +33,14 @@ class PrimaryNavBar extends StatelessWidget {
             children: [
               Container(
                 height: double.infinity,
-                color: baseBackground,
+                decoration: BoxDecoration(
+                  color: baseBackground,
+                  border: isDark
+                      ? const Border(
+                          top: BorderSide(color: Colors.white, width: 1),
+                        )
+                      : null,
+                ),
               ),
               AnimatedPositioned(
                 duration: const Duration(milliseconds: 280),
@@ -35,11 +50,9 @@ class PrimaryNavBar extends StatelessWidget {
                 bottom: 0,
                 width: tabWidth,
                 child: Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: activeBackground,
-                    border: Border(
-                      bottom: BorderSide(color: Colors.black, width: 3),
-                    ),
+                    border: Border(bottom: activeBorder),
                   ),
                 ),
               ),
@@ -47,7 +60,7 @@ class PrimaryNavBar extends StatelessWidget {
                 children: List.generate(tabs.length, (index) {
                   final isActive = selectedIndex == index;
                   final foreground = isActive
-                      ? Colors.black
+                      ? (isDark ? Colors.white : Colors.black)
                       : Colors.white.withValues(alpha: 0.8);
                   return Expanded(
                     child: GestureDetector(

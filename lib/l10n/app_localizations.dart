@@ -160,6 +160,12 @@ abstract class AppLocalizations {
   /// **'Muscles'**
   String get dashboardMuscles;
 
+  /// No description provided for @dashboardThemeToggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch theme'**
+  String get dashboardThemeToggle;
+
   /// No description provided for @historyViewList.
   ///
   /// In en, this message translates to:

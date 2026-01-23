@@ -2371,10 +2371,13 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkTheme = context.watch<ThemeController>().isDark;
     return Center(
       child: Text(
         message,
-        style: Theme.of(context).textTheme.titleMedium,
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: isDarkTheme ? Colors.white : const Color(0xFF352029),
+            ),
       ),
     );
   }

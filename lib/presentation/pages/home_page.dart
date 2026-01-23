@@ -1089,6 +1089,10 @@ class _TrainingDetailsSheet extends StatelessWidget {
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFFFE5D33),
+                        side: const BorderSide(color: Color(0xFFFE5D33)),
+                      ),
                       icon: const Icon(Icons.edit_outlined),
                       label: Text(l10n.buttonEditWorkout),
                       onPressed: () {
@@ -1100,6 +1104,10 @@ class _TrainingDetailsSheet extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFFFE5D33),
+                        side: const BorderSide(color: Color(0xFFFE5D33)),
+                      ),
                       icon: const Icon(Icons.delete_outline),
                       label: Text(l10n.buttonDeleteWorkout),
                       onPressed: () {
@@ -1278,6 +1286,10 @@ class _ExerciseDetailsSheet extends StatelessWidget {
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFFFE5D33),
+                        side: const BorderSide(color: Color(0xFFFE5D33)),
+                      ),
                       icon: const Icon(Icons.edit_outlined),
                       label: Text(l10n.buttonEditExercise),
                       onPressed: () {
@@ -1289,6 +1301,10 @@ class _ExerciseDetailsSheet extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFFFE5D33),
+                        side: const BorderSide(color: Color(0xFFFE5D33)),
+                      ),
                       icon: const Icon(Icons.delete_outline),
                       label: Text(l10n.buttonDeleteExercise),
                       onPressed: () {

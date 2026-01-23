@@ -27,6 +27,7 @@ import 'package:fit_app/l10n/app_localizations.dart';
 import 'package:fit_app/presentation/providers/locale_controller.dart';
 import 'package:fit_app/presentation/providers/theme_controller.dart';
 import 'package:fit_app/presentation/scaffold_messenger_key.dart';
+import 'package:fit_app/presentation/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -481,53 +482,58 @@ class _HomePageState extends State<HomePage> {
     final size = MediaQuery.of(context).size;
     final panelWidth = size.width < 480 ? size.width * 0.85 : 360.0;
     final themeController = context.read<ThemeController>();
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isDark = themeController.isDark;
-    final panelShape = RoundedRectangleBorder(
-      borderRadius: const BorderRadius.horizontal(
-        right: Radius.circular(24),
-      ),
-      side: isDark
-          ? const BorderSide(color: Colors.white, width: 2)
-          : BorderSide.none,
-    );
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
       barrierLabel: l10n.dashboardTitle,
-      barrierColor: colorScheme.scrim.withValues(alpha: 0.54),
+      barrierColor: Theme.of(context).colorScheme.scrim.withValues(alpha: 0.54),
       transitionDuration: const Duration(milliseconds: 250),
       pageBuilder: (context, animation, secondaryAnimation) {
-        return Align(
-          alignment: Alignment.centerLeft,
-          child: SafeArea(
-            child: SizedBox(
-              width: panelWidth,
-              height: double.infinity,
-              child: Material(
-                color: colorScheme.surface,
-                elevation: 12,
-                clipBehavior: Clip.antiAlias,
-                shape: panelShape,
-                child: Theme(
-                  data: _withDarkSurface(context),
-                  child: _DashboardSheet(
-                    onClose: () => Navigator.of(context).pop(),
-                    onOpenCategories: () {
-                      Navigator.of(context).pop();
-                      _openCategoriesSheet();
-                    },
-                    onOpenHistory: () {
-                      Navigator.of(context).pop();
-                      _openHistorySheet();
-                    },
-                    onToggleTheme: themeController.toggleTheme,
+        return Consumer<ThemeController>(
+          builder: (context, themeController, _) {
+            final isDark = themeController.isDark;
+            final themeData =
+                isDark ? AppTheme.darkTheme : AppTheme.lightTheme;
+            final colorScheme = themeData.colorScheme;
+            final panelShape = RoundedRectangleBorder(
+              borderRadius: const BorderRadius.horizontal(
+                right: Radius.circular(24),
+              ),
+              side: isDark
+                  ? const BorderSide(color: Colors.white, width: 2)
+                  : BorderSide.none,
+            );
+            return Theme(
+              data: themeData,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: SafeArea(
+                  child: SizedBox(
+                    width: panelWidth,
+                    height: double.infinity,
+                    child: Material(
+                      color: colorScheme.surface,
+                      elevation: 12,
+                      clipBehavior: Clip.antiAlias,
+                      shape: panelShape,
+                      child: _DashboardSheet(
+                        onClose: () => Navigator.of(context).pop(),
+                        onOpenCategories: () {
+                          Navigator.of(context).pop();
+                          _openCategoriesSheet();
+                        },
+                        onOpenHistory: () {
+                          Navigator.of(context).pop();
+                          _openHistorySheet();
+                        },
+                        onToggleTheme: themeController.toggleTheme,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
       transitionBuilder: (context, animation, secondaryAnimation, child) {
@@ -584,6 +590,11 @@ class _HomePageState extends State<HomePage> {
     final localeController = context.watch<LocaleController>();
     final isDarkTheme = context.watch<ThemeController>().isDark;
     final currentLocaleCode = localeController.locale?.languageCode;
+    final theme = Theme.of(context);
+    final filterColor =
+        isDarkTheme ? theme.colorScheme.surface : const Color(0xFF352029);
+    final filterTextColor =
+        isDarkTheme ? theme.colorScheme.onSurface : theme.scaffoldBackgroundColor;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -637,9 +648,22 @@ class _HomePageState extends State<HomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TextField(
+                  style: TextStyle(color: filterTextColor),
                   decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.search),
+                    prefixIcon: Icon(Icons.search, color: filterTextColor),
                     hintText: l10n.searchHint,
+                    hintStyle: TextStyle(color: filterTextColor),
+                    filled: true,
+                    fillColor: filterColor,
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(color: filterColor),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: filterColor),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: filterColor, width: 2),
+                    ),
                   ),
                   onChanged: _onSearchChanged,
                 ),
@@ -652,6 +676,11 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       OutlinedButton.icon(
                         onPressed: _openMusclesOverlay,
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: filterTextColor,
+                          backgroundColor: filterColor,
+                          side: BorderSide(color: filterColor),
+                        ),
                         icon: const Icon(Icons.fitness_center),
                         label: Text(
                           _selectedMuscleIds.isEmpty
@@ -666,6 +695,11 @@ class _HomePageState extends State<HomePage> {
                           _usesWeightsFilter == false,
                         ],
                         borderRadius: BorderRadius.circular(8),
+                        color: const Color(0xFF352029),
+                        selectedColor: filterTextColor,
+                        fillColor: filterColor,
+                        borderColor: filterColor,
+                        selectedBorderColor: filterColor,
                         onPressed: (index) {
                           setState(() {
                             if (index == 0) {

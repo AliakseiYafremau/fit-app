@@ -102,8 +102,8 @@ class _HomePageState extends State<HomePage> {
     setState(() => _selectedIndex = index);
     _pageController.animateToPage(
       index,
-      duration: const Duration(milliseconds: 250),
-      curve: Curves.easeInOut,
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeInOutCubicEmphasized,
     );
   }
 

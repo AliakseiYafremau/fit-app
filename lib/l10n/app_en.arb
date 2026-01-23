@@ -10,6 +10,7 @@
   "dashboardTitle": "",
   "dashboardCategories": "Categories",
   "dashboardMuscles": "Muscles",
+  "dashboardThemeToggle": "Switch theme",
   "historyViewList": "List",
   "historyViewCalendar": "Calendar",
   "noWorkouts": "No workouts yet",

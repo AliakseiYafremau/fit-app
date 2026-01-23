@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static ThemeData get darkTheme {
+  static ThemeData get lightTheme {
     const buttonColor = Color(0xFFFE5D33);
     final colorScheme = ColorScheme.fromSeed(
       seedColor: buttonColor,
@@ -9,6 +9,9 @@ class AppTheme {
     ).copyWith(
       primary: buttonColor,
       onPrimary: Colors.white,
+      surface: const Color(0xFF352029),
+      onSurface: Colors.white,
+      outline: buttonColor,
     );
     return ThemeData(
       colorScheme: colorScheme,
@@ -57,6 +60,95 @@ class AppTheme {
         borderColor: buttonColor,
         selectedBorderColor: buttonColor,
       ),
+      useMaterial3: true,
+    );
+  }
+
+  static ThemeData get darkTheme {
+    const backgroundColor = Colors.black;
+    const foregroundColor = Colors.white;
+    const solidButtonColor = Colors.white;
+    const onSolidButtonColor = Colors.black;
+    const outlineColor = Colors.white;
+    const colorScheme = ColorScheme.dark(
+      primary: solidButtonColor,
+      onPrimary: onSolidButtonColor,
+      secondary: solidButtonColor,
+      onSecondary: onSolidButtonColor,
+      surface: backgroundColor,
+      onSurface: foregroundColor,
+      outline: outlineColor,
+    );
+    return ThemeData(
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: backgroundColor,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+      ),
+      cardColor: backgroundColor,
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: solidButtonColor,
+          foregroundColor: onSolidButtonColor,
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: solidButtonColor,
+          foregroundColor: onSolidButtonColor,
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: outlineColor,
+          side: const BorderSide(color: outlineColor),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: foregroundColor,
+        ),
+      ),
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(
+          foregroundColor: foregroundColor,
+        ),
+      ),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+          side: BorderSide(color: outlineColor, width: 2),
+        ),
+      ),
+      toggleButtonsTheme: ToggleButtonsThemeData(
+        color: foregroundColor,
+        selectedColor: onSolidButtonColor,
+        fillColor: solidButtonColor,
+        borderColor: outlineColor,
+        selectedBorderColor: outlineColor,
+      ),
+      inputDecorationTheme: const InputDecorationTheme(
+        filled: true,
+        fillColor: backgroundColor,
+        border: OutlineInputBorder(
+          borderSide: BorderSide(color: outlineColor),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: outlineColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: outlineColor, width: 2),
+        ),
+        hintStyle: TextStyle(color: Color(0xFFBDBDBD)),
+      ),
+      iconTheme: const IconThemeData(color: foregroundColor),
+      dividerColor: outlineColor,
+      textTheme: ThemeData.dark()
+          .textTheme
+          .apply(bodyColor: foregroundColor, displayColor: foregroundColor),
       useMaterial3: true,
     );
   }

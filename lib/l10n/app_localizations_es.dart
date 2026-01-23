@@ -39,6 +39,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dashboardMuscles => 'Músculos';
 
   @override
+  String get dashboardThemeToggle => 'Cambiar tema';
+
+  @override
   String get historyViewList => 'Lista';
 
   @override

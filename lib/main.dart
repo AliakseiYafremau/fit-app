@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:fit_app/adapters/models.dart';
 import 'package:fit_app/presentation/providers/locale_controller.dart';
+import 'package:fit_app/presentation/providers/theme_controller.dart';
 import 'package:fit_app/presentation/scaffold_messenger_key.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -66,9 +67,13 @@ class FitApp extends StatelessWidget {
           create: (_) =>
               LocaleController(sharedPreferences, initialLocale),
         ),
+        ChangeNotifierProvider(
+          create: (_) => ThemeController(),
+        ),
       ],
-      child: Consumer<LocaleController>(
-        builder: (context, localeController, _) => MaterialApp(
+      child: Consumer2<LocaleController, ThemeController>(
+        builder: (context, localeController, themeController, _) =>
+            MaterialApp(
           onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
           localizationsDelegates: const [
             AppLocalizations.delegate,
@@ -79,7 +84,10 @@ class FitApp extends StatelessWidget {
           supportedLocales: AppLocalizations.supportedLocales,
           locale: localeController.locale,
           scaffoldMessengerKey: rootScaffoldMessengerKey,
-          theme: AppTheme.darkTheme,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode:
+              themeController.isDark ? ThemeMode.dark : ThemeMode.light,
           debugShowCheckedModeBanner: false,
           home: const HomePage(),
         ),

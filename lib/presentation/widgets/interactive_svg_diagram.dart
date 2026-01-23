@@ -344,6 +344,25 @@ const List<_MuscleRegion> _muscleRegions = <_MuscleRegion>[
         Offset(0.07, 0.025),
       ]),
     ]),
+  _MuscleRegion(
+    id: 'trapezius',
+    label: 'Trapezius',
+    shapes: <_RegionShape>[
+      _RegionShape(
+        alignment: Alignment(0, -0.41),
+        rotationDegrees: 0,
+        points: <Offset>[
+          Offset(0, 0),
+          Offset(0.06, -0.005),
+          Offset(0.125, 0.02),
+          Offset(0.09, 0.05),
+          Offset(-0.09, 0.05),
+          Offset(-0.125, 0.02),
+          Offset(-0.06, -0.005),
+        ],
+      ),
+    ],
+  ),
   _MuscleRegion(id: 'triceps', label: 'Triceps', shapes: <_RegionShape>[
     _RegionShape(
       alignment: Alignment(-0.44, -0.23),
